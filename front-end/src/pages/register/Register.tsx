@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { FilesUploader } from '../../components';
+import { FilesUploader, LabeledInput, LabeledSelect, PrimaryButton } from '../../components';
 
 const Register = () => {
   return (
@@ -13,74 +13,41 @@ const Register = () => {
 
       <div className="col-md-6 offset-md-3 col-sm-8 offset-sm-2 col-12">
         <form>
-          <div>
-            <label htmlFor="username">
-              Username
-              <input
-                id="username"
-                minLength={5}
-                name="username"
-                type="text"
-                placeholder="Enter username"
-                required
-              />
-            </label>
-          </div>
+          <LabeledInput
+            minLength={5}
+            name="username"
+            type="text"
+            placeholder="Enter username"
+            required={true}
+          />
 
           <FilesUploader accept=".jpg, .jpeg, .png" />
 
-          <div>
-            <label htmlFor="email">
-              E-mail
-              <input id="email" name="email" type="email" placeholder="Enter e-mail" required />
-            </label>
-          </div>
+          <LabeledInput
+            minLength={5}
+            name="email"
+            type="email"
+            placeholder="Enter e-mail"
+            required={true}
+          />
 
-          <div>
-            <label htmlFor="password">
-              Password
-              <input
-                id="password"
-                minLength={6}
-                name="password"
-                type="password"
-                placeholder="Enter password"
-                required
-              />
-            </label>
-          </div>
+          <LabeledInput
+            name="password"
+            placeholder="Enter password"
+            required={true}
+            type="password"
+          />
 
-          <div>
-            <label htmlFor="repeat-password">
-              Repeat password
-              <input
-                id="repeat-password"
-                minLength={6}
-                name="password"
-                type="password"
-                placeholder="Repeat password"
-                required
-              />
-            </label>
-          </div>
+          <LabeledInput
+            name="password"
+            placeholder="Repeat password"
+            required={true}
+            type="password"
+          />
 
-          <div>
-            <label htmlFor="role">
-              Role
-              <select name="role" id="role"></select>
-            </label>
-          </div>
+          <LabeledSelect label="Role" name="role" />
 
-          <div>
-            <button
-              className="btn btn-primary"
-              id="user-creator__action-button"
-              type="button"
-              disabled
-            >
-              Create
-            </button>
-          </div>
+          <PrimaryButton name="Create" disabled={true} />
         </form>
       </div>
     </div>

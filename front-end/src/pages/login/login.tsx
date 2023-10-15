@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { LabeledInput } from "../../components"
+import { LabeledInput, PrimaryButton } from '../../components';
 
 const Login = () => {
   return (
-    <div className="row">
+    <div className="row h-100">
       <div className="col-md-6 offset-md-3 col-sm-8 offset-sm-2 col-12">
         <header>
           <h1>Login</h1>
@@ -14,31 +14,23 @@ const Login = () => {
 
       <div className="col-md-6 offset-md-3 col-sm-8 offset-sm-2 col-12">
         <form>
-          <div>
-            <LabeledInput
-                minLength={5}
-                name="username"
-                type="text"
-                placeholder="Enter username"
-                required={true}
-            />
-          </div>
+          <LabeledInput
+            minLength={5}
+            name="username"
+            type="text"
+            placeholder="Enter username"
+            required={true}
+          />
 
-          <div>
-            <LabeledInput
-                minLength={5}
-                name="password"
-                placeholder="Enter password"
-                required={true}
-                type="password"
-            />
-          </div>
+          <LabeledInput
+            minLength={5}
+            name="password"
+            placeholder="Enter password"
+            required={true}
+            type="password"
+          />
 
-          <div>
-            <button className="btn btn-primary" id="login__action-button" type="button" disabled>
-              Log in
-            </button>
-          </div>
+          <PrimaryButton name="Log In" disabled={true} />
         </form>
 
         <div className="col-sm-12">
