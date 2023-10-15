@@ -1,0 +1,48 @@
+@import '../colors.scss';
+
+form {
+    padding-bottom: 16px;
+    padding-top: 29px;
+
+    button, label {
+        @media (min-width: 768px) {
+            max-width: 496px;
+        }
+        
+        width: 100%;
+    }
+
+    label, label > input, label > select, label > textarea {
+        margin: 8px 0;
+    }
+    
+    button, label > input, label > select, label > textarea {
+        padding: 16px !important;
+        width: 100%;
+    }
+    
+    label:has(input[type="checkbox"]) {
+        display: grid;
+        grid-auto-flow: column;
+    }
+    
+    input, form textarea, form select {
+        border: 1px solid $gray-2 !important;
+        border-radius: 8px;
+        color: $gray-4;
+    }
+    
+    textarea {
+        max-height: 200px;
+        min-height: 100px;
+        resize: vertical;
+    }
+    
+    button.btn-primary {
+        margin-top: 56px;
+    }
+}
+
+input[type="checkbox"]:checked {
+    accent-color: $primary-color;
+}

@@ -1,15 +1,16 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Login = () => {
   return (
     <div className="row content">
-      <div className="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-12">
+      <div className="col-md-6 offset-md-3 col-sm-8 offset-sm-2 col-12">
         <header>
           <h1>Login</h1>
         </header>
       </div>
 
-      <div className="col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2 col-12">
+      <div className="col-md-6 offset-md-3 col-sm-8 offset-sm-2 col-12">
         <form>
           <div>
             <label htmlFor="username">
@@ -47,9 +48,7 @@ const Login = () => {
         </form>
 
         <div className="col-sm-12">
-          <a className="login__forgot-password" href="forgot-password">
-            Forgot password?
-          </a>
+          <Link to="/forgot-password">Forgot password?</Link>
         </div>
       </div>
     </div>

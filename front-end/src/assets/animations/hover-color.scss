@@ -1,0 +1,11 @@
+@import '../colors.scss';
+
+@keyframes hover-color {
+    from {
+      border-color: $gray-3;
+    }
+
+    to {
+      border-color: $primary-color;
+    }
+}
