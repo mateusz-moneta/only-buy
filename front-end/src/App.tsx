@@ -1,6 +1,8 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Layout from "./layout";
-import Login from "./pages/login/login"
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+import Layout from './Layout';
+import Login from './pages/login/Login';
 
 import './App.scss';
 
