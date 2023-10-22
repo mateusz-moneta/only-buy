@@ -1,23 +1,19 @@
+import { Epic, combineEpics, ofType } from 'redux-observable';
 import { Observable } from 'rxjs';
-import { combineEpics, ofType } from 'redux-observable';
-import { catchError, exhaustMap, map } from 'rxjs/operators';
 import { ajax } from 'rxjs/ajax';
-import { Action } from 'redux';
+import { catchError, exhaustMap, map } from 'rxjs/operators';
 
-import { LOGIN_USER, loginUserFail, loginUserSuccess } from "./auth.actions";
+import { AuthAction, LOGIN_USER, LoginUser, loginUserFail, loginUserSuccess } from "./auth.actions";
 import { LoginErrorPayload, LoginPayload } from './models';
 
-const loginUser$ = (action$: Observable<Action>) =>
+const loginUser$ = (action$: ActionsObservable<AuthAction>): Epic<AuthAction> =>
     action$
         .pipe(
             ofType(LOGIN_USER),
-            exhaustMap(({ payload }: Action extends { payload?: any }) =>
+            exhaustMap(({ payload }: AuthAction) =>
                 ajax.getJSON<LoginPayload>('https://api.github.com/users/burczu/repos')
                     .pipe(
-                        map((payload: LoginPayload) => loginUserSuccess(payload)),
-                        catchError((error: string) => loginUserFail({
-                            error
-                        }))
+                        map((payload: LoginPayload) => loginUserSuccess(payload))
                     )
         );
 

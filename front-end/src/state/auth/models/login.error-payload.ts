@@ -1,3 +1,3 @@
 export interface LoginErrorPayload {
-    error: string;
+  error: string;
 }

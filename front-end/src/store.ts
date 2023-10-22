@@ -6,11 +6,8 @@ import rootEffects from './state/root.effects';
 
 const effectsMiddleware = createEpicMiddleware();
 
-const store = createStore(
-    rootReducer,
-    applyMiddleware(effectsMiddleware)
-);
+const store = createStore(rootReducer, applyMiddleware(effectsMiddleware));
 
-effectsMiddleware.run(rootEffects)
+effectsMiddleware.run(rootEffects);
 
 export default store;
