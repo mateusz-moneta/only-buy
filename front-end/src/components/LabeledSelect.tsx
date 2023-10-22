@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const LabeledSelect = ({ label, name }: { label: string, name: string }) => {
+export const LabeledSelect = ({ label, name }: { label: string; name: string }) => {
   return (
     <label htmlFor={name}>
       {label}

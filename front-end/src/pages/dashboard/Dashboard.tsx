@@ -11,20 +11,17 @@ const Dashboard = () => {
 
         <div className="col-md-3 col-sm-4 col-6 dashboard__menu-checkboxes">
           <div>
-            <input id="active" name="active" type="checkbox" checked />
+            <input name="active" type="checkbox" checked />
             <label htmlFor="active">Active</label>
           </div>
 
           <div>
-            <input id="promo" name="promo" type="checkbox" />
+            <input name="promo" type="checkbox" />
             <label htmlFor="promo">Promo</label>
           </div>
         </div>
 
-        <div
-          className="col-md-offset-2 col-md-2 col-sm-offset-1 col-sm-1 col-6"
-          id="dashboard__dropdown"
-        ></div>
+        <div className="col-md-offset-2 col-md-2 col-sm-offset-1 col-sm-1 col-6"></div>
       </div>
 
       <div className="row dashboard__content">
