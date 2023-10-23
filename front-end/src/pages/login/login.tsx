@@ -1,16 +1,47 @@
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
+import type { Dispatch } from 'redux';
 
 import { LabeledInput, PrimaryButton } from '../../components';
+import { loginUser } from '../../state';
+import { LoginRequestPayload } from '../../state/auth/models';
 
 const Login = () => {
+  const [inputs, setInputs] = useState({
+    username: {
+      value: '',
+      valid: false
+    },
+    password: {
+      value: '',
+      valid: false
+    }
+  });
+  const dispatch: Dispatch = useDispatch();
+
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    console.log(event.target.value);
+    const {
+      name,
+      value,
+      validity: { valid }
+    } = event.target;
+
+    setInputs((values) => ({
+      ...values,
+      [name]: {
+        value,
+        valid
+      }
+    }));
   };
 
-  const handleSubmit = () => {
-    console.log('');
-  };
+  const handleSubmit = () =>
+    dispatch(
+      loginUser({
+        username: inputs.username.value
+      } as LoginRequestPayload)
+    );
 
   return (
     <div className="row h-100">
@@ -24,6 +55,7 @@ const Login = () => {
         <form>
           <LabeledInput
             change={handleChange}
+            label="Username"
             minLength={5}
             name="username"
             type="text"
@@ -32,15 +64,21 @@ const Login = () => {
           />
 
           <LabeledInput
+            autoComplete="on"
             change={handleChange}
-            minLength={5}
+            label="Password"
+            minLength={8}
             name="password"
             placeholder="Enter password"
             required={true}
             type="password"
           />
 
-          <PrimaryButton click={handleSubmit} name="Log In" disabled={true} />
+          <PrimaryButton
+            click={handleSubmit}
+            disabled={Object.values(inputs).some(({ valid }) => !valid)}
+            name="Log In"
+          />
         </form>
 
         <div className="col-sm-12">

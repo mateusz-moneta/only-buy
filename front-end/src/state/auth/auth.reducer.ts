@@ -32,6 +32,24 @@ export const authReducer = (state: AuthState = authInitialState, action: AuthAct
         processing: false
       };
 
+    case Actions.REGISTER_USER:
+      return {
+        ...state,
+        processing: true
+      };
+
+    case Actions.REGISTER_USER_SUCCESS:
+      return {
+        ...state,
+        processing: false
+      };
+
+    case Actions.REGISTER_USER_FAIL:
+      return {
+        ...state,
+        processing: false
+      };
+
     default:
       return state;
   }

@@ -6,7 +6,7 @@ export const PrimaryButton = ({
   name
 }: {
   click: () => void;
-  disabled: boolean;
+  disabled?: boolean;
   name: string;
 }) => {
   return (

@@ -1,10 +1,18 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 
-export const LabeledSelect = ({ label, name }: { label: string; name: string }) => {
+export const LabeledSelect = ({
+  change,
+  label,
+  name
+}: {
+  change: (event: ChangeEvent<HTMLSelectElement>) => void;
+  label: string;
+  name: string;
+}) => {
   return (
     <label htmlFor={name}>
       {label}
-      <select name={name}></select>
+      <select onChange={change} name={name}></select>
     </label>
   );
 };
