@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 
 export const LabeledInput = ({
+  change,
   minLength,
   name,
   placeholder,
   required = false,
   type = 'text'
 }: {
+  change: (event: ChangeEvent<HTMLInputElement>) => void;
   minLength?: number;
   name: string;
   placeholder: string;
@@ -17,6 +19,7 @@ export const LabeledInput = ({
     <label htmlFor={name}>
       Username
       <input
+        onChange={(event) => change(event)}
         minLength={minLength}
         name={name}
         type={type}

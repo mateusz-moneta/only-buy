@@ -1,8 +1,16 @@
 import React from 'react';
 
-export const PrimaryButton = ({ disabled = false, name }: { disabled: boolean; name: string }) => {
+export const PrimaryButton = ({
+  click,
+  disabled = false,
+  name
+}: {
+  click: () => void;
+  disabled: boolean;
+  name: string;
+}) => {
   return (
-    <button className="btn btn-primary" disabled={disabled} type="button">
+    <button onClick={click} className="btn btn-primary" disabled={disabled} type="button">
       {name}
     </button>
   );

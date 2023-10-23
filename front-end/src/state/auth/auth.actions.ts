@@ -1,44 +1,46 @@
-import { LoginPayload, LoginErrorPayload, LoginRequestPayload } from './models';
+import { LoginFailPayload, LoginSuccessPayload, LoginRequestPayload } from './models';
 
-export const LOGIN_USER = 'LOGIN_USER';
-export const LOGIN_USER_SUCCESS = 'LOGIN_USER_SUCCESS';
-export const LOGIN_USER_FAIL = 'LOGIN_USER_FAIL';
+const LOGIN_USER = 'LOGIN_USER';
+const LOGIN_USER_SUCCESS = 'LOGIN_USER_SUCCESS';
+const LOGIN_USER_FAIL = 'LOGIN_USER_FAIL';
 
-export type LOGIN_USER = typeof LOGIN_USER;
-export type LOGIN_USER_SUCCESS = typeof LOGIN_USER_SUCCESS;
-export type LOGIN_USER_FAIL = typeof LOGIN_USER_FAIL;
+export const Actions = {
+  LOGIN_USER,
+  LOGIN_USER_SUCCESS,
+  LOGIN_USER_FAIL
+};
 
-export interface LoginUser {
-  type: LOGIN_USER;
+export interface LoginUserAction {
+  type: typeof LOGIN_USER;
   payload: LoginRequestPayload;
 }
 
-export interface LoginUserSuccess {
-  type: LOGIN_USER_SUCCESS;
-  payload: LoginPayload;
+export interface LoginUserSuccessAction {
+  type: typeof LOGIN_USER_SUCCESS;
+  payload: LoginSuccessPayload;
 }
 
-export interface LoginUserFail {
-  type: LOGIN_USER_FAIL;
-  payload: LoginPayload;
+export interface LoginUserFailAction {
+  type: typeof LOGIN_USER_FAIL;
+  payload: LoginFailPayload;
 }
 
-export const loginUser = (payload: LoginRequestPayload) => ({
+export const loginUser = (payload: LoginRequestPayload): LoginUserAction => ({
   type: LOGIN_USER,
   payload
 });
 
-export const loginUserSuccess = (payload: LoginPayload) => ({
+export const loginUserSuccess = (payload: LoginSuccessPayload): LoginUserSuccessAction => ({
   type: LOGIN_USER_SUCCESS,
   payload
 });
 
-export const loginUserFail = (payload: LoginErrorPayload) => ({
+export const loginUserFail = (payload: LoginFailPayload): LoginUserFailAction => ({
   type: LOGIN_USER_FAIL,
   payload
 });
 
-export type AuthAction = LoginUser | LoginUserSuccess | LoginUserFail;
+export type AuthAction = LoginUserAction | LoginUserSuccessAction | LoginUserFailAction;
 
 export default {
   loginUser,

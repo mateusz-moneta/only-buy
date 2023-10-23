@@ -3,6 +3,14 @@ import React from 'react';
 import { FilesUploader, LabeledInput, LabeledSelect, PrimaryButton } from '../../components';
 
 const Register = () => {
+  const handleChange = () => {
+    console.log('');
+  };
+
+  const handleSubmit = () => {
+    console.log('');
+  };
+
   return (
     <div className="row">
       <div className="col-md-6 offset-md-3 col-sm-8 offset-sm-2 col-12">
@@ -14,6 +22,7 @@ const Register = () => {
       <div className="col-md-6 offset-md-3 col-sm-8 offset-sm-2 col-12">
         <form>
           <LabeledInput
+            change={handleChange}
             minLength={5}
             name="username"
             type="text"
@@ -24,6 +33,7 @@ const Register = () => {
           <FilesUploader accept=".jpg, .jpeg, .png" />
 
           <LabeledInput
+            change={handleChange}
             minLength={5}
             name="email"
             type="email"
@@ -32,6 +42,7 @@ const Register = () => {
           />
 
           <LabeledInput
+            change={handleChange}
             name="password"
             placeholder="Enter password"
             required={true}
@@ -39,6 +50,7 @@ const Register = () => {
           />
 
           <LabeledInput
+            change={handleChange}
             name="password"
             placeholder="Repeat password"
             required={true}
@@ -47,7 +59,7 @@ const Register = () => {
 
           <LabeledSelect label="Role" name="role" />
 
-          <PrimaryButton name="Create" disabled={true} />
+          <PrimaryButton click={handleSubmit} name="Create" disabled={true} />
         </form>
       </div>
     </div>

@@ -1,32 +1,32 @@
-import { AuthAction, LOGIN_USER, LOGIN_USER_FAIL, LOGIN_USER_SUCCESS } from './auth.actions';
+import { Actions, AuthAction } from './auth.actions';
 import { User } from './models';
 
-interface AuthState {
+export interface AuthState {
   user: User | null;
   processing: boolean;
 }
 
-const initialState: AuthState = {
+export const authInitialState: AuthState = {
   user: null,
   processing: false
 };
 
-export const authReducer = (state: AuthState = initialState, { payload, type }: AuthAction) => {
-  switch (type) {
-    case LOGIN_USER:
+export const authReducer = (state: AuthState = authInitialState, action: AuthAction) => {
+  switch (action.type) {
+    case Actions.LOGIN_USER:
       return {
         ...state,
         processing: true
       };
 
-    case LOGIN_USER_SUCCESS:
+    case Actions.LOGIN_USER_SUCCESS:
       return {
         ...state,
-        user: payload,
+        user: action.payload,
         processing: false
       };
 
-    case LOGIN_USER_FAIL:
+    case Actions.LOGIN_USER_FAIL:
       return {
         ...state,
         processing: false

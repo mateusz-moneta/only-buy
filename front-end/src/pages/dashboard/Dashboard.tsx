@@ -1,7 +1,11 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
-const Dashboard = () => {
+const Dashboard = ({ user }: { user: { username: string } | null }) => {
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
   return (
     <>
       <div className="row dashboard__menu">
