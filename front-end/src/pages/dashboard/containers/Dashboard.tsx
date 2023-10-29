@@ -56,7 +56,7 @@ const Dashboard = ({ user }: { user: User | null }) => {
       {products.length ? (
         <div className="row">
           {products.map((product: ProductModel) => (
-            <div className="col-md-4 col-sm-6 col-12">
+            <div className="col-md-4 col-sm-6 col-12" key={product.productId}>
               <Product product={product} />
             </div>
           ))}
