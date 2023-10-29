@@ -1,0 +1,33 @@
+@import '../assets/colors.scss';
+
+button {
+    border: none;
+    font-size: 1.4rem;
+    outline: none;
+
+    &.primary {
+        background-color: $primary-color;
+        color: $white;
+    
+        &:disabled {
+            background-color: $gray-4;
+        }
+        
+        &:hover {
+            background-color: $secondary-color;
+        }
+    }
+    
+    &.secondary {
+        background-color: $white;
+        color: $primary-color;
+    
+        &:disabled {
+            color: $gray-4;
+        }
+    
+        &:hover {
+            color: $secondary-color;
+        }
+    }
+}

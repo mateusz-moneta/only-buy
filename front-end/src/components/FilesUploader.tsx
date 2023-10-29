@@ -1,19 +1,61 @@
-import React from 'react';
+import React, { ChangeEvent, useState } from 'react';
 
-export const FilesUploader = ({ accept }: { accept: string }) => {
+import { Button } from './Button';
+
+import './FilesUploader.scss';
+
+export const FilesUploader = ({
+  accept,
+  change,
+  chooseImageMessage = 'Choose image for avatar to upload (PNG, JPG)',
+  emptyMessage = 'No file currently selected for upload',
+  multiple = false,
+  name,
+  placeholder = 'Select file'
+}: {
+  accept: string;
+  change: (event: ChangeEvent<HTMLInputElement>) => void;
+  chooseImageMessage?: string;
+  emptyMessage?: string;
+  multiple?: boolean;
+  name: string;
+  placeholder?: string;
+}) => {
+  const [files, setFiles] = useState<FileList | null>(null);
+  const inputRef = React.createRef<HTMLInputElement>();
+
   return (
-    <>
-      <label htmlFor="image">Choose image for avatar to upload (PNG, JPG)</label>
+    <div className="files-uploader">
+      <label htmlFor="image">{chooseImageMessage}</label>
 
-      <button className="btn btn-secondary" type="button">
-        Select file
-      </button>
+      <Button click={() => inputRef.current?.click()} theme="secondary">
+        {placeholder}
+      </Button>
 
-      <input accept={accept} className="d-none" id="image" name="image" type="file" />
+      <input
+        ref={inputRef}
+        onChange={(event: ChangeEvent<HTMLInputElement>) => {
+          change(event);
+          setFiles(event.target.files);
+        }}
+        accept={accept}
+        className="d-none"
+        multiple={multiple}
+        name={name}
+        type="file"
+      />
 
-      <div className="preview">
-        <p>No file currently selected for upload</p>
-      </div>
-    </>
+      {files?.length ? (
+        <div className="files-uploader__files">
+          {Array.from(files).map((file: File) => (
+            <img className="w-100" key={file.name} src={URL.createObjectURL(file)} />
+          ))}
+        </div>
+      ) : (
+        <div className="files-uploader__preview">
+          <p>{emptyMessage}</p>
+        </div>
+      )}
+    </div>
   );
 };

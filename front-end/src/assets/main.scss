@@ -1,10 +1,13 @@
 @import './animations/hover-color.scss';
 
-@import './components/button.scss';
 @import './components/form.scss';
 @import './components/table.scss';
 
-html, body, #root, .container { 
+html {
+    font-size: 10px;
+}
+
+html, body, #root, .container, .container-fluid { 
     height: 100%;
 }
 
@@ -34,4 +37,9 @@ header > img {
 .responsive-table-container {
     overflow-x: auto;
     padding: 5px;
+}
+
+.link {
+    color: $gray-4;
+    font-size: 1.4rem;
 }

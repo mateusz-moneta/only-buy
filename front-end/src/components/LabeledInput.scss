@@ -1,0 +1,12 @@
+@import '../assets/colors.scss';
+
+.labeled-input {
+    color: $black;
+    font-size: 1.4rem;
+    font-weight: 700;
+
+    > input {
+        color: $gray-1;
+        font-weight: 500;
+    }
+}

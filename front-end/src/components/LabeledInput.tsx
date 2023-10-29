@@ -1,5 +1,7 @@
 import React, { ChangeEvent } from 'react';
 
+import './LabeledInput.scss';
+
 export const LabeledInput = ({
   autoComplete = 'off',
   change,
@@ -20,10 +22,10 @@ export const LabeledInput = ({
   type: string;
 }) => {
   return (
-    <label htmlFor={name}>
+    <label className="labeled-input" htmlFor={name}>
       {label}
       <input
-        onChange={(event) => change(event)}
+        onChange={(event: ChangeEvent<HTMLInputElement>) => change(event)}
         minLength={minLength}
         name={name}
         type={type}

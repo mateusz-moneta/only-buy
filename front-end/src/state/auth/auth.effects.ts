@@ -4,12 +4,12 @@ import { Observable } from 'rxjs';
 import { ajax } from 'rxjs/ajax';
 import { catchError, map, switchMap } from 'rxjs/operators';
 
-import { Actions, loginUserFail, loginUserSuccess, registerUserSuccess } from './auth.actions';
+import { AuthActions, loginUserFail, loginUserSuccess, registerUserSuccess } from './auth.actions';
 import { LoginSuccessPayload, RegisterSuccessPayload } from './models';
 
 const loginUser$ = (action$: Observable<Action<any>>) =>
   action$.pipe(
-    ofType(Actions.LOGIN_USER),
+    ofType(AuthActions.LOGIN_USER),
     switchMap(() =>
       ajax
         .getJSON('https://api.github.com/users?per_page=5')
@@ -19,7 +19,7 @@ const loginUser$ = (action$: Observable<Action<any>>) =>
 
 const registerUser$ = (action$: Observable<Action<any>>) =>
   action$.pipe(
-    ofType(Actions.LOGIN_USER),
+    ofType(AuthActions.REGISTER_USER),
     switchMap(() =>
       ajax
         .getJSON('https://api.github.com/users?per_page=5')

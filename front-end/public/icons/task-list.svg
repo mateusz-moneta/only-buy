@@ -1,0 +1,8 @@
+<svg width="38" height="48" viewBox="0 0 38 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g id="Group">
+        <g id="task-list-plain">
+            <path id="Shape" fill-rule="evenodd" clip-rule="evenodd" d="M26.5 9.02197H34C35.6569 9.02197 37 10.3651 37 12.022V43.522C37 45.1788 35.6569 46.522 34 46.522H4C2.34315 46.522 1 45.1788 1 43.522V12.022C1 10.3651 2.34315 9.02197 4 9.02197H11.5C11.5 4.87984 14.8579 1.52197 19 1.52197C23.1421 1.52197 26.5 4.87984 26.5 9.02197Z" stroke="#B9BDCF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path id="Shape_2" d="M19 7.52197C19.4142 7.52197 19.75 7.85776 19.75 8.27197C19.75 8.68619 19.4142 9.02197 19 9.02197C18.5858 9.02197 18.25 8.68619 18.25 8.27197C18.25 7.85776 18.5858 7.52197 19 7.52197" stroke="#B9BDCF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </g>
+    </g>
+</svg>

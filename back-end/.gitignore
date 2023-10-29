@@ -2,6 +2,7 @@
 
 # environment
 .env
+Dockerfile
 
 # dependencies
 /node_modules
