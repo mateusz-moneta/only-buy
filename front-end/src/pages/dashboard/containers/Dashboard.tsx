@@ -4,9 +4,15 @@ import { Navigate } from 'react-router-dom';
 import { Dispatch } from 'redux';
 
 import { Checkbox } from '../../../components';
-import { EmptyProducts } from '../components';
-import { selectActive, selectPromo, toggleActive, togglePromo } from '../../../state';
-import { User } from '../../../models';
+import { EmptyProducts, Product } from '../components';
+import {
+  selectActive,
+  selectProducts,
+  selectPromo,
+  toggleActive,
+  togglePromo
+} from '../../../state';
+import { Product as ProductModel, User } from '../../../models';
 
 import './Dashboard.scss';
 
@@ -16,6 +22,7 @@ const Dashboard = ({ user }: { user: User | null }) => {
   } */
 
   const active = useSelector(selectActive);
+  const products = useSelector(selectProducts);
   const promo = useSelector(selectPromo);
 
   const dispatch: Dispatch = useDispatch();
@@ -46,9 +53,19 @@ const Dashboard = ({ user }: { user: User | null }) => {
         <div className="col-md-offset-2 col-md-2 col-sm-offset-1 col-sm-1 col-6"></div>
       </header>
 
-      <div className="align-items-center d-flex flex-grow-1 justify-content-center row">
-        <EmptyProducts />
-      </div>
+      {products.length ? (
+        <div className="row">
+          {products.map((product: ProductModel) => (
+            <div className="col-md-4 col-sm-6 col-12">
+              <Product product={product} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="align-items-center d-flex flex-grow-1 justify-content-center row">
+          <EmptyProducts />
+        </div>
+      )}
     </div>
   );
 };
