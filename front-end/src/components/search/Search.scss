@@ -1,0 +1,10 @@
+@import '../../assets/colors.scss';
+
+.checkbox {
+  display: grid;
+  font-size: 1.6rem;
+  font-weight: bold;
+  gap: 0.5rem;
+  grid-template-columns: 1rem auto;
+  line-height: 1.1;
+}

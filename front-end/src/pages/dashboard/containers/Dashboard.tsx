@@ -3,10 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 import { Dispatch } from 'redux';
 
-import { Checkbox } from '../../components';
-import { EmptyProducts } from './components';
-import { selectActive, selectPromo, toggleActive, togglePromo } from '../../state';
-import { User } from '../../models';
+import { Checkbox } from '../../../components';
+import { EmptyProducts } from '../components';
+import { selectActive, selectPromo, toggleActive, togglePromo } from '../../../state';
+import { User } from '../../../models';
+
+import './Dashboard.scss';
 
 const Dashboard = ({ user }: { user: User | null }) => {
   /* if (!user) {
@@ -20,7 +22,7 @@ const Dashboard = ({ user }: { user: User | null }) => {
 
   return (
     <div className="container-fluid d-flex flex-column">
-      <div className="row">
+      <header className="row">
         <div className="col-md-5 col-sm-6 col-12 p-0">
           <input placeholder="Search" type="search" />
         </div>
@@ -42,7 +44,7 @@ const Dashboard = ({ user }: { user: User | null }) => {
         </div>
 
         <div className="col-md-offset-2 col-md-2 col-sm-offset-1 col-sm-1 col-6"></div>
-      </div>
+      </header>
 
       <div className="align-items-center d-flex flex-grow-1 justify-content-center row">
         <EmptyProducts />

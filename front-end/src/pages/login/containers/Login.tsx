@@ -1,43 +1,30 @@
 import React, { ChangeEvent, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Dispatch } from 'redux';
+import { Link } from 'react-router-dom';
+import type { Dispatch } from 'redux';
 
-import { Button, FilesUploader, LabeledInput, LabeledSelect } from '../../components';
+import { Button, LabeledInput } from '../../../components';
+import { loginUser } from '../../../state';
+import { LoginRequestPayload } from '../../../state/auth/models';
 
-import './Register.scss';
+import './Login.scss';
 
 const initialInputsState = {
   username: {
     value: '',
     valid: false
   },
-  image: {
-    value: '',
-    valid: false
-  },
-  email: {
-    value: '',
-    valid: false
-  },
   password: {
-    value: '',
-    valid: false
-  },
-  repeatPassword: {
-    value: '',
-    valid: false
-  },
-  role: {
     value: '',
     valid: false
   }
 };
 
-const Register = () => {
+const Login = () => {
   const [inputs, setInputs] = useState(initialInputsState);
   const dispatch: Dispatch = useDispatch();
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const {
       name,
       value,
@@ -53,14 +40,19 @@ const Register = () => {
     }));
   };
 
-  const handleSubmit = () => console.log(inputs);
+  const handleSubmit = () =>
+    dispatch(
+      loginUser({
+        username: inputs.username.value
+      } as LoginRequestPayload)
+    );
 
   return (
     <div className="container">
-      <div className="row">
+      <div className="row h-100">
         <div className="col-md-6 offset-md-3 col-sm-8 offset-sm-2 col-12">
           <header>
-            <h1>Register</h1>
+            <h1>Login</h1>
           </header>
         </div>
 
@@ -76,53 +68,35 @@ const Register = () => {
               required={true}
             />
 
-            <FilesUploader change={handleChange} accept=".jpg, .jpeg, .png" name="image" />
-
             <LabeledInput
-              change={handleChange}
-              label="E-mail"
-              minLength={5}
-              name="email"
-              type="email"
-              placeholder="Enter e-mail"
-              required={true}
-            />
-
-            <LabeledInput
+              autoComplete="on"
               change={handleChange}
               label="Password"
+              minLength={8}
               name="password"
               placeholder="Enter password"
               required={true}
               type="password"
             />
 
-            <LabeledInput
-              change={handleChange}
-              label="Repeat password"
-              name="repeatPassword"
-              placeholder="Repeat password"
-              required={true}
-              type="password"
-            />
-
-            <LabeledSelect change={handleChange} label="Role" name="role" />
-
             <Button
               click={handleSubmit}
-              disabled={
-                Object.values(inputs).some(({ valid }) => !valid) ||
-                inputs.password !== inputs.repeatPassword
-              }
+              disabled={Object.values(inputs).some(({ valid }) => !valid)}
               theme="primary"
             >
-              Create
+              Log In
             </Button>
           </form>
+
+          <div className="col-sm-12">
+            <Link className="link" to="/forgot-password">
+              Forgot password?
+            </Link>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default Register;
+export default Login;

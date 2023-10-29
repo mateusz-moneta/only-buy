@@ -1,3 +1,5 @@
+import { LoadProductsSuccessPayload } from './models';
+
 const LOAD_PRODUCTS = 'LOAD_PRODUCTS';
 const LOAD_PRODUCTS_SUCCESS = 'LOAD_PRODUCTS_SUCCESS';
 const LOAD_PRODUCTS_FAIL = 'LOAD_PRODUCTS_FAIL';
@@ -28,6 +30,7 @@ export interface LoadProductsAction {
 
 export interface LoadProductsSuccessAction {
   type: typeof LOAD_PRODUCTS_SUCCESS;
+  payload: LoadProductsSuccessPayload;
 }
 
 export interface LoadProductsFailAction {
@@ -62,8 +65,11 @@ export const loadProducts = (): LoadProductsAction => ({
   type: LOAD_PRODUCTS
 });
 
-export const loadProductsSuccess = (): LoadProductsSuccessAction => ({
-  type: LOAD_PRODUCTS_SUCCESS
+export const loadProductsSuccess = (
+  payload: LoadProductsSuccessPayload
+): LoadProductsSuccessAction => ({
+  type: LOAD_PRODUCTS_SUCCESS,
+  payload
 });
 
 export const loadProductsFail = (): LoadProductsFailAction => ({

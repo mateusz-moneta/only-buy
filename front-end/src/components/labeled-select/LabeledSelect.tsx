@@ -1,5 +1,7 @@
 import React, { ChangeEvent } from 'react';
 
+import './LabeledSelect.scss';
+
 export const LabeledSelect = ({
   change,
   label,

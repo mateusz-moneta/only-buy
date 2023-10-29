@@ -1,5 +1,5 @@
+import { DashboardActions, DashboardAction, LoadProductsSuccessAction } from './dashboard.actions';
 import { Product } from '../../models';
-import { DashboardActions, DashboardAction } from './dashboard.actions';
 
 export interface DashboardState {
   active: boolean;
@@ -29,7 +29,7 @@ export const dashboardReducer = (
     case DashboardActions.LOAD_PRODUCTS_SUCCESS:
       return {
         ...state,
-        products: [],
+        products: (action as LoadProductsSuccessAction).payload.products,
         loading: false
       };
 

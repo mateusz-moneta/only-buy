@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useState } from 'react';
 
-import { Button } from './Button';
+import { Button } from '../button/Button';
 
 import './FilesUploader.scss';
 
@@ -26,7 +26,9 @@ export const FilesUploader = ({
 
   return (
     <div className="files-uploader">
-      <label htmlFor="image">{chooseImageMessage}</label>
+      <label className="files-uploader__choose-image-message" htmlFor="image">
+        {chooseImageMessage}
+      </label>
 
       <Button click={() => inputRef.current?.click()} theme="secondary">
         {placeholder}

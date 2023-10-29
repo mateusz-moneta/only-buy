@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { lazy } from 'react';
 import { useSelector } from 'react-redux';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-import Dashboard from './pages/dashboard/Dashboard';
 import Layout from './Layout';
-import Login from './pages/login/Login';
-import NotFound from './pages/not-found/NotFound';
-import Register from './pages/register/Register';
 
 import { selectAuth } from './state';
+
+const Dashboard = lazy(() => import('./pages/dashboard/containers/Dashboard'));
+const Login = lazy(() => import('./pages/login/containers/Login'));
+const NotFound = lazy(() => import('./pages/not-found/NotFound'));
+const Register = lazy(() => import('./pages/register/containers/Register'));
 
 function App() {
   const { user } = useSelector(selectAuth);
