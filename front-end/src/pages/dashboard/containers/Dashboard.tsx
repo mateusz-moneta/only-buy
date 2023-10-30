@@ -33,7 +33,7 @@ const Dashboard = ({ user }: { user: User | null }) => {
       <header className="row">
         <div className="col-md-3 col-sm-6 col-12 d-flex align-items-center offset-md-1">
           <Search
-            change={({ target: { value } }) =>
+            change={({ target: { value } }: ChangeEvent<HTMLInputElement>) =>
               dispatch(
                 changePhrase({
                   phrase: value
