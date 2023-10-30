@@ -28,3 +28,5 @@ export const LabeledTextArea = ({
     ></textarea>
   </label>
 );
+
+export default LabeledTextArea;

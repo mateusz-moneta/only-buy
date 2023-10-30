@@ -19,3 +19,5 @@ export const LabeledSelect = ({
     ></select>
   </label>
 );
+
+export default LabeledSelect;

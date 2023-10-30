@@ -34,3 +34,5 @@ export const LabeledInput = ({
     />
   </label>
 );
+
+export default LabeledInput;

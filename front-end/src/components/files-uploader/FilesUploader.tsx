@@ -61,3 +61,5 @@ export const FilesUploader = ({
     </div>
   );
 };
+
+export default FilesUploader;

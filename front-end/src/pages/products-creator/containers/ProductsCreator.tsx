@@ -2,8 +2,13 @@ import React, { ChangeEvent, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Dispatch } from 'redux';
 
-import { Button, Checkbox, FilesUploader, LabeledInput } from '../../../components';
-import { LabeledTextArea } from '../../../components/labeled-textarea';
+import {
+  Button,
+  Checkbox,
+  FilesUploader,
+  LabeledInput,
+  LabeledTextArea
+} from '../../../components';
 
 const initialInputsState = {
   name: {
@@ -57,6 +62,7 @@ export const ProductsCreator = () => {
       <div className="row">
         <header className="col-md-6 offset-md-3 col-sm-8 offset-sm-2 col-12">
           <img alt="Left arrow" id="left-arrow" src="/icons/left-arrow.svg" />
+
           <h1>Creator of product</h1>
         </header>
       </div>
