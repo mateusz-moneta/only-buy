@@ -20,19 +20,17 @@ export const LabeledInput = ({
   placeholder: string;
   required: boolean;
   type: string;
-}) => {
-  return (
-    <label className="labeled-input" htmlFor={name}>
-      {label}
-      <input
-        onChange={(event: ChangeEvent<HTMLInputElement>) => change(event)}
-        minLength={minLength}
-        name={name}
-        type={type}
-        placeholder={placeholder}
-        required={required}
-        autoComplete={autoComplete}
-      />
-    </label>
-  );
-};
+}) => (
+  <label className="labeled-input" htmlFor={name}>
+    {label}
+    <input
+      onChange={(event: ChangeEvent<HTMLInputElement>) => change(event)}
+      minLength={minLength}
+      name={name}
+      type={type}
+      placeholder={placeholder}
+      required={required}
+      autoComplete={autoComplete}
+    />
+  </label>
+);

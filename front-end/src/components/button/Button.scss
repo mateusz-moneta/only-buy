@@ -4,6 +4,8 @@ button {
     border: none;
     font-size: 1.4rem;
     outline: none;
+    padding: 1.6rem;
+    width: 100%;    
 
     &.primary {
         background-color: $primary-color;

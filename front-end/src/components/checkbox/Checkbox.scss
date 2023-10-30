@@ -2,9 +2,12 @@
 
 .checkbox {
   display: grid;
-  font-size: 1.6rem;
-  font-weight: bold;
-  gap: 0.5rem;
-  grid-template-columns: 1rem auto;
-  line-height: 1.1;
+  font-size: 1.4rem;
+  grid-template-columns: 3rem auto;
+  margin: 0.8rem 0;
+  width: 100%;
+
+  &:checked {
+    accent-color: $primary-color;
+  }
 }

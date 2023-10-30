@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 
 import './Checkbox.scss';
 
@@ -9,14 +9,20 @@ export const Checkbox = ({
   label,
   name
 }: {
-  change: () => void;
+  change: (event: ChangeEvent<HTMLInputElement>) => void;
   checked?: boolean;
   disabled?: boolean;
   label: string;
   name: string;
 }) => (
   <label className="checkbox">
-    <input onChange={change} checked={checked} disabled={disabled} name={name} type="checkbox" />
+    <input
+      onChange={(event: ChangeEvent<HTMLInputElement>) => change(event)}
+      checked={checked}
+      disabled={disabled}
+      name={name}
+      type="checkbox"
+    />
 
     {label}
   </label>

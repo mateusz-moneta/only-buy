@@ -10,14 +10,12 @@ export const LabeledSelect = ({
   change: (event: ChangeEvent<HTMLSelectElement>) => void;
   label: string;
   name: string;
-}) => {
-  return (
-    <label className="labeled-select" htmlFor={name}>
-      {label}
-      <select
-        onChange={(event: ChangeEvent<HTMLSelectElement>) => change(event)}
-        name={name}
-      ></select>
-    </label>
-  );
-};
+}) => (
+  <label className="labeled-select" htmlFor={name}>
+    {label}
+    <select
+      onChange={(event: ChangeEvent<HTMLSelectElement>) => change(event)}
+      name={name}
+    ></select>
+  </label>
+);
