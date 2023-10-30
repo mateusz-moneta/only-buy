@@ -1,8 +1,14 @@
-import { DashboardActions, DashboardAction, LoadProductsSuccessAction } from './dashboard.actions';
+import {
+  DashboardActions,
+  DashboardAction,
+  LoadProductsSuccessAction,
+  ChangePhraseAction
+} from './dashboard.actions';
 import { Product } from '../../models';
 
 export interface DashboardState {
   active: boolean;
+  phrase: string;
   promo: boolean;
   products: Product[];
   loading: boolean;
@@ -10,6 +16,7 @@ export interface DashboardState {
 
 export const dashboardInitialState: DashboardState = {
   active: true,
+  phrase: '',
   promo: false,
   products: [],
   loading: false
@@ -20,6 +27,12 @@ export const dashboardReducer = (
   action: DashboardAction
 ) => {
   switch (action.type) {
+    case DashboardActions.CHANGE_PHRASE:
+      return {
+        ...state,
+        phrase: (action as ChangePhraseAction).payload.phrase
+      };
+
     case DashboardActions.LOAD_PRODUCTS:
       return {
         ...state,

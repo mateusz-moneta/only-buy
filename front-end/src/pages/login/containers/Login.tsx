@@ -4,8 +4,7 @@ import { Link } from 'react-router-dom';
 import type { Dispatch } from 'redux';
 
 import { Button, LabeledInput } from '../../../components';
-import { loginUser } from '../../../state';
-import { LoginRequestPayload } from '../../../state/auth/models';
+import { loginUser, LoginPayload } from '../../../state';
 
 import './Login.scss';
 
@@ -44,7 +43,7 @@ const Login = () => {
     dispatch(
       loginUser({
         username: inputs.username.value
-      } as LoginRequestPayload)
+      } as LoginPayload)
     );
 
   return (

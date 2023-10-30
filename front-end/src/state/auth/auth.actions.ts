@@ -1,19 +1,19 @@
 import {
   LoginFailPayload,
+  LoginPayload,
   LoginSuccessPayload,
-  LoginRequestPayload,
   RegisterFailPayload,
-  RegisterSuccessPayload,
-  RegisterRequestPayload
+  RegisterPayload,
+  RegisterSuccessPayload
 } from './models';
 
-const LOGIN_USER = 'LOGIN_USER';
-const LOGIN_USER_SUCCESS = 'LOGIN_USER_SUCCESS';
-const LOGIN_USER_FAIL = 'LOGIN_USER_FAIL';
+const LOGIN_USER = '[Auth] Login user';
+const LOGIN_USER_SUCCESS = '[Auth] Login user success';
+const LOGIN_USER_FAIL = '[Auth] Login user fail';
 
-const REGISTER_USER = 'REGISTER_USER';
-const REGISTER_USER_SUCCESS = 'REGISTER_USER_SUCCESS';
-const REGISTER_USER_FAIL = 'REGISTER_USER_FAIL';
+const REGISTER_USER = '[Auth] Register user';
+const REGISTER_USER_SUCCESS = '[Auth] Register user success';
+const REGISTER_USER_FAIL = '[Auth] Register user fail';
 
 export const AuthActions = {
   LOGIN_USER,
@@ -26,7 +26,7 @@ export const AuthActions = {
 
 export interface LoginUserAction {
   type: typeof LOGIN_USER;
-  payload: LoginRequestPayload;
+  payload: LoginPayload;
 }
 
 export interface LoginUserSuccessAction {
@@ -41,7 +41,7 @@ export interface LoginUserFailAction {
 
 export interface RegisterUserAction {
   type: typeof REGISTER_USER;
-  payload: RegisterRequestPayload;
+  payload: RegisterPayload;
 }
 
 export interface RegisterUserSuccessAction {
@@ -54,7 +54,7 @@ export interface RegisterUserFailAction {
   payload: RegisterFailPayload;
 }
 
-export const loginUser = (payload: LoginRequestPayload): LoginUserAction => ({
+export const loginUser = (payload: LoginPayload): LoginUserAction => ({
   type: LOGIN_USER,
   payload
 });
@@ -69,7 +69,7 @@ export const loginUserFail = (payload: LoginFailPayload): LoginUserFailAction =>
   payload
 });
 
-export const registerUser = (payload: RegisterRequestPayload): RegisterUserAction => ({
+export const registerUser = (payload: RegisterPayload): RegisterUserAction => ({
   type: REGISTER_USER,
   payload
 });

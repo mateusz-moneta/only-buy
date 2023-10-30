@@ -1,8 +1,10 @@
 @import '../../assets/colors.scss';
 
 .checkbox {
+  align-self: center;
   display: grid;
   font-size: 1.4rem;
+  gap: 0.5rem;
   grid-template-columns: 3rem auto;
   margin: 0.8rem 0;
   width: 100%;

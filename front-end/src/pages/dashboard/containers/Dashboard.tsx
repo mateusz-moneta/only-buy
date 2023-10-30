@@ -3,9 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 import { Dispatch } from 'redux';
 
-import { Checkbox } from '../../../components';
+import { Checkbox, Search } from '../../../components';
 import { EmptyProducts, Product } from '../components';
 import {
+  changePhrase,
   selectActive,
   selectProducts,
   selectPromo,
@@ -30,11 +31,21 @@ const Dashboard = ({ user }: { user: User | null }) => {
   return (
     <div className="container-fluid d-flex flex-column">
       <header className="row">
-        <div className="col-md-5 col-sm-6 col-12 p-0">
-          <input placeholder="Search" type="search" />
+        <div className="col-md-3 col-sm-6 col-12 d-flex align-items-center offset-md-1">
+          <Search
+            change={({ target: { value } }) =>
+              dispatch(
+                changePhrase({
+                  phrase: value
+                })
+              )
+            }
+            name="search"
+            placeholder="Search"
+          />
         </div>
 
-        <div className="col-md-3 col-sm-4 col-6 dashboard__menu-checkboxes">
+        <div className="col-md-3 col-sm-4 col-6 d-flex offset-md-1">
           <Checkbox
             change={() => dispatch(toggleActive())}
             checked={active}
@@ -49,8 +60,6 @@ const Dashboard = ({ user }: { user: User | null }) => {
             name="promo"
           />
         </div>
-
-        <div className="col-md-offset-2 col-md-2 col-sm-offset-1 col-sm-1 col-6"></div>
       </header>
 
       {products.length ? (

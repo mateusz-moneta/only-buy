@@ -1,23 +1,24 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 
-import './Checkbox.scss';
+import './Search.scss';
 
 export const Search = ({
   change,
-  checked = false,
   disabled = false,
-  label,
-  name
+  name,
+  placeholder
 }: {
-  change: () => void;
-  checked?: boolean;
+  change: (event: ChangeEvent<HTMLInputElement>) => void;
   disabled?: boolean;
-  label: string;
   name: string;
+  placeholder: string;
 }) => (
-  <label className="checkbox">
-    <input onChange={change} checked={checked} disabled={disabled} name={name} type="checkbox" />
-
-    {label}
-  </label>
+  <input
+    onChange={change}
+    className="search"
+    disabled={disabled}
+    name={name}
+    placeholder={placeholder}
+    type="search"
+  />
 );
