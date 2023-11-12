@@ -1,7 +1,16 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+
 import { CreateProductDto, UpdateProductDto } from './dto';
-import { Product } from './entities';
+import { Product } from './models';
 import { ProductsService } from './services';
 
 @ApiTags('products')
@@ -20,7 +29,7 @@ export class ProductsController {
   @ApiResponse({
     status: 200,
     description: 'The found records',
-    type: Product
+    type: 'Product',
   })
   findAll(): Promise<Product[]> {
     return null;
@@ -31,7 +40,7 @@ export class ProductsController {
   @ApiResponse({
     status: 200,
     description: 'The found record',
-    type: Product
+    type: 'Product',
   })
   @ApiParam({ name: 'id' })
   find(@Param('id') id: string): Promise<Product> {
@@ -43,7 +52,7 @@ export class ProductsController {
   @ApiResponse({
     status: 200,
     description: 'The remove record',
-    type: Product
+    type: 'Product',
   })
   @ApiParam({ name: 'id' })
   remove(@Param('id') id: string): Promise<Product> {
@@ -55,10 +64,13 @@ export class ProductsController {
   @ApiResponse({
     status: 200,
     description: 'The update record',
-    type: Product
+    type: 'Product',
   })
   @ApiParam({ name: 'id' })
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto): Promise<Product> {
+  update(
+    @Param('id') id: string,
+    @Body() updateProductDto: UpdateProductDto,
+  ): Promise<Product> {
     return null;
   }
 }

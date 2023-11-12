@@ -18,9 +18,9 @@ import { Product as ProductModel, User } from '../../../models';
 import './Dashboard.scss';
 
 const Dashboard = ({ user }: { user: User | null }) => {
-  /* if (!user) {
+  if (!user) {
     return <Navigate to="/login" replace />;
-  } */
+  }
 
   const active = useSelector(selectActive);
   const products = useSelector(selectProducts);
@@ -33,10 +33,10 @@ const Dashboard = ({ user }: { user: User | null }) => {
       <header className="row">
         <div className="col-md-3 col-sm-6 col-12 d-flex align-items-center offset-md-1">
           <Search
-            change={({ target: { value } }: ChangeEvent<HTMLInputElement>) =>
+            change={({ target: { value: phrase } }: ChangeEvent<HTMLInputElement>) =>
               dispatch(
                 changePhrase({
-                  phrase: value
+                  phrase
                 })
               )
             }
