@@ -1,21 +1,12 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-} from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { RegisterUserDto, LoginUserDto } from './dto';
-import { UserEntity } from './entities';
-import { AuthService } from './services';
+import { Body, Controller, Post } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { RegisterUserDto, LoginUserDto } from '../users/dto';
+import { UsersService } from '../users/services';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly usersService: UsersService) {}
 
   @Post('register')
   @ApiOperation({ summary: 'Register of user' })
@@ -25,7 +16,7 @@ export class AuthController {
     type: 'boolean',
   })
   create(@Body() registerUserDto: RegisterUserDto): Promise<boolean> {
-    return this.authService.register(registerUserDto);
+    return this.usersService.register(registerUserDto);
   }
 
   @Post('login')
@@ -35,7 +26,7 @@ export class AuthController {
     description: 'The auth token',
     type: 'string',
   })
-  findAll(): Promise<string> {
+  login(): Promise<string> {
     return null;
   }
 }

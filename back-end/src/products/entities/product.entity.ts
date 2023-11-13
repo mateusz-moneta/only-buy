@@ -8,10 +8,10 @@ export class ProductEntity extends BaseEntity {
   @Column()
   name: string;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'timestamptz' })
   createdDate: Date;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'timestamptz' })
   updatedDate: Date;
 
   constructor(partial: Partial<ProductEntity>) {
