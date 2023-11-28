@@ -1,5 +1,12 @@
-import { Controller, Get } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  Controller,
+  Get,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+
+import { UserEntity } from './entities';
 import { UsersService } from './services';
 
 @ApiTags('users')
@@ -7,14 +14,15 @@ import { UsersService } from './services';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get()
-  @ApiOperation({ summary: 'Register of user' })
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get('')
+  @ApiOperation({ summary: 'List of users' })
   @ApiResponse({
     status: 200,
-    description: 'Status of register',
-    type: 'boolean',
+    description: 'List of users',
+    type: 'User',
   })
-  findAll(): Promise<boolean> {
-    return null;
+  findAll(): Promise<UserEntity[]> {
+    return this.usersService.findAll();
   }
 }

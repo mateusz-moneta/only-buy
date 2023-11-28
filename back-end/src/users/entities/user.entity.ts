@@ -9,12 +9,13 @@ import {
 } from 'typeorm';
 
 import { RoleEntity } from './role.entity';
+import { Transform } from 'class-transformer';
 
 @Entity({ name: 'users' })
 @Unique('constraint_name', ['username', 'email'])
 export class UserEntity extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   username: string;
@@ -25,6 +26,7 @@ export class UserEntity extends BaseEntity {
   @Column()
   password: string;
 
+  @Transform(({ value }) => value.name)
   @OneToOne(() => RoleEntity)
   @JoinColumn({ name: 'roleId' })
   role: RoleEntity;

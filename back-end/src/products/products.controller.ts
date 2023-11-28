@@ -1,29 +1,34 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
   Param,
   Post,
   Put,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { Product } from './models';
 import { ProductsService } from './services';
+import { ProductEntity } from './entities';
 
 @ApiTags('products')
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Post('new')
   @ApiOperation({ summary: 'Create product' })
   create(@Body() createProductDto: CreateProductDto): Promise<Product> {
     return null;
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   @ApiOperation({ summary: 'Get all products' })
   @ApiResponse({
@@ -32,9 +37,10 @@ export class ProductsController {
     type: 'Product',
   })
   findAll(): Promise<Product[]> {
-    return null;
+    return this.productsService.findAll();
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
   @ApiOperation({ summary: 'Get product' })
   @ApiResponse({
@@ -43,8 +49,8 @@ export class ProductsController {
     type: 'Product',
   })
   @ApiParam({ name: 'id' })
-  find(@Param('id') id: string): Promise<Product> {
-    return null;
+  find(@Param('id') id: string): Promise<ProductEntity | null> {
+    return this.productsService.findOneById(id);
   }
 
   @Delete(':id')
@@ -55,10 +61,11 @@ export class ProductsController {
     type: 'Product',
   })
   @ApiParam({ name: 'id' })
-  remove(@Param('id') id: string): Promise<Product> {
-    return null;
+  remove(@Param('id') id: string): Promise<void> {
+    return this.productsService.remove(id);
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id')
   @ApiOperation({ summary: 'Update product' })
   @ApiResponse({
