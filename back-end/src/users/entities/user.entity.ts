@@ -1,12 +1,14 @@
 import {
   BaseEntity,
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
   Unique,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Transform } from 'class-transformer';
 import { RefreshTokenEntity } from './refresh-token.entity';
@@ -32,10 +34,10 @@ export class UserEntity extends BaseEntity {
   @JoinColumn({ name: 'roleId' })
   role: RoleEntity;
 
-  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn()
   createdDate: Date;
 
-  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  @UpdateDateColumn()
   updatedDate: Date;
 
   @OneToOne(() => RefreshTokenEntity, (refreshToken) => refreshToken.user)

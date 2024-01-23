@@ -11,7 +11,7 @@ import { UserEntity } from '../entities';
 export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
-    private usersRepository: Repository<UserEntity>,
+    private readonly usersRepository: Repository<UserEntity>,
     private readonly rolesService: RolesService,
   ) {}
 

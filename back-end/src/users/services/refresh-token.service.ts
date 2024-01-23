@@ -9,7 +9,7 @@ import { UsersService } from './users.service';
 export class RefreshTokenService {
   constructor(
     @InjectRepository(RefreshTokenEntity)
-    private refreshTokenRepository: Repository<RefreshTokenEntity>,
+    private readonly refreshTokenRepository: Repository<RefreshTokenEntity>,
     private readonly userService: UsersService,
   ) {}
 

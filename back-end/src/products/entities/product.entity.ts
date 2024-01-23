@@ -1,4 +1,13 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { ProductImageEntity } from './product-image.entity';
 
 @Entity({ name: 'products' })
 export class ProductEntity extends BaseEntity {
@@ -8,10 +17,22 @@ export class ProductEntity extends BaseEntity {
   @Column()
   name: string;
 
-  @Column({ type: 'timestamptz' })
+  @Column()
+  description: string;
+
+  @Column()
+  isActive: boolean;
+
+  @Column()
+  isPromo: boolean;
+
+  @OneToMany(() => ProductImageEntity, (productImage) => productImage.product)
+  productsImages: ProductImageEntity[];
+
+  @CreateDateColumn()
   createdDate: Date;
 
-  @Column({ type: 'timestamptz' })
+  @UpdateDateColumn()
   updatedDate: Date;
 
   constructor(partial: Partial<ProductEntity>) {
