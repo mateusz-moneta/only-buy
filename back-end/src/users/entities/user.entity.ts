@@ -3,13 +3,14 @@ import {
   Column,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
-
-import { RoleEntity } from './role.entity';
 import { Transform } from 'class-transformer';
+import { RefreshTokenEntity } from './refresh-token.entity';
+import { RoleEntity } from './role.entity';
 
 @Entity({ name: 'users' })
 @Unique('constraint_name', ['username', 'email'])
@@ -27,7 +28,7 @@ export class UserEntity extends BaseEntity {
   password: string;
 
   @Transform(({ value }) => value.name)
-  @OneToOne(() => RoleEntity)
+  @ManyToOne(() => RoleEntity)
   @JoinColumn({ name: 'roleId' })
   role: RoleEntity;
 
@@ -36,6 +37,9 @@ export class UserEntity extends BaseEntity {
 
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   updatedDate: Date;
+
+  @OneToOne(() => RefreshTokenEntity, (refreshToken) => refreshToken.user)
+  refreshToken: RefreshTokenEntity;
 
   constructor(partial: Partial<UserEntity>) {
     super();

@@ -1,14 +1,16 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
-import { LoginUserDto, RegisterUserDto } from '../dto';
+import { RegisterUserDto } from '../dto';
 import { RoleEntity, UserEntity } from '../entities';
 
 @Injectable()
 export class UsersService {
   constructor(
+    @InjectRepository(RoleEntity)
+    private rolesRepository: Repository<RoleEntity>,
     @InjectRepository(UserEntity)
     private usersRepository: Repository<UserEntity>,
   ) {}
@@ -30,12 +32,13 @@ export class UsersService {
       const saltOrRounds = 10;
       const { password } = registerUserDto;
       const hash = await bcrypt.hash(password, saltOrRounds);
+      const role = await this.rolesRepository.findOneBy({ id: 1 });
+
       const user = new UserEntity({
         ...registerUserDto,
         password: hash,
-        role: {
-          id: 1,
-        } as RoleEntity,
+        refreshToken: null,
+        role,
       });
 
       return !!(await user.save());

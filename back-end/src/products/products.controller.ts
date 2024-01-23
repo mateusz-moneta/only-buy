@@ -12,9 +12,8 @@ import {
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { CreateProductDto, UpdateProductDto } from './dto';
-import { Product } from './models';
-import { ProductsService } from './services';
 import { ProductEntity } from './entities';
+import { ProductsService } from './services';
 
 @ApiTags('products')
 @Controller('products')
@@ -24,7 +23,7 @@ export class ProductsController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Post('new')
   @ApiOperation({ summary: 'Create product' })
-  create(@Body() createProductDto: CreateProductDto): Promise<Product> {
+  create(@Body() createProductDto: CreateProductDto): Promise<ProductEntity> {
     return null;
   }
 
@@ -36,7 +35,7 @@ export class ProductsController {
     description: 'The found records',
     type: 'Product',
   })
-  findAll(): Promise<Product[]> {
+  findAll(): Promise<ProductEntity[]> {
     return this.productsService.findAll();
   }
 
@@ -77,7 +76,7 @@ export class ProductsController {
   update(
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto,
-  ): Promise<Product> {
+  ): Promise<ProductEntity> {
     return null;
   }
 }

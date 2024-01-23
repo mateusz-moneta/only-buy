@@ -1,10 +1,21 @@
-import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from './services';
 import { Public } from './decorators';
-import { RegisterUserDto, LoginUserDto } from '../users/dto';
+import {
+  RegisterUserDto,
+  LoginUserDto,
+  GetAccessTokenFromRefreshTokenDto,
+} from '../users/dto';
 import { UsersService } from '../users/services';
+import { Login } from '../users/models';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -31,12 +42,28 @@ export class AuthController {
   @ApiOperation({ summary: 'Login of user' })
   @ApiResponse({
     status: 200,
-    description: 'The auth token',
-    type: 'string',
+    description: 'Auth and refresh tokens',
+    type: 'Login',
   })
   login(
     @Body() loginUserDto: LoginUserDto,
-  ): Promise<{ accessToken: string } | UnauthorizedException> {
+  ): Promise<Login | UnauthorizedException> {
     return this.authService.login(loginUserDto);
+  }
+
+  @Get('refresh-token')
+  @ApiOperation({ summary: 'Get access token based on refresh token' })
+  @ApiResponse({
+    status: 200,
+    description: 'The refresh token',
+    type: 'string',
+  })
+  async getAccessFromRefreshToken(
+    @Body()
+    getAccessTokenFromRefreshTokenDto: GetAccessTokenFromRefreshTokenDto,
+  ) {
+    return this.authService.getAccessTokenFromRefreshToken(
+      getAccessTokenFromRefreshTokenDto.refreshToken,
+    );
   }
 }
