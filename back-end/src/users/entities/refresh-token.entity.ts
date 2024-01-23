@@ -20,6 +20,6 @@ export class RefreshTokenEntity {
   expiresAt: Date;
 
   @OneToOne(() => UserEntity, (user) => user.refreshToken)
-  @JoinColumn({ name: 'id' })
+  @JoinColumn({ name: 'userId' })
   user: UserEntity;
 }

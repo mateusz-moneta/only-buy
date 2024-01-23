@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from '@hapi/joi';
-
-import { CreateRoles1701095733886 } from '../../migrations';
 
 @Module({
   imports: [
@@ -32,6 +31,7 @@ import { CreateRoles1701095733886 } from '../../migrations';
         synchronize: true,
       }),
     }),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
 })
 export class CoreModule {}

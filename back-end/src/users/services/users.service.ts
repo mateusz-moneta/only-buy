@@ -4,15 +4,15 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 import { RegisterUserDto } from '../dto';
-import { RoleEntity, UserEntity } from '../entities';
+import { RolesService } from './roles.service';
+import { UserEntity } from '../entities';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(RoleEntity)
-    private rolesRepository: Repository<RoleEntity>,
     @InjectRepository(UserEntity)
     private usersRepository: Repository<UserEntity>,
+    private readonly rolesService: RolesService,
   ) {}
 
   findAll(): Promise<UserEntity[]> {
@@ -32,7 +32,7 @@ export class UsersService {
       const saltOrRounds = 10;
       const { password } = registerUserDto;
       const hash = await bcrypt.hash(password, saltOrRounds);
-      const role = await this.rolesRepository.findOneBy({ id: 1 });
+      const role = await this.rolesService.findOneById(1);
 
       const user = new UserEntity({
         ...registerUserDto,

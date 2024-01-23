@@ -55,7 +55,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Get access token based on refresh token' })
   @ApiResponse({
     status: 200,
-    description: 'The refresh token',
+    description: 'The access token',
     type: 'string',
   })
   async getAccessFromRefreshToken(

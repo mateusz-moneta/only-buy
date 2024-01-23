@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
@@ -24,14 +28,15 @@ export class AuthService {
 
     if (!!user) {
       const isMatch = bcrypt.compare(password, user.password);
-      const refreshToken = this.generateRefreshToken();
-      await this.createRefreshToken(
-        user.id,
-        refreshToken.token,
-        refreshToken.expiresAt,
-      );
 
       if (isMatch) {
+        const refreshToken = this.generateRefreshToken();
+        await this.createRefreshToken(
+          user.id,
+          refreshToken.token,
+          refreshToken.expiresAt,
+        );
+
         return {
           accessToken: await this.generateAccessToken(user),
           refreshToken: refreshToken.token,
@@ -66,7 +71,7 @@ export class AuthService {
     );
 
     if (!user) {
-      return null;
+      throw new NotFoundException('User not found');
     }
 
     return await this.generateAccessToken(user);
@@ -77,6 +82,14 @@ export class AuthService {
       await this.refreshTokenService.findRefreshTokenByToken(token);
 
     return !!refreshToken && refreshToken.expiresAt >= new Date();
+  }
+
+  async validateUserById(userId: string): Promise<UserEntity | null> {
+    try {
+      return await this.usersService.findOneById(userId);
+    } catch (error) {
+      return null;
+    }
   }
 
   private generateRefreshToken(): RefreshToken {

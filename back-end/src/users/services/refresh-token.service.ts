@@ -1,23 +1,33 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
 import { RefreshTokenEntity } from '../entities';
+import { UsersService } from './users.service';
 
 @Injectable()
 export class RefreshTokenService {
   constructor(
     @InjectRepository(RefreshTokenEntity)
     private refreshTokenRepository: Repository<RefreshTokenEntity>,
+    private readonly userService: UsersService,
   ) {}
 
   async createRefreshToken(
-    id: string,
+    userId: string,
     token: string,
     expiresAt: Date,
   ): Promise<RefreshTokenEntity> {
-    const existingToken = await this.refreshTokenRepository.findOne({
-      where: { id },
-    });
+    const user = await this.userService.findOneById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const existingToken = await this.refreshTokenRepository
+      .createQueryBuilder('user')
+      .where('user.id = :id', { id: userId })
+      .getOne();
 
     if (existingToken) {
       existingToken.token = token;
@@ -27,7 +37,7 @@ export class RefreshTokenService {
     }
 
     const newRefreshToken = this.refreshTokenRepository.create({
-      id,
+      user,
       token,
       expiresAt,
     });
@@ -38,7 +48,11 @@ export class RefreshTokenService {
   async findRefreshTokenByToken(
     token: string,
   ): Promise<RefreshTokenEntity | undefined> {
-    return this.refreshTokenRepository.findOneBy({ token });
+    return this.refreshTokenRepository
+      .createQueryBuilder('refreshToken')
+      .leftJoinAndSelect('refreshToken.user', 'user')
+      .where('refreshToken.token = :token', { token })
+      .getOne();
   }
 
   async deleteRefreshToken(id: number): Promise<void> {
