@@ -2,7 +2,8 @@ import { DataSource } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { config } from 'dotenv';
 import { CreateRoles1701095733886, CreateUser1701097096009 } from "./migrations";
-import { RoleEntity, UserEntity } from "./src/users/entities";
+import { RoleEntity } from "./src/roles/entities";
+import { UserEntity } from "./src/users/entities";
 
 config();
 

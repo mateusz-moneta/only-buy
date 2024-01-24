@@ -1,16 +1,18 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { RefreshTokenEntity, RoleEntity, UserEntity } from './entities';
-import { RefreshTokenService, RolesService, UsersService } from './services';
+import { RefreshTokenEntity, UserEntity } from './entities';
+import { RefreshTokenService, UsersService } from './services';
 import { UsersController } from './users.controller';
+import { RolesModule } from '../roles';
 
 @Module({
   controllers: [UsersController],
   imports: [
-    TypeOrmModule.forFeature([RefreshTokenEntity, RoleEntity, UserEntity]),
+    RolesModule,
+    TypeOrmModule.forFeature([RefreshTokenEntity, UserEntity]),
   ],
-  providers: [RefreshTokenService, RolesService, UsersService],
+  providers: [RefreshTokenService, UsersService],
   exports: [RefreshTokenService, UsersService],
 })
 export class UsersModule {}

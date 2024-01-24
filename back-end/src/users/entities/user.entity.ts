@@ -12,7 +12,7 @@ import {
 } from 'typeorm';
 import { Transform } from 'class-transformer';
 import { RefreshTokenEntity } from './refresh-token.entity';
-import { RoleEntity } from './role.entity';
+import { RoleEntity } from '../../roles/entities';
 
 @Entity({ name: 'users' })
 @Unique('constraint_name', ['username', 'email'])

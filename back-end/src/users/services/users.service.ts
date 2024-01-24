@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 import { RegisterUserDto } from '../dto';
-import { RolesService } from './roles.service';
+import { RolesService } from '../../roles/services';
 import { UserEntity } from '../entities';
 
 @Injectable()
