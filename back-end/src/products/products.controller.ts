@@ -24,7 +24,7 @@ export class ProductsController {
   @Post('new')
   @ApiOperation({ summary: 'Create product' })
   create(@Body() createProductDto: CreateProductDto): Promise<ProductEntity> {
-    return null;
+    return this.productsService.createProduct(createProductDto);
   }
 
   @UseInterceptors(ClassSerializerInterceptor)

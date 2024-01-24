@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsNotEmpty,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
 export class CreateProductDto {
   @IsNotEmpty()
@@ -10,6 +16,25 @@ export class CreateProductDto {
 
   @IsNotEmpty()
   @IsString()
+  @MaxLength(350)
+  @ApiProperty({ description: 'The description of the product' })
+  readonly description: string;
+
+  @IsNotEmpty()
+  @IsString()
   @ApiProperty({ description: 'The price of the product' })
   readonly price: string;
+
+  @IsNotEmpty()
+  @IsBoolean()
+  @ApiProperty({ description: 'The status of active' })
+  readonly isActive: boolean;
+
+  @IsNotEmpty()
+  @IsBoolean()
+  @ApiProperty({ description: 'The status of promo' })
+  readonly isPromo: boolean;
+
+  @IsArray()
+  productImages: Express.Multer.File[];
 }

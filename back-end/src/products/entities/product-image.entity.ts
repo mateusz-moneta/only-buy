@@ -15,13 +15,7 @@ export class ProductImageEntity extends BaseEntity {
   id: string;
 
   @Column()
-  name: string;
-
-  @Column()
-  description: string;
-
-  @Column()
-  file: string;
+  path: string;
 
   @CreateDateColumn()
   uploadedDate: Date;

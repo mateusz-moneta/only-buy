@@ -6,13 +6,16 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
-import { UserEntity } from './entities';
-import { UsersService } from './services';
+import { RoleEntity, UserEntity } from './entities';
+import { RolesService, UsersService } from './services';
 
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly rolesService: RolesService,
+    private readonly usersService: UsersService,
+  ) {}
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get('')
@@ -20,9 +23,23 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'List of users',
-    type: 'User',
+    type: UserEntity,
+    isArray: true,
   })
-  findAll(): Promise<UserEntity[]> {
+  findAllUsers(): Promise<UserEntity[]> {
     return this.usersService.findAll();
+  }
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get('roles')
+  @ApiOperation({ summary: 'List of roles' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of roles',
+    type: RoleEntity,
+    isArray: true,
+  })
+  findAllRoles(): Promise<RoleEntity[]> {
+    return this.rolesService.findAll();
   }
 }
