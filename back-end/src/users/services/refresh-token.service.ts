@@ -17,7 +17,7 @@ export class RefreshTokenService {
     userId: string,
     token: string,
     expiresAt: Date,
-  ): Promise<RefreshTokenEntity> {
+  ): Promise<boolean> {
     const user = await this.userService.findOneById(userId);
 
     if (!user) {
@@ -30,19 +30,23 @@ export class RefreshTokenService {
       .getOne();
 
     if (existingToken) {
-      existingToken.token = token;
-      existingToken.expiresAt = expiresAt;
+      await this.refreshTokenRepository
+        .createQueryBuilder()
+        .update(RefreshTokenEntity)
+        .set({ token, expiresAt })
+        .where('id = :id', { id: 1 })
+        .execute();
 
-      return this.refreshTokenRepository.save(existingToken);
+      return true;
     }
 
-    const newRefreshToken = this.refreshTokenRepository.create({
+    this.refreshTokenRepository.create({
       user,
       token,
       expiresAt,
     });
 
-    return this.refreshTokenRepository.save(newRefreshToken);
+    return true;
   }
 
   async findRefreshTokenByToken(
