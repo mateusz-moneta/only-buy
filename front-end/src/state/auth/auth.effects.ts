@@ -1,32 +1,40 @@
-import { Action } from 'redux';
-import { ofType } from 'redux-observable';
-import { Observable } from 'rxjs';
+import {filter, Observable} from 'rxjs';
 import { ajax } from 'rxjs/ajax';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 
-import { AuthActions, loginUserFail, loginUserSuccess, registerUserSuccess } from './auth.actions';
-import { LoginSuccessPayload, RegisterSuccessPayload } from './models';
+import {
+    AuthActions,
+    LoginUserAction,
+    loginUserFail,
+    loginUserSuccess,
+    RegisterUserAction,
+    registerUserSuccess
+} from './auth.actions';
+import {LoginSuccessPayload, RegisterSuccessPayload} from './models';
 
-const loginUser$ = (action$: Observable<Action<any>>) =>
+export const loginUser$ = (action$: Observable<LoginUserAction>) =>
   action$.pipe(
-    ofType(AuthActions.LOGIN_USER),
-    switchMap(() =>
+      filter(action => action.type === AuthActions.LOGIN_USER),
+      switchMap((action: LoginUserAction) =>
       ajax
-        .getJSON('https://api.github.com/users?per_page=5')
-        .pipe(map((payload) => loginUserSuccess(payload as LoginSuccessPayload)))
+        .post<LoginSuccessPayload>('/api/login', action.payload)
+        .pipe(map(({ response }) => loginUserSuccess(response)))
     )
   );
 
-const registerUser$ = (action$: Observable<Action<any>>) =>
-  action$.pipe(
-    ofType(AuthActions.REGISTER_USER),
-    switchMap(() =>
-      ajax
-        .getJSON('https://api.github.com/users?per_page=5')
-        .pipe(map((payload) => registerUserSuccess(payload as RegisterSuccessPayload)))
-    )
-  );
+export const registerUser$ = (action$: Observable<RegisterUserAction>) =>
+    action$.pipe(
+        filter(action => action.type === AuthActions.REGISTER_USER),
+        switchMap((action) =>
+            ajax
+                .post<RegisterSuccessPayload>(
+                    '/api/register',
+                    action.payload
+                )
+                .pipe(map(({ response }) => registerUserSuccess(response))
+        )
+    ));
 
-export const authEffects = [loginUser$];
+export const authEffects = [loginUser$, registerUser$];
 
 export default authEffects;
