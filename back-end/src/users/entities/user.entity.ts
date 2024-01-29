@@ -10,7 +10,6 @@ import {
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
-import { Transform } from 'class-transformer';
 import { RefreshTokenEntity } from './refresh-token.entity';
 import { RoleEntity } from '../../roles/entities';
 
@@ -29,7 +28,6 @@ export class UserEntity extends BaseEntity {
   @Column()
   password: string;
 
-  @Transform(({ value }) => value.name)
   @ManyToOne(() => RoleEntity)
   @JoinColumn({ name: 'roleId' })
   role: RoleEntity;

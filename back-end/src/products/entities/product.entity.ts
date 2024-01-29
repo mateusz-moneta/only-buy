@@ -20,6 +20,12 @@ export class ProductEntity extends BaseEntity {
   @Column()
   description: string;
 
+  @Column({ type: 'numeric', precision: 10, scale: 2 })
+  price: number;
+
+  @Column({ nullable: true })
+  code: string;
+
   @Column()
   isActive: boolean;
 

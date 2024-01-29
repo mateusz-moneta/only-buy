@@ -11,9 +11,7 @@ import { UploadService } from './services/upload.service';
 @Module({
   controllers: [ProductsController],
   imports: [
-    MulterModule.registerAsync({
-      useClass: UploadService,
-    }),
+    MulterModule.register(),
     TypeOrmModule.forFeature([ProductEntity, ProductImageEntity]),
   ],
   providers: [ProductImagesService, ProductsService, UploadService],

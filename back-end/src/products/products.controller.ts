@@ -7,9 +7,12 @@ import {
   Param,
   Post,
   Put,
+  Req,
+  UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 import { CreateProductDto, UpdateProductDto } from './dto';
 import { ProductEntity } from './entities';
@@ -20,20 +23,24 @@ import { ProductsService } from './services';
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
-  @UseInterceptors(ClassSerializerInterceptor)
   @Post('new')
-  @ApiOperation({ summary: 'Create product' })
-  create(@Body() createProductDto: CreateProductDto): Promise<ProductEntity> {
-    return this.productsService.createProduct(createProductDto);
+  @UseInterceptors(ClassSerializerInterceptor)
+  @UseInterceptors(FilesInterceptor('productImages'))
+  @ApiOperation({ summary: 'Create the product' })
+  create(
+    @UploadedFiles() productImages: Express.Multer.File[],
+    @Req() req: { body: CreateProductDto },
+  ): Promise<ProductEntity> {
+    return this.productsService.createProduct(req.body, productImages);
   }
 
-  @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   @ApiOperation({ summary: 'Get all products' })
   @ApiResponse({
     status: 200,
     description: 'The found records',
-    type: 'Product',
+    type: ProductEntity,
+    isArray: true,
   })
   findAll(): Promise<ProductEntity[]> {
     return this.productsService.findAll();

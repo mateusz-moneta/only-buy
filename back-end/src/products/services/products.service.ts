@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { CreateProductDto } from '../dto';
-import { ProductEntity, ProductImageEntity } from '../entities';
+import { ProductEntity } from '../entities';
 import { UploadService } from './upload.service';
 import { ProductImagesService } from './product-images.service';
 
@@ -16,26 +16,39 @@ export class ProductsService {
     private readonly uploadService: UploadService,
   ) {}
 
-  async createProduct(createProduct: CreateProductDto): Promise<ProductEntity> {
-    const product = this.productsRepository.create(createProduct);
+  async createProduct(
+    createProduct: CreateProductDto,
+    productImages: Express.Multer.File[],
+  ): Promise<ProductEntity> {
+    const product = new ProductEntity({
+      name: createProduct.name,
+      description: createProduct.description,
+      price: parseFloat(createProduct.price),
+      code: createProduct.code,
+      isActive: createProduct.isActive === 'true',
+      isPromo: createProduct.isPromo === 'true',
+    });
 
     const savedProduct = await this.productsRepository.save(product);
-    const productImages: ProductImageEntity[] = [];
 
-    if (createProduct.productImages?.length) {
-      for (const image of createProduct.productImages) {
-        const path = await this.uploadService.uploadFile(image);
-        const productImage = await this.productImagesService.createProductImage(
-          {
-            productId: savedProduct.id,
-            path,
-          },
-        );
-        productImages.push(productImage);
-      }
+    if (productImages?.length) {
+      await Promise.all(
+        productImages.map(async (productImage) => {
+          const path = this.uploadService.saveFile(
+            productImage,
+            savedProduct.id,
+          );
+          const savedProductImage =
+            await this.productImagesService.createProductImage({
+              productId: savedProduct.id,
+              path,
+            });
+          savedProductImage.product = savedProduct;
+
+          await savedProductImage.save();
+        }),
+      );
     }
-
-    savedProduct.productsImages = productImages;
 
     return savedProduct;
   }

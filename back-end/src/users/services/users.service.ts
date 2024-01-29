@@ -16,15 +16,26 @@ export class UsersService {
   ) {}
 
   findAll(): Promise<UserEntity[]> {
-    return this.usersRepository.find();
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.role', 'role')
+      .getMany();
   }
 
   findOneById(id: string): Promise<UserEntity | null> {
-    return this.usersRepository.findOneBy({ id });
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.role', 'role')
+      .where({ id })
+      .getOne();
   }
 
   findOneByUsername(username: string): Promise<UserEntity | null> {
-    return this.usersRepository.findOneBy({ username });
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.role', 'role')
+      .where({ username })
+      .getOne();
   }
 
   async register(registerUserDto: RegisterUserDto): Promise<boolean> {

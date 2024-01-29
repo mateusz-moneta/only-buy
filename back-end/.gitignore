@@ -3,6 +3,7 @@
 # environment
 .env
 Dockerfile
+uploads/*
 
 # dependencies
 /node_modules
