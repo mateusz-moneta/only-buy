@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { ProductImageEntity } from './product-image.entity';
+import { ProductRateEntity } from './product-rate.entity';
 
 @Entity({ name: 'products' })
 export class ProductEntity extends BaseEntity {
@@ -34,6 +35,9 @@ export class ProductEntity extends BaseEntity {
 
   @OneToMany(() => ProductImageEntity, (productImage) => productImage.product)
   productsImages: ProductImageEntity[];
+
+  @OneToMany(() => ProductRateEntity, (productRate) => productRate.product)
+  productRates: ProductRateEntity[];
 
   @CreateDateColumn()
   createdDate: Date;

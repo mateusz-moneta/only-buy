@@ -5,6 +5,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   Unique,
@@ -12,6 +13,7 @@ import {
 } from 'typeorm';
 import { RefreshTokenEntity } from './refresh-token.entity';
 import { RoleEntity } from '../../roles/entities';
+import { ProductRateEntity } from '../../products/entities';
 
 @Entity({ name: 'users' })
 @Unique('constraint_name', ['username', 'email'])
@@ -31,6 +33,9 @@ export class UserEntity extends BaseEntity {
   @ManyToOne(() => RoleEntity)
   @JoinColumn({ name: 'roleId' })
   role: RoleEntity;
+
+  @OneToMany(() => ProductRateEntity, (productRate) => productRate.user)
+  productRates: ProductRateEntity[];
 
   @CreateDateColumn()
   createdDate: Date;

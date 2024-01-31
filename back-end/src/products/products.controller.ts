@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Req,
   UploadedFiles,
   UseInterceptors,
@@ -14,14 +15,22 @@ import {
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
 
-import { CreateProductDto, UpdateProductDto } from './dto';
-import { ProductEntity } from './entities';
-import { ProductsService } from './services';
+import {
+  CreateProductDto,
+  CreateProductRateDto,
+  UpdateProductDto,
+  UpdateProductRateDto,
+} from './dto';
+import { ProductEntity, ProductRateEntity } from './entities';
+import { ProductRatesService, ProductsService } from './services';
 
 @ApiTags('products')
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(
+    private readonly productsService: ProductsService,
+    private readonly productRatesService: ProductRatesService,
+  ) {}
 
   @Post('new')
   @UseInterceptors(ClassSerializerInterceptor)
@@ -42,8 +51,11 @@ export class ProductsController {
     type: ProductEntity,
     isArray: true,
   })
-  findAll(): Promise<ProductEntity[]> {
-    return this.productsService.findAll();
+  findAll(
+    @Query('isActive') isActive: boolean,
+    @Query('isPromo') isPromo: boolean,
+  ): Promise<ProductEntity[]> {
+    return this.productsService.findAll(isActive, isPromo);
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -85,5 +97,35 @@ export class ProductsController {
     @Body() updateProductDto: UpdateProductDto,
   ): Promise<ProductEntity> {
     return null;
+  }
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Post('rate')
+  @ApiOperation({ summary: 'Create the rate for product' })
+  @ApiResponse({
+    status: 200,
+    description: 'The create of rate',
+    type: 'object',
+  })
+  @ApiParam({ name: 'id' })
+  createRate(
+    @Body() createRateDto: CreateProductRateDto,
+  ): Promise<ProductRateEntity> {
+    return this.productRatesService.createProductRate(createRateDto);
+  }
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Put('rate')
+  @ApiOperation({ summary: 'Update the rate for product' })
+  @ApiResponse({
+    status: 200,
+    description: 'The update of rate',
+    type: 'boolean',
+  })
+  @ApiParam({ name: 'id' })
+  updateProductRate(
+    @Body() updateRateDto: UpdateProductRateDto,
+  ): Promise<boolean> {
+    return this.productRatesService.updateProductRate(updateRateDto);
   }
 }

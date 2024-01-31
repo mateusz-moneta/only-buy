@@ -53,12 +53,28 @@ export class ProductsService {
     return savedProduct;
   }
 
-  findAll(): Promise<ProductEntity[]> {
-    return this.productsRepository.find();
+  findAll(isActive: boolean, isPromo: boolean): Promise<ProductEntity[]> {
+    let query = this.productsRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.productsImages', 'productImages');
+
+    if (isActive !== undefined) {
+      query = query.andWhere('product.isActive = :isActive', { isActive });
+    }
+
+    if (isPromo !== undefined) {
+      query = query.andWhere('product.isPromo = :isPromo', { isPromo });
+    }
+
+    return query.getMany();
   }
 
   findOneById(id: string): Promise<ProductEntity | null> {
-    return this.productsRepository.findOneBy({ id });
+    return this.productsRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.productsImages', 'productImages')
+      .where({ id })
+      .getOne();
   }
 
   async remove(id: string): Promise<void> {

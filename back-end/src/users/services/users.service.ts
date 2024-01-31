@@ -23,11 +23,13 @@ export class UsersService {
   }
 
   findOneById(id: string): Promise<UserEntity | null> {
-    return this.usersRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.role', 'role')
-      .where({ id })
-      .getOne();
+    return (
+      this.usersRepository
+        .createQueryBuilder('user')
+        //.leftJoinAndSelect('user.role', 'role')
+        .where({ id })
+        .getOne()
+    );
   }
 
   findOneByUsername(username: string): Promise<UserEntity | null> {

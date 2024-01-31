@@ -3,17 +3,33 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MulterModule } from '@nestjs/platform-express';
 
 import { ProductsController } from './products.controller';
-import { ProductEntity, ProductImageEntity } from './entities';
-import { ProductImagesService } from './services/product-images.service';
-import { ProductsService } from './services';
-import { UploadService } from './services/upload.service';
+import {
+  ProductEntity,
+  ProductImageEntity,
+  ProductRateEntity,
+} from './entities';
+import {
+  ProductImagesService,
+  ProductRatesService,
+  ProductsService,
+  UploadService,
+} from './services';
 
 @Module({
   controllers: [ProductsController],
   imports: [
     MulterModule.register(),
-    TypeOrmModule.forFeature([ProductEntity, ProductImageEntity]),
+    TypeOrmModule.forFeature([
+      ProductEntity,
+      ProductImageEntity,
+      ProductRateEntity,
+    ]),
   ],
-  providers: [ProductImagesService, ProductsService, UploadService],
+  providers: [
+    ProductImagesService,
+    ProductRatesService,
+    ProductsService,
+    UploadService,
+  ],
 })
 export class ProductsModule {}
