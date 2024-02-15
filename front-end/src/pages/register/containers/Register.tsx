@@ -1,17 +1,21 @@
-import React, { ChangeEvent, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { Dispatch } from 'redux';
+import React, { ChangeEvent, useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import { Button, FilesUploader, LabeledInput, LabeledSelect } from '../../../components';
+import { AlertContext } from '../../../contexts';
+import { apiUrl } from '../../../api';
+import { Button, FilesUploader, LabeledInput } from '../../../components';
+import { request } from '../../../utils';
 
 import './Register.scss';
+import { Input } from '../../../models';
 
-const initialInputsState = {
-  username: {
-    value: '',
-    valid: false
+const initialInputsState: Input = {
+  avatar: {
+    value: null,
+    valid: false,
+    nullable: true
   },
-  image: {
+  username: {
     value: '',
     valid: false
   },
@@ -26,18 +30,20 @@ const initialInputsState = {
   repeatPassword: {
     value: '',
     valid: false
-  },
-  role: {
-    value: '',
-    valid: false
   }
 };
 
 const Register = () => {
+  const alertContext = useContext(AlertContext);
+
+  const navigate = useNavigate();
+
+  const [forceDisabled, setForceDisabled] = useState(false);
   const [inputs, setInputs] = useState(initialInputsState);
-  const dispatch: Dispatch = useDispatch();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    setForceDisabled(false);
+
     const {
       name,
       value,
@@ -53,7 +59,27 @@ const Register = () => {
     }));
   };
 
-  const handleSubmit = () => console.log(inputs);
+  const handleSubmit = () =>
+    request(`${apiUrl}/auth/register`, {
+      username: inputs.username.value,
+      password: inputs.password.value,
+      email: inputs.email.value
+    }).then((result: boolean) => {
+      if (!result) {
+        setForceDisabled(true);
+        alertContext.writeMessage('User has not been registered.');
+        alertContext.open();
+
+        setTimeout(() => {
+          alertContext.close();
+          alertContext.cleanMessage();
+        }, 3000);
+
+        return;
+      }
+
+      navigate('/login');
+    });
 
   return (
     <div className="container">
@@ -106,13 +132,14 @@ const Register = () => {
               type="password"
             />
 
-            <LabeledSelect change={handleChange} label="Role" name="role" />
-
             <Button
               click={handleSubmit}
               disabled={
-                Object.values(inputs).some(({ valid }) => !valid) ||
-                inputs.password !== inputs.repeatPassword
+                Object.values(inputs)
+                  .filter((input) => !input?.nullable)
+                  .some(({ valid }) => !valid) ||
+                inputs.password.value !== inputs.repeatPassword.value ||
+                forceDisabled
               }
               theme="primary"
             >

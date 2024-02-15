@@ -1,14 +1,15 @@
-import React, { ChangeEvent, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
-import type { Dispatch } from 'redux';
+import React, { ChangeEvent, useContext, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
+import { apiUrl } from '../../../api';
 import { Button, LabeledInput } from '../../../components';
-import { loginUser, LoginPayload } from '../../../state';
+import { request } from '../../../utils';
+import { Input, User } from '../../../models';
+import { UserContext } from '../../../contexts/user-context';
 
 import './Login.scss';
 
-const initialInputsState = {
+const initialInputsState: Input = {
   username: {
     value: '',
     valid: false
@@ -20,8 +21,11 @@ const initialInputsState = {
 };
 
 const Login = () => {
+  const userContext = useContext(UserContext);
+
   const [inputs, setInputs] = useState(initialInputsState);
-  const dispatch: Dispatch = useDispatch();
+
+  const navigate = useNavigate();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const {
@@ -40,11 +44,12 @@ const Login = () => {
   };
 
   const handleSubmit = () =>
-    dispatch(
-      loginUser({
-        username: inputs.username.value
-      } as LoginPayload)
-    );
+    request(`${apiUrl}/auth/login`, {
+      username: inputs.username.value,
+      password: inputs.password.value
+    })
+      .then((user: User) => userContext.login(user))
+      .then(() => navigate('/'));
 
   return (
     <div className="container">

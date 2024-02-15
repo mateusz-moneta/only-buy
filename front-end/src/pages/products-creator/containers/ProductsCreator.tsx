@@ -1,7 +1,7 @@
-import React, { ChangeEvent, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { Dispatch } from 'redux';
+import React, { ChangeEvent, startTransition, useState } from 'react';
+import { useNavigate } from 'react-router';
 
+import { apiUrl } from '../../../api';
 import {
   Button,
   Checkbox,
@@ -9,8 +9,10 @@ import {
   LabeledInput,
   LabeledTextArea
 } from '../../../components';
+import { Input } from '../../../models';
+import { request } from '../../../utils';
 
-const initialInputsState = {
+const initialInputsState: Input = {
   name: {
     value: '',
     valid: false
@@ -19,8 +21,12 @@ const initialInputsState = {
     value: '',
     valid: false
   },
-  images: {
-    value: [],
+  price: {
+    value: '',
+    valid: false
+  },
+  productImages: {
+    value: null,
     valid: false
   },
   active: {
@@ -35,33 +41,60 @@ const initialInputsState = {
 
 export const ProductsCreator = () => {
   const [inputs, setInputs] = useState(initialInputsState);
-  const dispatch: Dispatch = useDispatch();
+
+  const navigate = useNavigate();
+
+  const goToDashboard = async () => {
+    startTransition(() => {
+      navigate('/');
+    });
+  };
 
   const handleChange = (
     event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
+    const target = event.target as HTMLInputElement;
+    const files = target.files as FileList;
+
     const {
       name,
       value,
       validity: { valid }
     } = event.target;
 
-    setInputs((values) => ({
-      ...values,
-      [name]: {
-        value,
-        valid
-      }
-    }));
+    if (files?.length) {
+      console.log(files);
+
+      setInputs((values) => ({
+        ...values,
+        [name]: {
+          value: files,
+          valid
+        }
+      }));
+      console.log(inputs);
+      return;
+    }
   };
 
-  const handleSubmit = () => console.log(inputs);
+  const handleSubmit = () =>
+    request(`${apiUrl}/products/new`, {
+      name: inputs.name.value,
+      description: inputs.description.value,
+      price: inputs.price.value,
+      isActive: inputs.active.value,
+      isPromo: inputs.promo.value,
+      productImages: inputs.productImages.value
+    }).then((res) => console.log(res));
+  // .then(() => navigate('/'));
 
   return (
     <div className="container">
       <div className="row">
         <header className="col-md-6 offset-md-3 col-sm-8 offset-sm-2 col-12">
-          <img alt="Left arrow" id="left-arrow" src="/icons/left-arrow.svg" />
+          <button onClick={() => goToDashboard()} type="button">
+            <img alt="Left arrow" src="/icons/left-arrow.svg" />
+          </button>
 
           <h1>Creator of product</h1>
         </header>
@@ -87,18 +120,34 @@ export const ProductsCreator = () => {
             required={true}
           />
 
+          <LabeledInput
+            change={handleChange}
+            label="Price"
+            name="price"
+            pattern="^\d*(\.\d{0,2})?$"
+            placeholder="Enter price"
+            required={true}
+            step=".01"
+            type="number"
+          />
+
           <FilesUploader
             change={handleChange}
             accept=".jpg, .jpeg, .png"
             multiple={true}
-            name="image"
+            name="productImages"
           />
-
-          <Checkbox change={handleChange} checked={inputs.promo.value} label="Promo" name="promo" />
 
           <Checkbox
             change={handleChange}
-            checked={inputs.active.value}
+            checked={inputs.promo.value as boolean}
+            label="Promo"
+            name="promo"
+          />
+
+          <Checkbox
+            change={handleChange}
+            checked={inputs.active.value as boolean}
             label="Active"
             name="active"
           />

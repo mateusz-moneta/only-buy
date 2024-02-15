@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 import { Product as ProductModel } from '../../../../models';
 
 export const Product = ({
-  product: { description, images, isPromo, name }
+  product: { description, images, isPromo, name },
+  index
 }: {
   product: ProductModel;
+  index: number;
 }) => {
-  const [index, setIndex] = useState(0);
-
   return (
     <div className="product">
       <div className="product__image">

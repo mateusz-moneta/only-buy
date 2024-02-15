@@ -1,0 +1,44 @@
+@import "../../assets/colors.scss";
+
+.alert-box {
+    background: $white;
+    border: 0.1rem solid $gray-2;
+    bottom: 25px;
+    box-shadow: 0.5rem 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    right: 25px;
+    padding: 1.5rem;
+    position: fixed;
+    z-index: 99;
+}
+ 
+.slide-in {
+    animation-name: slideIn;
+    animation-duration: 0.8s;
+ }
+ 
+@keyframes slideIn {
+    from {
+       transform: translateX(-400px);
+    }
+    
+    to {
+       transform: translateX(0);
+    }
+}
+ 
+.slide-out {
+    animation-name: slideOut;
+    animation-duration: 0.8s;
+}
+ 
+ @keyframes slideOut {
+    from {
+       transform: translateY(0);
+       opacity: 1;
+    }
+    
+    to {
+       transform: translateY(80px);
+       opacity: 0;
+    }
+}

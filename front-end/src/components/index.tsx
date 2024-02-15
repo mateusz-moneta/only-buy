@@ -1,3 +1,4 @@
+export * from './alert-box';
 export * from './button';
 export * from './checkbox';
 export * from './files-uploader';

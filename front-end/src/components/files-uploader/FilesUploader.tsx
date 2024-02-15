@@ -50,7 +50,7 @@ export const FilesUploader = ({
       {files?.length ? (
         <div className="files-uploader__files">
           {Array.from(files).map((file: File) => (
-            <img className="w-100" key={file.name} src={URL.createObjectURL(file)} />
+            <img alt="" className="w-100" key={file.name} src={URL.createObjectURL(file)} />
           ))}
         </div>
       ) : (

@@ -15,7 +15,7 @@ button {
             background-color: $gray-4;
         }
         
-        &:hover {
+        &:not(:disabled):hover {
             background-color: $secondary-color;
         }
     }
@@ -24,7 +24,7 @@ button {
         background-color: $white;
         color: $primary-color;
     
-        &:disabled {
+        &:not(:disabled):disabled {
             color: $gray-4;
         }
     
