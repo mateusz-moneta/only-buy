@@ -1,8 +1,18 @@
 import React, { useState } from 'react';
 
+import { RoleName } from '../../../../models';
+
 import './Avatar.scss';
 
-export const Avatar = ({ logout, src }: { logout: () => void; src: string }) => {
+export const Avatar = ({
+  logout,
+  roleName,
+  src
+}: {
+  logout: () => void;
+  roleName: RoleName;
+  src: string;
+}) => {
   const [isOpenMenu, setOpenMenu] = useState(false);
 
   const closeMenu = () => setOpenMenu(false);
@@ -15,9 +25,11 @@ export const Avatar = ({ logout, src }: { logout: () => void; src: string }) => 
       {isOpenMenu && (
         <div onMouseLeave={() => closeMenu()} className="avatar__menu">
           <ul>
-            <li>
-              <a href="/products-creator">Creator of product</a>
-            </li>
+            {roleName === RoleName.ADMIN && (
+              <li>
+                <a href="/products-creator">Creator of product</a>
+              </li>
+            )}
 
             <li onClick={logout}>Log out</li>
           </ul>

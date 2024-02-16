@@ -18,6 +18,11 @@ const initialInputsState: Input = {
     value: '',
     valid: false
   },
+  code: {
+    value: '',
+    valid: false,
+    nullable: true
+  },
   description: {
     value: '',
     valid: false
@@ -28,7 +33,8 @@ const initialInputsState: Input = {
   },
   productImages: {
     value: null,
-    valid: false
+    valid: false,
+    nullable: true
   },
   active: {
     value: true,
@@ -101,24 +107,34 @@ export const ProductsCreator = () => {
   const handleSubmit = () => {
     const formData = new FormData();
     formData.append('name', inputs.name.value as string);
+
+    if (inputs.code.value) {
+      formData.append('code', inputs.code.value as string);
+    }
+
     formData.append('description', inputs.description.value as string);
     formData.append('price', inputs.price.value?.toString() as string);
     formData.append('isActive', inputs.active.value?.toString() as string);
     formData.append('isPromo', inputs.promo.value?.toString() as string);
 
-    Array.from(inputs.productImages.value as FileList).forEach((file) =>
-      formData.append('productImages[]', file)
-    );
+    if (inputs.productImages.value) {
+      Array.from(inputs.productImages.value as FileList).forEach((file) =>
+        formData.append('productImages[]', file, file.name)
+      );
+    }
 
-    console.log(formData);
-
-    request(`${apiUrl}/products/new`, formData, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${userContext.user?.accessToken}`,
-        'Content-Type': 'multipart/form-data'
-      }
-    })
+    request(
+      `${apiUrl}/products/new`,
+      formData,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${userContext.user?.accessToken}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      },
+      userContext
+    )
       .then((response) => response.json())
       .then((res) => console.log(res));
   };
@@ -144,6 +160,15 @@ export const ProductsCreator = () => {
             minLength={5}
             placeholder="Enter name"
             required={true}
+            type="text"
+          />
+
+          <LabeledInput
+            change={handleChange}
+            label="Code"
+            name="code"
+            minLength={5}
+            placeholder="Enter code"
             type="text"
           />
 
@@ -189,7 +214,9 @@ export const ProductsCreator = () => {
 
           <Button
             click={handleSubmit}
-            disabled={Object.values(inputs).some(({ valid }) => !valid)}
+            disabled={Object.values(inputs)
+              .filter((input) => !input?.nullable)
+              .some(({ valid }) => !valid)}
             theme="primary"
           >
             Create

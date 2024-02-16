@@ -9,6 +9,7 @@ import { SecureRoute } from './SecureRoute';
 const Dashboard = lazy(() => import('./pages/dashboard/containers/Dashboard'));
 const Login = lazy(() => import('./pages/login/containers/Login'));
 const NotFound = lazy(() => import('./pages/not-found/NotFound'));
+const Product = lazy(() => import('./pages/product/containers/Product'));
 const ProductsCreator = lazy(() => import('./pages/products-creator/containers/ProductsCreator'));
 const Register = lazy(() => import('./pages/register/containers/Register'));
 
@@ -64,6 +65,14 @@ function App() {
               element={
                 <SecureRoute>
                   <Dashboard />
+                </SecureRoute>
+              }
+            />
+            <Route
+              path="/product/:id"
+              element={
+                <SecureRoute>
+                  <Product />
                 </SecureRoute>
               }
             />

@@ -21,7 +21,7 @@ export const LabeledInput = ({
   name: string;
   pattern?: string;
   placeholder: string;
-  required: boolean;
+  required?: boolean;
   step?: string;
   type: string;
 }) => (

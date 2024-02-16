@@ -3,7 +3,7 @@ import React, { ChangeEvent, useContext, useEffect, useRef, useState } from 'rea
 import { apiUrl } from '../../../api';
 import { Avatar, EmptyProducts, Product } from '../components';
 import { Checkbox, Search, Spinner } from '../../../components';
-import { Product as ProductModel } from '../../../models';
+import { Product as ProductModel, RoleName } from '../../../models';
 import { request } from '../../../utils';
 import { UserContext } from '../../../contexts';
 
@@ -86,7 +86,7 @@ const Dashboard = () => {
         </div>
 
         <div className="col-md-3 col-sm-2 col-6 d-flex align-items-center mt-2 offset-md-1">
-          <Avatar logout={() => logout()} src={''} />
+          <Avatar logout={() => logout()} roleName={userContext.user?.role as RoleName} src={''} />
         </div>
       </header>
 

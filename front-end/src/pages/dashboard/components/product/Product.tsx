@@ -1,4 +1,5 @@
-import React, { useContext, useState } from 'react';
+import React, { startTransition, useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { apiUrl } from '../../../../api';
 import { Product as ProductModel, Rate } from '../../../../models';
@@ -26,6 +27,8 @@ export const Product = ({
   product: ProductModel;
   index: number;
 }) => {
+  const navigate = useNavigate();
+
   const userContext = useContext(UserContext);
 
   const [imageIndex, setImageIndex] = useState(0);
@@ -56,9 +59,7 @@ export const Product = ({
       .then(() => setConfirmedRating(rating));
   };
 
-  const showDetails = () => {
-    return;
-  };
+  const showDetails = () => startTransition(() => navigate(`/product/${id}`));
 
   return (
     <div className="product">

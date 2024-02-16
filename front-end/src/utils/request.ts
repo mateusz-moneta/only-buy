@@ -29,7 +29,7 @@ export const request = async (
   };
 
   if (body && options.method !== 'GET') {
-    params.body = JSON.stringify(body);
+    params.body = body instanceof FormData ? (body as FormData) : JSON.stringify(body);
   }
 
   const response = await fetch(url, params);
