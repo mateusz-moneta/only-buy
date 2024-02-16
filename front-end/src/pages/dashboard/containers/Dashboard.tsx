@@ -93,7 +93,7 @@ const Dashboard = () => {
       {loading ? (
         <Spinner />
       ) : products.length ? (
-        <div className="row mt-sm-4 mt-md-5">
+        <div className="row mt-3 mt-sm-4 mt-md-5">
           {products.map((product, index) => (
             <div className="col-md-4 col-sm-6 col-12" key={product.id}>
               <Product product={product} index={index} />

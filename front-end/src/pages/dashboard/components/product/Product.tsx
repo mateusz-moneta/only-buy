@@ -62,7 +62,7 @@ export const Product = ({
   const showDetails = () => startTransition(() => navigate(`/product/${id}`));
 
   return (
-    <div className="product">
+    <div className="mt-4 mt-sm-2 mt-md-2 product">
       <div className="product__image">
         {isPromo && <div className="product__promo">Promo</div>}
 
