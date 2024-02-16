@@ -6,3 +6,4 @@ export * from './labeled-input';
 export * from './labeled-select';
 export * from './labeled-text-area';
 export * from './search';
+export * from './spinner';

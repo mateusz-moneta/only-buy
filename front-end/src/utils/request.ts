@@ -3,7 +3,7 @@ import { apiUrl } from '../api';
 
 export const request = async (
   url = '',
-  body: NonNullable<unknown> | null,
+  body: FormData | NonNullable<unknown> | null,
   options: RequestInit = {
     method: 'POST',
     mode: 'cors',
@@ -50,11 +50,13 @@ export const request = async (
     throw new Error(`HTTP error! status: ${response.status}`);
   }
 
-  return response.json();
+  return response;
 };
 
 async function refreshAccessToken(userContext: React.ContextType<typeof UserContext>) {
   request(`${apiUrl}/auth/refresh-token`, {
     refreshToken: userContext?.user?.refreshToken
-  }).then((newAccessToken: string) => userContext.replaceAccessToken(newAccessToken));
+  })
+    .then((response) => response.text())
+    .then((newAccessToken: string) => userContext.replaceAccessToken(newAccessToken));
 }

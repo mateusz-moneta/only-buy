@@ -4,50 +4,54 @@
 @import './components/table.scss';
 
 html {
-    font-size: 10px;
+  font-size: 10px;
 }
 
-html, body, #root, .container, .container-fluid { 
-    height: 100%;
+html,
+body,
+#root,
+.container,
+.container-fluid {
+  height: 100%;
 }
 
 body {
-    font-family: 'Nunito';
+  font-family: 'Nunito';
 }
 
 header {
-    display: flex;
-    padding: 2.9rem 0;
+  display: flex;
+  padding: 2.9rem 0;
 
-    > button {
-        background: transparent;
-        border: none;
-        margin-bottom: .5rem;
-        margin-right: 2rem;
-        outline: none;
-        padding: 0;
-        width: 2.5rem;
+  > button {
+    background: transparent;
+    border: none;
+    margin-bottom: 0.5rem;
+    margin-right: 2rem;
+    outline: none;
+    padding: 0;
+    width: 2.5rem;
 
-        > img {
-            height: 100%;
-            width: 100%;
-        }
+    > img {
+      height: 100%;
+      width: 100%;
     }
+  }
 }
 
 #spinner {
-    height: 5rem;
-    left: 50%;
-    position: absolute;
-    top: 55%;
+  height: 5rem;
+  left: 50%;
+  position: absolute;
+  top: 55%;
 }
 
 .responsive-table-container {
-    overflow-x: auto;
-    padding: .5rem;
+  overflow-x: auto;
+  padding: 0.5rem;
 }
 
 .link {
-    color: $gray-4;
-    font-size: 1.4rem;
+  color: $gray-4;
+  font-size: 1.4rem;
 }

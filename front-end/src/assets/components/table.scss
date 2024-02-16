@@ -1,28 +1,29 @@
 @import '../colors.scss';
 
 table {
-    border-collapse: collapse;
-    width: 100%;
+  border-collapse: collapse;
+  width: 100%;
 
-    td, th {
-        border: 1px solid var(--gray-2);
-        padding: 8px;
-        text-align: center;
-        white-space: nowrap;
-    }
-    
-    tr {
-        &:nth-child(even) {
-            background-color: var(--gray-1);
-        }
+  td,
+  th {
+    border: 1px solid var(--gray-2);
+    padding: 8px;
+    text-align: center;
+    white-space: nowrap;
+  }
 
-        &:not(:has(th)):hover {
-            background-color: var(--gray-2);
-        }
+  tr {
+    &:nth-child(even) {
+      background-color: var(--gray-1);
     }
-    
-    th {
-        padding-top: 12px;
-        padding-bottom: 12px;
+
+    &:not(:has(th)):hover {
+      background-color: var(--gray-2);
     }
+  }
+
+  th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
 }

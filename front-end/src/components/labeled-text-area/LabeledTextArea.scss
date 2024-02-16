@@ -1,21 +1,21 @@
 @import '../../assets/colors.scss';
 
 .labeled-text-area {
-    color: $black;
-    font-size: 1.4rem;
-    font-weight: 700;
-    margin: 0.8rem 0;
+  color: $black;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0.8rem 0;
 
-    > textarea {
-        border: 0.1rem solid $gray-2;
-        border-radius: 0.8rem;
-        color: $gray-4;
-        font-weight: 500;
-        margin-top: 0.8rem;
-        max-height: 200px;
-        min-height: 100px;
-        resize: vertical;
-        padding: 1.6rem;
-        width: 100%;
-    }
+  > textarea {
+    border: 0.1rem solid $gray-2;
+    border-radius: 0.8rem;
+    color: $gray-4;
+    font-weight: 500;
+    margin-top: 0.8rem;
+    max-height: 200px;
+    min-height: 100px;
+    resize: vertical;
+    padding: 1.6rem;
+    width: 100%;
+  }
 }

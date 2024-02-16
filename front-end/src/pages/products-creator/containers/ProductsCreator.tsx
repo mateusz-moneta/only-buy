@@ -1,4 +1,4 @@
-import React, { ChangeEvent, startTransition, useState } from 'react';
+import React, { ChangeEvent, startTransition, useContext, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { apiUrl } from '../../../api';
@@ -11,6 +11,7 @@ import {
 } from '../../../components';
 import { Input } from '../../../models';
 import { request } from '../../../utils';
+import { UserContext } from '../../../contexts';
 
 const initialInputsState: Input = {
   name: {
@@ -31,15 +32,17 @@ const initialInputsState: Input = {
   },
   active: {
     value: true,
-    valid: false
+    valid: true
   },
   promo: {
     value: true,
-    valid: false
+    valid: true
   }
 };
 
 export const ProductsCreator = () => {
+  const userContext = useContext(UserContext);
+
   const [inputs, setInputs] = useState(initialInputsState);
 
   const navigate = useNavigate();
@@ -53,17 +56,27 @@ export const ProductsCreator = () => {
   const handleChange = (
     event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
-    const target = event.target as HTMLInputElement;
-    const files = target.files as FileList;
-
     const {
       name,
       value,
       validity: { valid }
     } = event.target;
 
-    if (files?.length) {
-      console.log(files);
+    if (['active', 'promo'].includes(name)) {
+      setInputs((values) => ({
+        ...values,
+        [name]: {
+          value: !inputs[name].value,
+          valid
+        }
+      }));
+
+      return;
+    }
+
+    if (name === 'productImages') {
+      const target = event.target as HTMLInputElement;
+      const files = target.files as FileList;
 
       setInputs((values) => ({
         ...values,
@@ -72,21 +85,43 @@ export const ProductsCreator = () => {
           valid
         }
       }));
-      console.log(inputs);
+
       return;
     }
+
+    setInputs((values) => ({
+      ...values,
+      [name]: {
+        value,
+        valid
+      }
+    }));
   };
 
-  const handleSubmit = () =>
-    request(`${apiUrl}/products/new`, {
-      name: inputs.name.value,
-      description: inputs.description.value,
-      price: inputs.price.value,
-      isActive: inputs.active.value,
-      isPromo: inputs.promo.value,
-      productImages: inputs.productImages.value
-    }).then((res) => console.log(res));
-  // .then(() => navigate('/'));
+  const handleSubmit = () => {
+    const formData = new FormData();
+    formData.append('name', inputs.name.value as string);
+    formData.append('description', inputs.description.value as string);
+    formData.append('price', inputs.price.value?.toString() as string);
+    formData.append('isActive', inputs.active.value?.toString() as string);
+    formData.append('isPromo', inputs.promo.value?.toString() as string);
+
+    Array.from(inputs.productImages.value as FileList).forEach((file) =>
+      formData.append('productImages[]', file)
+    );
+
+    console.log(formData);
+
+    request(`${apiUrl}/products/new`, formData, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${userContext.user?.accessToken}`,
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+      .then((response) => response.json())
+      .then((res) => console.log(res));
+  };
 
   return (
     <div className="container">

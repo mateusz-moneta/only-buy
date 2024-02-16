@@ -1,35 +1,35 @@
 @import '../../assets/colors.scss';
 
 button {
-    border: none;
-    font-size: 1.4rem;
-    outline: none;
-    padding: 1.6rem;
-    width: 100%;    
+  border: none;
+  font-size: 1.4rem;
+  outline: none;
+  padding: 1.6rem;
+  width: 100%;
 
-    &.primary {
-        background-color: $primary-color;
-        color: $white;
-    
-        &:disabled {
-            background-color: $gray-4;
-        }
-        
-        &:not(:disabled):hover {
-            background-color: $secondary-color;
-        }
+  &.primary {
+    background-color: $primary-color;
+    color: $white;
+
+    &:disabled {
+      background-color: $gray-4;
     }
-    
-    &.secondary {
-        background-color: $white;
-        color: $primary-color;
-    
-        &:not(:disabled):disabled {
-            color: $gray-4;
-        }
-    
-        &:hover {
-            color: $secondary-color;
-        }
+
+    &:not(:disabled):hover {
+      background-color: $secondary-color;
     }
+  }
+
+  &.secondary {
+    background-color: $white;
+    color: $primary-color;
+
+    &:not(:disabled):disabled {
+      color: $gray-4;
+    }
+
+    &:hover {
+      color: $secondary-color;
+    }
+  }
 }

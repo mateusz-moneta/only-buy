@@ -64,22 +64,24 @@ const Register = () => {
       username: inputs.username.value,
       password: inputs.password.value,
       email: inputs.email.value
-    }).then((result: boolean) => {
-      if (!result) {
-        setForceDisabled(true);
-        alertContext.writeMessage('User has not been registered.');
-        alertContext.open();
+    })
+      .then((response) => response.json())
+      .then((result: boolean) => {
+        if (!result) {
+          setForceDisabled(true);
+          alertContext.writeMessage('User has not been registered.');
+          alertContext.open();
 
-        setTimeout(() => {
-          alertContext.close();
-          alertContext.cleanMessage();
-        }, 3000);
+          setTimeout(() => {
+            alertContext.close();
+            alertContext.cleanMessage();
+          }, 3000);
 
-        return;
-      }
+          return;
+        }
 
-      navigate('/login');
-    });
+        navigate('/login');
+      });
 
   return (
     <div className="container">

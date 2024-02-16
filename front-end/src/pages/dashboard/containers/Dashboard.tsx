@@ -2,7 +2,7 @@ import React, { ChangeEvent, useContext, useEffect, useRef, useState } from 'rea
 
 import { apiUrl } from '../../../api';
 import { Avatar, EmptyProducts, Product } from '../components';
-import { Checkbox, Search } from '../../../components';
+import { Checkbox, Search, Spinner } from '../../../components';
 import { Product as ProductModel } from '../../../models';
 import { request } from '../../../utils';
 import { UserContext } from '../../../contexts';
@@ -15,6 +15,7 @@ const Dashboard = () => {
   const shouldLoadProducts = useRef(true);
 
   const [active, setActive] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [phrase, setPhrase] = useState('');
   const [products, setProducts] = useState([] as ProductModel[]);
   const [promo, setPromo] = useState(false);
@@ -43,7 +44,9 @@ const Dashboard = () => {
     loadProducts();
   };
 
-  const loadProducts = () =>
+  const loadProducts = () => {
+    setLoading(true);
+
     request(
       `${apiUrl}/products?active=${active}&phrase=${phrase}&promo=${promo}`,
       null,
@@ -56,9 +59,12 @@ const Dashboard = () => {
         }
       },
       userContext
-    ).then((products: ProductModel[]) => {
-      setProducts(products);
-    });
+    )
+      .then((response) => response.json())
+      .then((products: ProductModel[]) => setProducts(products))
+      .then(() => setLoading(false))
+      .catch(() => setLoading(false));
+  };
 
   return (
     <div className="container-fluid d-flex flex-column">
@@ -73,21 +79,23 @@ const Dashboard = () => {
           />
         </div>
 
-        <div className="col-md-3 col-sm-4 col-6 d-flex offset-md-1">
+        <div className="col-md-3 col-sm-4 col-6 d-flex mt-2 offset-md-1">
           <Checkbox change={() => toggleActive()} checked={active} label="Active" name="active" />
 
           <Checkbox change={() => togglePromo()} checked={promo} label="Promo" name="promo" />
         </div>
 
-        <div className="col-md-3 col-sm-2 col-6 d-flex align-items-center offset-md-1">
+        <div className="col-md-3 col-sm-2 col-6 d-flex align-items-center mt-2 offset-md-1">
           <Avatar logout={() => logout()} src={''} />
         </div>
       </header>
 
-      {products.length ? (
-        <div className="row">
-          {products.map((product: ProductModel, index: number) => (
-            <div className="col-md-4 col-sm-6 col-12" key={product.productId}>
+      {loading ? (
+        <Spinner />
+      ) : products.length ? (
+        <div className="row mt-sm-4 mt-md-5">
+          {products.map((product, index) => (
+            <div className="col-md-4 col-sm-6 col-12" key={product.id}>
               <Product product={product} index={index} />
             </div>
           ))}

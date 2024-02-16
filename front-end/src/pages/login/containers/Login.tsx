@@ -48,6 +48,7 @@ const Login = () => {
       username: inputs.username.value,
       password: inputs.password.value
     })
+      .then((response) => response.json())
       .then((user: User) => userContext.login(user))
       .then(() => navigate('/'));
 

@@ -1,20 +1,20 @@
-.files-uploader {  
-    margin: 1.2rem 0;
+.files-uploader {
+  margin: 1.2rem 0;
 
-    &__choose-image-message {
-        font-size: 1.4rem;
+  &__choose-image-message {
+    font-size: 1.4rem;
+  }
+
+  &__files {
+    margin: 0.8rem 0;
+
+    > img:not(:last-of-type) {
+      margin-bottom: 1rem;
     }
+  }
 
-    &__files {
-        margin: 0.8rem 0;
-
-        > img:not(:last-of-type) {
-            margin-bottom: 1rem;
-        }
-    }
-
-    &__preview {
-        font-size: 1.4rem;
-        margin-top: 0.5rem;
-    }
+  &__preview {
+    font-size: 1.4rem;
+    margin-top: 0.5rem;
+  }
 }
