@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import classNames from 'classnames';
 
 import './Rates.scss';
 
@@ -27,7 +28,10 @@ export const Rates = ({
           onClick={() => handleClick(value + 1)}
           onMouseEnter={() => handleMouseEnter(value + 1)}
           onMouseLeave={handleMouseLeave}
-          className="rate"
+          className={classNames({
+            rates__item: true,
+            'rates__item--filled': value + 1 <= (rating || confirmedRating)
+          })}
           key={value}
           role="button"
           src={`/icons/${value + 1 <= (rating || confirmedRating) ? 'star-filled' : 'star'}.svg`}

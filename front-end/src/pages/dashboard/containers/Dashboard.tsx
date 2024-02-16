@@ -62,8 +62,8 @@ const Dashboard = () => {
     )
       .then((response) => response.json())
       .then((products: ProductModel[]) => setProducts(products))
-      .then(() => setLoading(false))
-      .catch(() => setLoading(false));
+      .then(() => setTimeout(() => setLoading(false), 300))
+      .catch(() => setTimeout(() => setLoading(false), 300));
   };
 
   return (

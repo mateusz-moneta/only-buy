@@ -1,23 +1,59 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 
-import { Product as ProductModel } from '../../../../models';
+import { apiUrl } from '../../../../api';
+import { Product as ProductModel, Rate } from '../../../../models';
 import { Rates } from '../rates';
+import { request } from '../../../../utils';
+import { UserContext } from '../../../../contexts';
 
 import './Product.scss';
 
+const calculateAverageRating = (rates: Rate[]) => {
+  if (!rates.length) {
+    return 0;
+  }
+
+  const sum = rates.reduce((acc, rate) => acc + rate.rating, 0);
+  const average = sum / rates.length;
+
+  return average;
+};
+
 export const Product = ({
-  product: { description, productsImages, isPromo, name, rate },
+  product: { id, description, images, isPromo, name, rates },
   index
 }: {
   product: ProductModel;
   index: number;
 }) => {
+  const userContext = useContext(UserContext);
+
   const [imageIndex, setImageIndex] = useState(0);
-  const [confirmedRating, setConfirmedRating] = useState(rate || 0);
+  const [confirmedRating, setConfirmedRating] = useState(calculateAverageRating(rates) || 0);
 
   const selectRates = (rating: number) => {
-    setConfirmedRating(rating);
-    console.log(rating);
+    if (rating === confirmedRating) {
+      return;
+    }
+
+    request(
+      `${apiUrl}/products/rate`,
+      {
+        productId: id,
+        rating
+      },
+      {
+        method: confirmedRating > 0 ? 'PATCH' : 'POST',
+        headers: {
+          Authorization: `Bearer ${userContext.user?.accessToken}`,
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      },
+      userContext
+    )
+      .then((response) => response.text())
+      .then(() => setConfirmedRating(rating));
   };
 
   const showDetails = () => {
@@ -29,11 +65,7 @@ export const Product = ({
       <div className="product__image">
         {isPromo && <div className="product__promo">Promo</div>}
 
-        <img
-          alt=""
-          className="w-100"
-          src={`http://localhost:5000${productsImages[imageIndex].path}`}
-        />
+        <img alt="" className="w-100" src={`http://localhost:5000${images[imageIndex].path}`} />
       </div>
 
       <div className="product__content">

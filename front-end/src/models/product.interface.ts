@@ -1,5 +1,6 @@
 import { BaseModel } from './base-model.interface';
 import { ProductImage } from './product-image.interface';
+import { Rate } from './rate.interface';
 
 export interface Product extends BaseModel {
   id: number;
@@ -7,6 +8,6 @@ export interface Product extends BaseModel {
   description: string;
   isActive: string;
   isPromo: string;
-  productsImages: ProductImage[];
-  rate: number;
+  images: ProductImage[];
+  rates: Rate[];
 }

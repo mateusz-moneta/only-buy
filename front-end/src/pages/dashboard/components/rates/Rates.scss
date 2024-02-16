@@ -5,4 +5,13 @@
   flex-direction: row;
   justify-content: space-between;
   max-width: 15rem;
+
+  &__item {
+    filter: invert(0.7);
+
+    &--filled {
+      filter: invert(12%) sepia(139%) saturate(768%) hue-rotate(363deg) brightness(299%)
+        contrast(176%);
+    }
+  }
 }
