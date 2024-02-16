@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MulterModule } from '@nestjs/platform-express';
 
@@ -14,6 +15,7 @@ import {
   ProductsService,
   UploadService,
 } from './services';
+import { UsersModule } from '../users';
 
 @Module({
   controllers: [ProductsController],
@@ -24,8 +26,10 @@ import {
       ProductImageEntity,
       ProductRateEntity,
     ]),
+    UsersModule,
   ],
   providers: [
+    JwtService,
     ProductImagesService,
     ProductRatesService,
     ProductsService,

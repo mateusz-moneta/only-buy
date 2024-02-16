@@ -5,13 +5,16 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
   Req,
+  UnauthorizedException,
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
 
@@ -21,13 +24,14 @@ import {
   UpdateProductDto,
   UpdateProductRateDto,
 } from './dto';
-import { ProductEntity, ProductRateEntity } from './entities';
+import { ProductEntity } from './entities';
 import { ProductRatesService, ProductsService } from './services';
 
 @ApiTags('products')
 @Controller('products')
 export class ProductsController {
   constructor(
+    private readonly jwtService: JwtService,
     private readonly productsService: ProductsService,
     private readonly productRatesService: ProductRatesService,
   ) {}
@@ -40,6 +44,8 @@ export class ProductsController {
     @UploadedFiles() productImages: Express.Multer.File[],
     @Req() req: { body: CreateProductDto },
   ): Promise<ProductEntity> {
+    console.log(req.body);
+    console.log(productImages);
     return this.productsService.createProduct(req.body, productImages);
   }
 
@@ -105,27 +111,45 @@ export class ProductsController {
   @ApiResponse({
     status: 200,
     description: 'The create of rate',
-    type: 'object',
+    type: 'boolean',
   })
-  @ApiParam({ name: 'id' })
   createRate(
     @Body() createRateDto: CreateProductRateDto,
-  ): Promise<ProductRateEntity> {
-    return this.productRatesService.createProductRate(createRateDto);
+    @Req() request: Request,
+  ): Promise<boolean> {
+    const token = request.headers['authorization'].replace('Bearer ', '');
+    const decodedToken = this.jwtService.decode(token);
+
+    if (!decodedToken || !decodedToken.hasOwnProperty('username')) {
+      throw new UnauthorizedException('Invalid token or missing username');
+    }
+
+    const { username } = decodedToken;
+
+    return this.productRatesService.createProductRate(createRateDto, username);
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
-  @Put('rate')
+  @Patch('rate')
   @ApiOperation({ summary: 'Update the rate for product' })
   @ApiResponse({
     status: 200,
     description: 'The update of rate',
     type: 'boolean',
   })
-  @ApiParam({ name: 'id' })
   updateProductRate(
     @Body() updateRateDto: UpdateProductRateDto,
+    @Req() request: Request,
   ): Promise<boolean> {
-    return this.productRatesService.updateProductRate(updateRateDto);
+    const token = request.headers['authorization'].replace('Bearer ', '');
+    const decodedToken = this.jwtService.decode(token);
+
+    if (!decodedToken || !decodedToken.hasOwnProperty('username')) {
+      throw new UnauthorizedException('Invalid token or missing username');
+    }
+
+    const { username } = decodedToken;
+
+    return this.productRatesService.updateProductRate(updateRateDto, username);
   }
 }

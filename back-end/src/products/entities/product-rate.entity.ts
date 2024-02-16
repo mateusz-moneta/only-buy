@@ -17,10 +17,10 @@ export class ProductRateEntity extends BaseEntity {
   @Column({ type: 'smallint' })
   rating: number;
 
-  @ManyToOne(() => ProductEntity, (product) => product.productRates)
+  @ManyToOne(() => ProductEntity, (product) => product.rates)
   product: ProductEntity;
 
-  @ManyToOne(() => UserEntity, (user) => user.productRates)
+  @ManyToOne(() => UserEntity, (user) => user.rates)
   user: UserEntity;
 
   constructor(partial: Partial<ProductRateEntity>) {

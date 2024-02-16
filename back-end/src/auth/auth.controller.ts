@@ -51,7 +51,8 @@ export class AuthController {
     return this.authService.login(loginUserDto);
   }
 
-  @Get('refresh-token')
+  @Public()
+  @Post('refresh-token')
   @ApiOperation({ summary: 'Get access token based on refresh token' })
   @ApiResponse({
     status: 200,

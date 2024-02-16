@@ -24,27 +24,26 @@ export class RefreshTokenService {
       throw new NotFoundException('User not found');
     }
 
-    const existingToken = await this.refreshTokenRepository
-      .createQueryBuilder('user')
-      .where('user.id = :id', { id: userId })
-      .getOne();
+    const existingToken = await this.refreshTokenRepository.findOne({
+      where: { user: { id: userId } },
+    });
 
     if (existingToken) {
-      await this.refreshTokenRepository
-        .createQueryBuilder()
-        .update(RefreshTokenEntity)
-        .set({ token, expiresAt })
-        .where('id = :id', { id: 1 })
-        .execute();
+      await this.refreshTokenRepository.update(existingToken.id, {
+        token,
+        expiresAt,
+      });
 
       return true;
     }
 
-    this.refreshTokenRepository.create({
-      user,
-      token,
-      expiresAt,
-    });
+    await this.refreshTokenRepository
+      .create({
+        user,
+        token,
+        expiresAt,
+      })
+      .save();
 
     return true;
   }

@@ -21,6 +21,9 @@ export class UserEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column({ nullable: true })
+  avatar: string;
+
   @Column()
   username: string;
 
@@ -35,7 +38,7 @@ export class UserEntity extends BaseEntity {
   role: RoleEntity;
 
   @OneToMany(() => ProductRateEntity, (productRate) => productRate.user)
-  productRates: ProductRateEntity[];
+  rates: ProductRateEntity[];
 
   @CreateDateColumn()
   createdDate: Date;

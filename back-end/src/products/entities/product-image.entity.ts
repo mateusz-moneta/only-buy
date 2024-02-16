@@ -20,10 +20,7 @@ export class ProductImageEntity extends BaseEntity {
   @CreateDateColumn()
   uploadedDate: Date;
 
-  @ManyToOne(
-    () => ProductEntity,
-    (productEntity) => productEntity.productsImages,
-  )
+  @ManyToOne(() => ProductEntity, (productEntity) => productEntity.images)
   product: ProductEntity;
 
   constructor(partial: Partial<ProductImageEntity>) {

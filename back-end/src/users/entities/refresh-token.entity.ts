@@ -1,4 +1,5 @@
 import {
+  BaseEntity,
   Entity,
   Column,
   PrimaryGeneratedColumn,
@@ -9,7 +10,7 @@ import {
 import { UserEntity } from './user.entity';
 
 @Entity({ name: 'refresh_tokens' })
-export class RefreshTokenEntity {
+export class RefreshTokenEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

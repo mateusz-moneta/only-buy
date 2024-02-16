@@ -11,6 +11,7 @@ import { Login, RefreshToken } from '../../users/models';
 import { LoginUserDto } from '../../users/dto';
 import { RefreshTokenService, UsersService } from '../../users/services';
 import { UserEntity } from '../../users/entities';
+import { RoleEntity } from 'src/roles/entities';
 
 @Injectable()
 export class AuthService {
@@ -38,6 +39,8 @@ export class AuthService {
         );
 
         return {
+          username: user.username,
+          role: user.role.name,
           accessToken: await this.generateAccessToken(user),
           refreshToken: refreshToken.token,
         };

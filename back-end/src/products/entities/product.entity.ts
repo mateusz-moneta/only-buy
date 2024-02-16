@@ -34,10 +34,10 @@ export class ProductEntity extends BaseEntity {
   isPromo: boolean;
 
   @OneToMany(() => ProductImageEntity, (productImage) => productImage.product)
-  productsImages: ProductImageEntity[];
+  images: ProductImageEntity[];
 
   @OneToMany(() => ProductRateEntity, (productRate) => productRate.product)
-  productRates: ProductRateEntity[];
+  rates: ProductRateEntity[];
 
   @CreateDateColumn()
   createdDate: Date;

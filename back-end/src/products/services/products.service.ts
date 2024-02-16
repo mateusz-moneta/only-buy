@@ -56,7 +56,8 @@ export class ProductsService {
   findAll(isActive: boolean, isPromo: boolean): Promise<ProductEntity[]> {
     let query = this.productsRepository
       .createQueryBuilder('product')
-      .leftJoinAndSelect('product.productsImages', 'productImages');
+      .leftJoinAndSelect('product.images', 'images')
+      .leftJoinAndSelect('product.rates', 'rates');
 
     if (isActive !== undefined) {
       query = query.andWhere('product.isActive = :isActive', { isActive });
@@ -72,7 +73,7 @@ export class ProductsService {
   findOneById(id: string): Promise<ProductEntity | null> {
     return this.productsRepository
       .createQueryBuilder('product')
-      .leftJoinAndSelect('product.productsImages', 'productImages')
+      .leftJoinAndSelect('product.images', 'images')
       .where({ id })
       .getOne();
   }
