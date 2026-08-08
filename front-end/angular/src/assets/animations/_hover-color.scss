@@ -1,0 +1,11 @@
+@use '../colors' as colors;
+
+@keyframes hover-color {
+  from {
+    border-color: colors.$gray-3;
+  }
+
+  to {
+    border-color: colors.$app-primary-color;
+  }
+}

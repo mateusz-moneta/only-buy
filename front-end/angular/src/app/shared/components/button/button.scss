@@ -1,0 +1,47 @@
+@use 'assets/colors' as colors;
+
+:host {
+  width: 100%;
+}
+
+button {
+  border: none;
+  font-size: 1.4rem;
+  outline: none;
+  padding: 1.6rem;
+  width: 100%;
+
+  &.primary {
+    background-color: colors.$app-primary-color;
+    color: colors.$white;
+
+    &:disabled {
+      background-color: colors.$gray-4;
+    }
+
+    &:not(:disabled):hover {
+      background-color: colors.$app-secondary-color;
+    }
+  }
+
+  &.secondary {
+    background-color: colors.$white;
+    color: colors.$app-primary-color;
+
+    &:not(:disabled):disabled {
+      color: colors.$gray-4;
+    }
+
+    &:hover {
+      color: colors.$app-secondary-color;
+    }
+  }
+
+  &.text {
+    background: transparent;
+    border: none;
+    color: colors.$gray-4;
+    outline: none;
+    padding: 0;
+  }
+}
