@@ -1,1 +1,37 @@
-<p>product-details works!</p>
+<div class="container">
+  <div class="row">
+    <header class="col-md-6 col-sm-8 col-12 offset-sm-2 offset-md-3 d-flex align-items-center">
+      <app-button (callback)="goToDashboard()" type="button">
+        <img alt="Left arrow" src="/icons/left-arrow.svg" />
+      </app-button>
+
+      <h1>Details of product</h1>
+    </header>
+  </div>
+
+  <div class="col-md-6 col-sm-8 col-12 offset-sm-2 offset-md-3 product__content">
+    @if (loading()) {
+      <app-spinner />
+    } @else {
+      <h1>{{ product()?.name }}</h1>
+
+      <div>
+        <h2>Code</h2>
+
+        <p>{{ product()?.code ?? 'Not assigned' }}</p>
+      </div>
+
+      <div>
+        <h2>Description</h2>
+
+        <p>{{ product()?.description }}</p>
+      </div>
+
+      <div>
+        <h2>Price</h2>
+
+        <p>{{ product()?.price }} PLN</p>
+      </div>
+    }
+  </div>
+</div>
