@@ -1,16 +1,21 @@
-import { NewProduct } from './new-product';
 import { createComponentFactory, Spectator } from '@ngneat/spectator';
-import { beforeEach, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-describe(NewProduct.name, () => {
+import { FilesUploader } from './files-uploader';
+
+describe(FilesUploader.name, () => {
   const createComponent = createComponentFactory({
-    component: NewProduct,
+    component: FilesUploader,
   });
 
-  let spectator: Spectator<NewProduct>;
+  let spectator: Spectator<FilesUploader>;
 
   beforeEach(() => {
-    spectator = createComponent();
+    spectator = createComponent({
+      props: {
+        name: 'avatar',
+      },
+    });
   });
 
   it('should create', () => {

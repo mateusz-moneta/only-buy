@@ -1,0 +1,31 @@
+<div class="files-uploader">
+  <p>
+    {{ chooseImageMessage() }}
+  </p>
+
+  <button type="button" class="btn btn-secondary" (click)="openFileDialog()">
+    {{ placeholder() }}
+  </button>
+
+  <input
+    #fileInput
+    class="d-none"
+    type="file"
+    [accept]="accept()"
+    [multiple]="multiple()"
+    [name]="name()"
+    (change)="onFileChange($event)"
+  />
+
+  @if (files.length) {
+    <div class="files-uploader__files">
+      @for (file of files; track file.name) {
+        <img class="w-100" [src]="getPreviewUrl(file)" [alt]="file.name" />
+      }
+    </div>
+  } @else {
+    <div class="files-uploader__preview">
+      <p>{{ emptyMessage() }}</p>
+    </div>
+  }
+</div>

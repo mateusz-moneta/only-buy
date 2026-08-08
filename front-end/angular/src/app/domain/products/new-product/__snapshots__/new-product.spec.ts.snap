@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`_NewProduct > should match snapshot 1`] = `"<p>new-product works!</p>"`;

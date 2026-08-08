@@ -1,22 +1,26 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ProductDetails } from './product-details';
+import { createComponentFactory, Spectator } from '@ngneat/spectator';
+import { FilesUploader } from '../../../shared/components';
+import { beforeEach, expect, it } from 'vitest';
 
 describe(ProductDetails.name, () => {
-  let component: ProductDetails;
-  let fixture: ComponentFixture<ProductDetails>;
+  const createComponent = createComponentFactory({
+    component: ProductDetails,
+  });
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [ProductDetails],
-    }).compileComponents();
+  let spectator: Spectator<ProductDetails>;
 
-    fixture = TestBed.createComponent(ProductDetails);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
+  beforeEach(() => {
+    spectator = createComponent();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(spectator.component).toBeTruthy();
+  });
+
+  it('should match snapshot', () => {
+    expect(spectator.element.innerHTML).toMatchSnapshot();
   });
 });

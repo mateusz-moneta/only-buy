@@ -1,22 +1,23 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { NotFound } from './not-found';
+import { createComponentFactory, Spectator } from '@ngneat/spectator';
+import { beforeEach, expect, it } from 'vitest';
 
 describe(NotFound.name, () => {
-  let component: NotFound;
-  let fixture: ComponentFixture<NotFound>;
+  const createComponent = createComponentFactory({
+    component: NotFound,
+  });
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [NotFound],
-    }).compileComponents();
+  let spectator: Spectator<NotFound>;
 
-    fixture = TestBed.createComponent(NotFound);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
+  beforeEach(() => {
+    spectator = createComponent();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(spectator.component).toBeTruthy();
+  });
+
+  it('should match snapshot', () => {
+    expect(spectator.element.innerHTML).toMatchSnapshot();
   });
 });

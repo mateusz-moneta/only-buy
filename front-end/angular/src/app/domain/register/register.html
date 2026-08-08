@@ -1,15 +1,37 @@
 <div class="container">
   <header>
-    <h1>Login</h1>
+    <h1>Register</h1>
   </header>
 
   <main [formGroup]="form" (ngSubmit)="onSubmit()">
     <div>
+      <app-files-uploader name="Avatar" />
+    </div>
+
+    <div class="mt-4">
       <app-input label="Username" placeholder="Enter username" formControlName="username" />
     </div>
 
     <div class="mt-4">
-      <app-input label="Password" placeholder="Enter password" formControlName="password" />
+      <app-input label="E-mail" placeholder="Enter e-mail" formControlName="email" />
+    </div>
+
+    <div class="mt-4">
+      <app-input
+        label="Password"
+        placeholder="Enter password"
+        type="password"
+        formControlName="password"
+      />
+    </div>
+
+    <div class="mt-4">
+      <app-input
+        label="Repeat password"
+        placeholder="Repeat password"
+        type="password"
+        formControlName="repeatPassword"
+      />
     </div>
 
     <div class="mt-5 w-100">

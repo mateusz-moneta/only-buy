@@ -1,22 +1,23 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { Register } from './register';
+import { createComponentFactory, Spectator } from '@ngneat/spectator';
+import { beforeEach, expect, it } from 'vitest';
 
 describe(Register.name, () => {
-  let component: Register;
-  let fixture: ComponentFixture<Register>;
+  const createComponent = createComponentFactory({
+    component: Register,
+  });
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [Register],
-    }).compileComponents();
+  let spectator: Spectator<Register>;
 
-    fixture = TestBed.createComponent(Register);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
+  beforeEach(() => {
+    spectator = createComponent();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(spectator.component).toBeTruthy();
+  });
+
+  it('should match snapshot', () => {
+    expect(spectator.element.innerHTML).toMatchSnapshot();
   });
 });
