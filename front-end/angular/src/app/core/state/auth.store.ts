@@ -1,9 +1,10 @@
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { inject } from '@angular/core';
-import { AuthService } from '../services';
-import { pipe, switchMap, tap } from 'rxjs';
-import { Login, LoginRequest, Role } from '../models';
+import { AuthService, TokenStorageService } from '../services';
+import { catchError, EMPTY, of, pipe, switchMap, tap } from 'rxjs';
+import { Login, LoginRequest, RefreshTokenRequest, Role } from '../models';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
+import { Router } from '@angular/router';
 
 export interface AuthUser {
   username: string;
@@ -27,26 +28,76 @@ const initialState: AuthState = {
 export const AuthStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  withMethods((store, authService = inject(AuthService)) => ({
-    login: rxMethod<LoginRequest>(
-      pipe(
-        tap(() => {
-          patchState(store, {
-            isLoading: true,
-          });
-        }),
-        switchMap((payload: LoginRequest) => authService.login(payload)),
-        tap((login: Login) => {
-          patchState(store, {
-            accessToken: login.accessToken,
-            isAuthenticated: true,
-            user: {
-              role: login.role,
-              username: login.username,
-            },
-          });
-        }),
+  withMethods(
+    (
+      store,
+      authService = inject(AuthService),
+      router = inject(Router),
+      tokenStorageService = inject(TokenStorageService),
+    ) => ({
+      login: rxMethod<LoginRequest>(
+        pipe(
+          tap(() => {
+            patchState(store, {
+              isLoading: true,
+            });
+          }),
+          switchMap((payload: LoginRequest) => authService.login(payload)),
+          tap((login: Login) => {
+            tokenStorageService.setRefreshToken(login.refreshToken);
+
+            patchState(store, {
+              accessToken: login.accessToken,
+              isAuthenticated: true,
+              user: {
+                role: login.role,
+                username: login.username,
+              },
+            });
+
+            router.navigate(['/']);
+          }),
+          catchError(() => {
+            tokenStorageService.removeRefreshToken();
+
+            patchState(store, {
+              accessToken: null,
+              isAuthenticated: false,
+              user: null,
+            });
+
+            return EMPTY;
+          }),
+        ),
       ),
-    ),
-  })),
+      refreshToken: rxMethod<RefreshTokenRequest>(
+        pipe(
+          tap(() => {
+            patchState(store, {
+              isLoading: true,
+            });
+          }),
+          switchMap((payload: RefreshTokenRequest) => authService.refreshToken(payload)),
+          tap((accessToken: string) => {
+            patchState(store, {
+              accessToken,
+              isLoading: false,
+            });
+          }),
+          catchError(() => {
+            tokenStorageService.removeRefreshToken();
+
+            patchState(store, {
+              accessToken: null,
+              isAuthenticated: false,
+              isLoading: false,
+              user: null,
+            });
+
+            return EMPTY;
+          }),
+        ),
+      ),
+    }),
+  ),
 );

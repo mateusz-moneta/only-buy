@@ -1,0 +1,19 @@
+<div class="product">
+  <div class="product__image">
+    @if (isPromo()) {
+      <div class="product__promo">Promo</div>
+    }
+
+    <img alt="" class="w-100" [src]="'http://localhost:5000/' + images()[imageIndex()].path" />
+  </div>
+
+  <div class="product__content">
+    <h4>{{ name() }}</h4>
+
+    <p>{{ description().length > 100 ? description().slice(0, 150) + '...' : description() }}</p>
+
+    <app-rates [confirmedRating]="confirmedRating()" (selectRates)="selectRates.emit($event)" />
+
+    <app-button (callback)="showDetails.emit()" type="button"> Show details </app-button>
+  </div>
+</div>

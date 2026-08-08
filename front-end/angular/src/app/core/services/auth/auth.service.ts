@@ -14,7 +14,9 @@ export class AuthService {
   }
 
   public refreshToken(payload: RefreshTokenRequest): Observable<string> {
-    return this.httpClient.post<string>('/api/auth/register', payload);
+    return this.httpClient.post<string>('/api/auth/refresh-token', payload, {
+      responseType: 'text',
+    });
   }
 
   public register(payload: RegisterRequest): Observable<string> {
