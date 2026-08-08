@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Button, Input } from '../../shared/components';
 import { LoginFormBuilder } from './builders';
 import { ReactiveFormsModule } from '@angular/forms';
+import { AuthStore } from '../../core/state';
 
 @Component({
   selector: 'app-login',
@@ -11,7 +12,26 @@ import { ReactiveFormsModule } from '@angular/forms';
   standalone: true,
 })
 export class Login {
+  private readonly authStore = inject(AuthStore);
+
   protected readonly form = LoginFormBuilder.build();
 
-  protected onSubmit(): void {}
+  protected onSubmit(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+
+      return;
+    }
+
+    const { password, username } = this.form.value;
+
+    if (!password || !username) {
+      return;
+    }
+
+    this.authStore.login({
+      password,
+      username,
+    });
+  }
 }
