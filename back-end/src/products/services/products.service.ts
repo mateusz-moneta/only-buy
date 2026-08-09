@@ -74,6 +74,7 @@ export class ProductsService {
     return this.productsRepository
       .createQueryBuilder('product')
       .leftJoinAndSelect('product.images', 'images')
+      .leftJoinAndSelect('product.rates', 'rates')
       .where({ id })
       .getOne();
   }

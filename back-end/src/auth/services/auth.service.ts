@@ -7,11 +7,11 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
 import { JwtPayload } from '../payloads';
-import { Login, RefreshToken } from '../../users/models';
+import { Login, RefreshToken, Role } from '../../users/models';
 import { LoginUserDto } from '../../users/dto';
 import { RefreshTokenService, UsersService } from '../../users/services';
 import { UserEntity } from '../../users/entities';
-import { RoleEntity } from 'src/roles/entities';
+import { UserData } from '../../users/models/user-data.model';
 
 @Injectable()
 export class AuthService {
@@ -38,10 +38,16 @@ export class AuthService {
           refreshToken.expiresAt,
         );
 
+        const { role, username } = user;
+
         return {
-          username: user.username,
-          role: user.role.name,
-          accessToken: await this.generateAccessToken(user),
+          username,
+          role: role.name,
+          accessToken: await this.generateAccessToken(
+            user.id,
+            role.name as Role,
+            username,
+          ),
           refreshToken: refreshToken.token,
         };
       }
@@ -50,18 +56,19 @@ export class AuthService {
     throw new UnauthorizedException();
   }
 
-  async generateAccessToken({
-    id: sub,
-    username,
-  }: UserEntity): Promise<string> {
-    const payload: JwtPayload = { username, sub };
+  async generateAccessToken(
+    sub: string,
+    role: Role,
+    username: string,
+  ): Promise<string> {
+    const payload: JwtPayload = { username, role, sub };
 
     return this.jwtService.sign(payload);
   }
 
-  async getAccessTokenFromRefreshToken(
+  async getUserDataFromRefreshToken(
     refreshToken: string,
-  ): Promise<string | null> {
+  ): Promise<UserData | null> {
     const existingRefreshToken =
       await this.refreshTokenService.findRefreshTokenByToken(refreshToken);
 
@@ -77,7 +84,17 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    return await this.generateAccessToken(user);
+    const { role, username } = user;
+
+    return {
+      username,
+      role: role.name,
+      accessToken: await this.generateAccessToken(
+        user.id,
+        role.name as Role,
+        username,
+      ),
+    };
   }
 
   async validateRefreshToken(token: string): Promise<boolean> {

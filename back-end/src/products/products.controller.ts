@@ -12,6 +12,7 @@ import {
   Req,
   UnauthorizedException,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -26,6 +27,8 @@ import {
 } from './dto';
 import { ProductEntity } from './entities';
 import { ProductRatesService, ProductsService } from './services';
+import { RolesGuard } from '../auth/guards';
+import { Admin } from '../auth/decorators';
 
 @ApiTags('products')
 @Controller('products')
@@ -36,6 +39,8 @@ export class ProductsController {
     private readonly productRatesService: ProductRatesService,
   ) {}
 
+  @UseGuards(RolesGuard)
+  @Admin()
   @Post('new')
   @UseInterceptors(ClassSerializerInterceptor)
   @UseInterceptors(FilesInterceptor('productImages'))
@@ -77,6 +82,8 @@ export class ProductsController {
     return this.productsService.findOneById(id);
   }
 
+  @UseGuards(RolesGuard)
+  @Admin()
   @Delete(':id')
   @ApiOperation({ summary: 'Remove product' })
   @ApiResponse({
@@ -89,6 +96,8 @@ export class ProductsController {
     return this.productsService.remove(id);
   }
 
+  @UseGuards(RolesGuard)
+  @Admin()
   @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id')
   @ApiOperation({ summary: 'Update product' })

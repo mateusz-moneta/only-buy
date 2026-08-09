@@ -26,7 +26,7 @@ export class ProductRatesService {
     const user = await this.usersService.findOneByUsername(username);
 
     if (!product || !user) {
-      throw new Error('Product or User not found');
+      throw new Error('ProductComponent or User not found');
     }
 
     await this.productRatesRepository.create({

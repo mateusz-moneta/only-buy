@@ -8,8 +8,8 @@ import { UploadsController } from './uploads.controller';
   controllers: [UploadsController],
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads')
+      rootPath: join(__dirname, '..', 'uploads'),
     }),
-  ]
+  ],
 })
 export class UploadsModule {}

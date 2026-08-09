@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { RegisterUserDto } from '../dto';
 import { RolesService } from '../../roles/services';
 import { UserEntity } from '../entities';
+import { User } from '../models';
 
 @Injectable()
 export class UsersService {
@@ -15,21 +16,28 @@ export class UsersService {
     private readonly rolesService: RolesService,
   ) {}
 
-  findAll(): Promise<UserEntity[]> {
+  findAll(): Promise<User[]> {
     return this.usersRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.role', 'role')
-      .getMany();
+      .select([
+        'user.avatar AS avatar',
+        'user.id AS id',
+        'user.username AS username',
+        'user.email AS email',
+        'user.createdDate AS "createdDate"',
+        'user.updatedDate AS "updatedDate"',
+        'role.name AS role',
+      ])
+      .getRawMany();
   }
 
   findOneById(id: string): Promise<UserEntity | null> {
-    return (
-      this.usersRepository
-        .createQueryBuilder('user')
-        //.leftJoinAndSelect('user.role', 'role')
-        .where({ id })
-        .getOne()
-    );
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.role', 'role')
+      .where({ id })
+      .getOne();
   }
 
   findOneByUsername(username: string): Promise<UserEntity | null> {
