@@ -2,6 +2,7 @@ import { Role } from '@core/models';
 
 export interface User {
   id: string;
+  active: boolean;
   avatar: string;
   username: string;
   email: string;

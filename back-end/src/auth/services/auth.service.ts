@@ -28,6 +28,10 @@ export class AuthService {
     const user = await this.usersService.findOneByUsername(username);
 
     if (!!user) {
+      if (!user.active) {
+        throw new UnauthorizedException('Account is inactive');
+      }
+
       const isMatch = bcrypt.compare(password, user.password);
 
       if (isMatch) {
@@ -51,9 +55,11 @@ export class AuthService {
           refreshToken: refreshToken.token,
         };
       }
+
+      throw new UnauthorizedException('Invalid credentials');
     }
 
-    throw new UnauthorizedException();
+    throw new UnauthorizedException('Invalid credentials');
   }
 
   async generateAccessToken(

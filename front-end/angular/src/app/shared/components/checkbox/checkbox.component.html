@@ -1,11 +1,13 @@
 <div class="checkbox">
   <input
     type="checkbox"
-    [value]="value"
-    [disabled]="disabled"
-    (input)="onInput($event)"
-    (blur)="onTouched()"
+    [checked]="isChecked"
+    [disabled]="checkboxDisabled"
+    (change)="onInput($event)"
+    (blur)="onBlur()"
   />
 
-  <label>{{ label() }}</label>
+  <label>
+    {{ label() }}
+  </label>
 </div>

@@ -1,10 +1,5 @@
-import { ChangeDetectionStrategy, Component, forwardRef, input } from '@angular/core';
-import {
-  ControlValueAccessor,
-  FormsModule,
-  NG_VALUE_ACCESSOR,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { ChangeDetectionStrategy, Component, forwardRef, input, output } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
   selector: 'app-checkbox',
@@ -12,7 +7,6 @@ import {
   styleUrl: './checkbox.component.scss',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, ReactiveFormsModule],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -22,20 +16,31 @@ import {
   ],
 })
 export class CheckboxComponent implements ControlValueAccessor {
-  public readonly label = input<string>('');
-  public readonly placeholder = input<string>('');
+  public readonly checked = input<boolean | undefined>(undefined);
+  public readonly disabled = input(false);
+  public readonly label = input('');
 
-  disabled = false;
-  value = '';
+  public readonly changeValue = output<boolean>();
 
-  private onChange: (value: string) => void = () => {};
+  protected currentValue = false;
+  protected isDisabled = false;
+
+  private onChange: (value: boolean) => void = () => {};
   protected onTouched: () => void = () => {};
 
-  writeValue(value: string | null): void {
-    this.value = value ?? '';
+  protected get checkboxDisabled(): boolean {
+    return this.disabled() || this.isDisabled;
   }
 
-  registerOnChange(fn: (value: string) => void): void {
+  protected get isChecked(): boolean {
+    return this.checked() ?? this.currentValue;
+  }
+
+  writeValue(value: boolean | null): void {
+    this.currentValue = value ?? false;
+  }
+
+  registerOnChange(fn: (value: boolean) => void): void {
     this.onChange = fn;
   }
 
@@ -44,17 +49,18 @@ export class CheckboxComponent implements ControlValueAccessor {
   }
 
   setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
+    this.isDisabled = isDisabled;
   }
 
-  onInput(event: Event): void {
-    const value = (event.target as HTMLInputElement).value;
-
-    this.value = value;
-    this.onChange(value);
-  }
-
-  onBlur(): void {
+  protected onBlur(): void {
     this.onTouched();
+  }
+
+  protected onInput(event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+
+    this.currentValue = checked;
+    this.onChange(checked);
+    this.changeValue.emit(checked);
   }
 }

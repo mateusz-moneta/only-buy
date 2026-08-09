@@ -25,6 +25,7 @@
           <th>Role</th>
           <th>Date of create</th>
           <th>Date of update</th>
+          <th>Is active?</th>
         </thead>
 
         <tbody>
@@ -36,6 +37,15 @@
               <td>{{ user.role | titlecase }}</td>
               <td>{{ user.createdDate | date: standardDate }}</td>
               <td>{{ user.updatedDate | date: standardDate }}</td>
+              <td>
+                <div class="d-flex align-items-center justify-content-center">
+                  <app-checkbox
+                    [disabled]="user.username === currentUsername()"
+                    (changeValue)="onChangeValue(user.id, $event)"
+                    [checked]="user.active"
+                  />
+                </div>
+              </td>
             </tr>
           }
         </tbody>

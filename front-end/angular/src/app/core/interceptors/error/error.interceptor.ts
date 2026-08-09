@@ -20,7 +20,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
             snackbarService.error('Your session has expired. Please log in again.');
           } else {
-            snackbarService.error('Invalid credentials.');
+            snackbarService.error(error.error.message ?? 'Invalid credentials.');
           }
 
           break;

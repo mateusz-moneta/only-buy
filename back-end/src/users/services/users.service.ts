@@ -21,6 +21,7 @@ export class UsersService {
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.role', 'role')
       .select([
+        'user.active AS active',
         'user.avatar AS avatar',
         'user.id AS id',
         'user.username AS username',
@@ -46,6 +47,28 @@ export class UsersService {
       .leftJoinAndSelect('user.role', 'role')
       .where({ username })
       .getOne();
+  }
+
+  async updateActive(id: string, active: boolean): Promise<User> {
+    await this.usersRepository.update(id, {
+      active,
+    });
+
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .leftJoin('user.role', 'role')
+      .select([
+        'user.active AS active',
+        'user.avatar AS avatar',
+        'user.id AS id',
+        'user.username AS username',
+        'user.email AS email',
+        'user.createdDate AS "createdDate"',
+        'user.updatedDate AS "updatedDate"',
+        'role.name AS role',
+      ])
+      .where('user.id = :id', { id })
+      .getRawOne();
   }
 
   async register(registerUserDto: RegisterUserDto): Promise<boolean> {

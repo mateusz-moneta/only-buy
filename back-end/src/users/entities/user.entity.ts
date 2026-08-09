@@ -33,6 +33,9 @@ export class UserEntity extends BaseEntity {
   @Column()
   password: string;
 
+  @Column({ default: true })
+  active: boolean;
+
   @ManyToOne(() => RoleEntity)
   @JoinColumn({ name: 'roleId' })
   role: RoleEntity;
