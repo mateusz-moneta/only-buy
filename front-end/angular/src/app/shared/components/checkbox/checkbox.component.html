@@ -1,13 +1,19 @@
 <div class="checkbox">
   <input
-    type="checkbox"
     [checked]="isChecked"
-    [disabled]="checkboxDisabled"
-    (change)="onInput($event)"
+    [disabled]="isControlDisabled"
     (blur)="onBlur()"
+    (change)="onInput($event)"
+    type="checkbox"
   />
 
-  <label>
-    {{ label() }}
-  </label>
+  @if (label(); as label) {
+    <label>
+      {{ label }}
+    </label>
+  }
+
+  @if (showError()) {
+    <app-errors [errors]="errors" />
+  }
 </div>

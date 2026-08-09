@@ -1,6 +1,11 @@
 {
-  "printWidth": 100,
+  "printWidth": 80,
   "singleQuote": true,
+  "plugins": [
+    "prettier-plugin-organize-attributes",
+    "prettier-plugin-css-order"
+  ],
+  "attributeSort": "ASC",
   "overrides": [
     {
       "files": "*.html",

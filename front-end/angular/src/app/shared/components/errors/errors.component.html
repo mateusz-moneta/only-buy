@@ -1,0 +1,29 @@
+<div class="errors">
+  @if (errors()?.['required']) {
+    <span>This field is required.</span>
+  }
+
+  @if (errors()?.['email']) {
+    <span>Please enter a valid e-mail address.</span>
+  }
+
+  @if (errors()?.['minlength']) {
+    <span>
+      Minimum length is
+      {{ errors()?.['minlength'].requiredLength }}
+      characters.
+    </span>
+  }
+
+  @if (errors()?.['maxlength']) {
+    <span>
+      Maximum length is
+      {{ errors()?.['maxlength'].requiredLength }}
+      characters.
+    </span>
+  }
+
+  @if (errors()?.['passwordMismatch']) {
+    <span>Passwords do not match.</span>
+  }
+</div>

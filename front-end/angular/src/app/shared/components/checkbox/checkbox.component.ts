@@ -1,11 +1,19 @@
-import { ChangeDetectionStrategy, Component, forwardRef, input, output } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  forwardRef,
+  input,
+  output,
+} from '@angular/core';
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { BaseInput } from '../../abstracts';
+import { ErrorsComponent } from '@shared/components';
 
 @Component({
   selector: 'app-checkbox',
+  standalone: true,
   templateUrl: './checkbox.component.html',
   styleUrl: './checkbox.component.scss',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
@@ -14,46 +22,21 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
       multi: true,
     },
   ],
+  imports: [ErrorsComponent],
 })
-export class CheckboxComponent implements ControlValueAccessor {
-  public readonly checked = input<boolean | undefined>(undefined);
-  public readonly disabled = input(false);
+export class CheckboxComponent extends BaseInput<boolean> {
+  public readonly checked = input<boolean | undefined>();
   public readonly label = input('');
+  public readonly disabled = input(false);
 
   public readonly changeValue = output<boolean>();
 
-  protected currentValue = false;
-  protected isDisabled = false;
-
-  private onChange: (value: boolean) => void = () => {};
-  protected onTouched: () => void = () => {};
-
-  protected get checkboxDisabled(): boolean {
-    return this.disabled() || this.isDisabled;
-  }
-
   protected get isChecked(): boolean {
-    return this.checked() ?? this.currentValue;
+    return this.checked() ?? this.currentValue ?? false;
   }
 
-  writeValue(value: boolean | null): void {
-    this.currentValue = value ?? false;
-  }
-
-  registerOnChange(fn: (value: boolean) => void): void {
-    this.onChange = fn;
-  }
-
-  registerOnTouched(fn: () => void): void {
-    this.onTouched = fn;
-  }
-
-  setDisabledState(isDisabled: boolean): void {
-    this.isDisabled = isDisabled;
-  }
-
-  protected onBlur(): void {
-    this.onTouched();
+  protected get isControlDisabled(): boolean {
+    return this.disabled() || this.isDisabled;
   }
 
   protected onInput(event: Event): void {

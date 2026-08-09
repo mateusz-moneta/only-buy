@@ -1,7 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { Login, LoginRequest, RefreshTokenRequest, RegisterRequest } from '../../models';
+import {
+  Login,
+  LoginRequest,
+  RefreshTokenRequest,
+  RegisterRequest,
+} from '../../models';
 import { UserData } from '../../models/user-data';
 
 @Injectable({

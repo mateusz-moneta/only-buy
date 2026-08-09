@@ -1,28 +1,22 @@
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   forwardRef,
-  inject,
-  Injector,
   input,
-  signal,
 } from '@angular/core';
-import {
-  ControlValueAccessor,
-  FormsModule,
-  NG_VALUE_ACCESSOR,
-  NgControl,
-  ReactiveFormsModule,
-} from '@angular/forms';
+
+import { NG_VALUE_ACCESSOR } from '@angular/forms';
+
+import { BaseInput } from '../../abstracts';
 import { InputType } from './models';
+import { ErrorsComponent } from '@shared/components';
 
 @Component({
   selector: 'app-input',
+  standalone: true,
   templateUrl: './input.component.html',
   styleUrl: './input.component.scss',
-  standalone: true,
-  imports: [FormsModule, ReactiveFormsModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -30,61 +24,23 @@ import { InputType } from './models';
       multi: true,
     },
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [ErrorsComponent],
 })
-export class InputComponent implements ControlValueAccessor, AfterViewInit {
-  private readonly injector = inject(Injector);
-
-  protected ngControl: NgControl | null = null;
-
-  public readonly label = input<string>('');
-  public readonly placeholder = input<string>('');
+export class InputComponent extends BaseInput<string> {
+  public readonly disabled = input<boolean>(false);
+  public readonly label = input('');
+  public readonly placeholder = input('');
+  public readonly step = input<string | undefined>(undefined);
   public readonly type = input<InputType>('text');
 
-  protected readonly showError = signal<boolean>(false);
-
-  disabled = false;
-  value = '';
-
-  protected get errors() {
-    return this.ngControl?.control?.errors;
+  protected get isControlDisabled(): boolean {
+    return this.disabled() || this.isDisabled;
   }
 
-  ngAfterViewInit() {
-    this.ngControl = this.injector.get(NgControl);
-
-    this.ngControl.control?.events.subscribe(({ source }) => {
-      this.showError.set(source.invalid && source.touched);
-    });
-  }
-
-  private onChange: (value: string) => void = () => {};
-  protected onTouched: () => void = () => {};
-
-  writeValue(value: string | null): void {
-    this.value = value ?? '';
-  }
-
-  registerOnChange(fn: (value: string) => void): void {
-    this.onChange = fn;
-  }
-
-  registerOnTouched(fn: () => void): void {
-    this.onTouched = fn;
-  }
-
-  setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
-  }
-
-  onInput(event: Event): void {
+  protected onInput(event: Event): void {
     const value = (event.target as HTMLInputElement).value;
 
-    this.value = value;
+    this.currentValue = value;
     this.onChange(value);
-  }
-
-  onBlur(): void {
-    this.onTouched();
   }
 }

@@ -6,7 +6,11 @@ import {
   ProductComponent,
   SearchComponent,
 } from './components';
-import { ButtonComponent, CheckboxComponent, SpinnerComponent } from '@shared/components';
+import {
+  ButtonComponent,
+  CheckboxComponent,
+  SpinnerComponent,
+} from '@shared/components';
 import { Router } from '@angular/router';
 import { Product } from '@core/models';
 

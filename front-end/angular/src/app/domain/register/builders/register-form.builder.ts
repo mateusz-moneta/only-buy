@@ -11,12 +11,18 @@ export class RegisterFormBuilder {
           nonNullable: true,
           validators: [Validators.email, Validators.required],
         }),
-        password: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+        password: new FormControl('', {
+          nonNullable: true,
+          validators: [Validators.required],
+        }),
         repeatPassword: new FormControl('', {
           nonNullable: true,
           validators: [Validators.required],
         }),
-        username: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+        username: new FormControl('', {
+          nonNullable: true,
+          validators: [Validators.required],
+        }),
       },
       {
         validators: passwordMatchValidator,

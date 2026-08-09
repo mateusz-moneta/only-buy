@@ -13,9 +13,11 @@
 
   <div>
     @if (isAuthenticated()) {
-      <app-avatar (logout)="onLogout()" [role]="user()?.role ?? 'STANDARD'" />
+      <app-avatar [role]="user()?.role ?? 'STANDARD'" (logout)="onLogout()" />
     } @else {
-      <app-button (callback)="onLogin()" type="button" variant="secondary"> Log in </app-button>
+      <app-button (callback)="onLogin()" type="button" variant="secondary">
+        Log in
+      </app-button>
     }
   </div>
 </section>
@@ -30,12 +32,12 @@
       @for (product of products(); track product.id) {
         <div class="col-md-4 col-12 mt-md-4 mt-4 pl-4 pr-4">
           <app-product
-            (showDetails)="onShowDetails(product)"
             [confirmedRating]="0"
             [description]="product.description ?? ''"
             [images]="product.images ?? []"
             [isPromo]="product.isPromo ?? false"
             [name]="product.name ?? ''"
+            (showDetails)="onShowDetails(product)"
           />
         </div>
       } @empty {

@@ -7,10 +7,14 @@
     >
       <img
         class="rates__item"
-        [class.rates__item--filled]="value <= (rating() || confirmedRating() || 0)"
+        [class.rates__item--filled]="
+          value <= (rating() || confirmedRating() || 0)
+        "
         [src]="
           '/icons/' +
-          (value <= (rating() || confirmedRating() || 0) ? 'star-filled' : 'star') +
+          (value <= (rating() || confirmedRating() || 0)
+            ? 'star-filled'
+            : 'star') +
           '.svg'
         "
         alt=""

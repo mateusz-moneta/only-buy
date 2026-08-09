@@ -2,7 +2,13 @@ import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { inject } from '@angular/core';
 import { AuthService, TokenStorageService } from '../services';
 import { catchError, EMPTY, of, pipe, switchMap, tap } from 'rxjs';
-import { Login, LoginRequest, RefreshTokenRequest, RegisterRequest, Role } from '../models';
+import {
+  Login,
+  LoginRequest,
+  RefreshTokenRequest,
+  RegisterRequest,
+  Role,
+} from '../models';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { Router } from '@angular/router';
 import { UserData } from '../models/user-data';
@@ -112,7 +118,9 @@ export const AuthStore = signalStore(
               isLoading: true,
             });
           }),
-          switchMap((payload: RefreshTokenRequest) => authService.refreshToken(payload)),
+          switchMap((payload: RefreshTokenRequest) =>
+            authService.refreshToken(payload),
+          ),
           tap((userData: UserData) => {
             patchState(store, {
               accessToken: userData.accessToken,

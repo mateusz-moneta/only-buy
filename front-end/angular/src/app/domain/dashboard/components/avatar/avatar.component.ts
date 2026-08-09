@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { Role } from '@core/models';
 import { RouterLink } from '@angular/router';
 

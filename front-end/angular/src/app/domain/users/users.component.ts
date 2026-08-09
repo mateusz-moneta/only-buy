@@ -1,9 +1,19 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { UsersService } from './services';
 import { UsersStore } from './state';
 import { DatePipe, NgOptimizedImage, TitleCasePipe } from '@angular/common';
 import { STANDARD_DATE } from '@core/constants';
-import { ButtonComponent, CheckboxComponent, SpinnerComponent } from '@shared/components';
+import {
+  ButtonComponent,
+  CheckboxComponent,
+  SpinnerComponent,
+} from '@shared/components';
 import { Router } from '@angular/router';
 import { AuthStore } from '@core/state';
 

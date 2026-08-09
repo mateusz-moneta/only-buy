@@ -1,0 +1,11 @@
+import { FormControl } from '@angular/forms';
+
+export interface NewProductForm {
+  active: FormControl<boolean>;
+  code: FormControl<string>;
+  description: FormControl<string>;
+  images: FormControl<File[]>;
+  name: FormControl<string>;
+  price: FormControl<string>;
+  promo: FormControl<boolean>;
+}

@@ -1,15 +1,17 @@
 @use 'assets/colors' as colors;
 
 section {
-  background: colors.$white;
   display: grid;
-  grid-template-columns: minmax(0, 40rem) minmax(0, 8rem) minmax(0, 8rem) minmax(0, 1fr);
+  grid-template-columns:
+    minmax(0, 40rem) minmax(0, 8rem) minmax(0, 8rem)
+    minmax(0, 1fr);
+  background: colors.$white;
   grid-column-gap: 2rem;
   padding: 3rem 5.5rem;
 
   > div {
-    align-items: center;
     display: flex;
+    align-items: center;
     width: 100%;
 
     > app-search {

@@ -1,0 +1,17 @@
+<label class="textarea" [class.textarea__label--error]="showError()">
+  {{ label() }}
+
+  <textarea
+    [class.textarea__field--error]="showError()"
+    [disabled]="isControlDisabled"
+    [name]="name()"
+    [placeholder]="placeholder()"
+    [value]="currentValue"
+    (blur)="onTouched()"
+    (input)="onInput($event)"
+  ></textarea>
+
+  @if (showError()) {
+    <app-errors [errors]="errors" />
+  }
+</label>

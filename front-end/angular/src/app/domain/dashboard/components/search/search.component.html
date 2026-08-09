@@ -1,8 +1,8 @@
 <input
+  [disabled]="disabled"
   [placeholder]="placeholder()"
   [value]="value"
-  [disabled]="disabled"
-  (input)="onInput($event)"
   (blur)="onTouched()"
+  (input)="onInput($event)"
   type="search"
 />

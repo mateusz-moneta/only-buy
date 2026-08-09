@@ -22,7 +22,9 @@ export class ProductsService {
     return this.httpClient.post<Product>(this.basePath, payload);
   }
 
-  public createProductRate(payload: CreateProductRateRequest): Observable<ProductRate> {
+  public createProductRate(
+    payload: CreateProductRateRequest,
+  ): Observable<ProductRate> {
     return this.httpClient.post<ProductRate>(`${this.basePath}/rate`, payload);
   }
 
@@ -30,11 +32,16 @@ export class ProductsService {
     return this.httpClient.delete<void>(`${this.basePath}/${id}`);
   }
 
-  public editProduct(id: string, payload: CreateProductRequest): Observable<Product> {
+  public editProduct(
+    id: string,
+    payload: CreateProductRequest,
+  ): Observable<Product> {
     return this.httpClient.put<Product>(`${this.basePath}/${id}`, payload);
   }
 
-  public editProductRate(payload: EditProductRateRequest): Observable<ProductRate> {
+  public editProductRate(
+    payload: EditProductRateRequest,
+  ): Observable<ProductRate> {
     return this.httpClient.patch<ProductRate>(`${this.basePath}/rate`, payload);
   }
 

@@ -1,0 +1,34 @@
+@use 'assets/colors' as colors;
+
+.textarea {
+  margin: 0.8rem 0;
+  width: 100%;
+  color: colors.$black;
+  font-weight: 700;
+  font-size: 1.4rem;
+
+  > textarea {
+    margin-top: 0.8rem;
+    border: 0.1rem solid colors.$gray-2;
+    border-radius: 0.8rem;
+    padding: 1.6rem;
+    width: 100%;
+    min-height: 10rem;
+    max-height: 15rem;
+    resize: vertical;
+    color: colors.$gray-4;
+    font-weight: 500;
+
+    &::placeholder {
+      color: colors.$error;
+    }
+  }
+
+  &__field--error {
+    border: 0.1rem solid colors.$error;
+  }
+
+  &__label--error {
+    color: colors.$error;
+  }
+}

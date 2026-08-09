@@ -1,1 +1,67 @@
-<p>new-product works!</p>
+<main class="container">
+  <header class="row product__header">
+    <div class="col-md-6 col-sm-3 col-4 d-flex align-items-center">
+      <app-button (callback)="goToDashboard()" type="button" variant="text">
+        <img
+          alt="Left arrow"
+          height="30"
+          ngSrc="/icons/left-arrow.svg"
+          width="30"
+        />
+      </app-button>
+    </div>
+
+    <div class="col-md-6 col-sm-9 col-8 d-flex align-items-center">
+      <h1>Creator of product</h1>
+    </div>
+  </header>
+
+  <section class="row">
+    <form
+      class="col-md-6 offset-md-3 col-sm-8 offset-sm-2 col-12"
+      [formGroup]="form"
+      (ngSubmit)="onSubmit()"
+    >
+      <app-input
+        formControlName="name"
+        label="Name"
+        placeholder="Enter name"
+        type="text"
+      />
+
+      <app-input
+        formControlName="code"
+        label="Code"
+        placeholder="Enter code"
+        type="text"
+      />
+
+      <app-textarea
+        formControlName="description"
+        label="Description"
+        name="description"
+        placeholder="Enter description"
+      />
+
+      <app-input
+        formControlName="price"
+        label="Price"
+        placeholder="Enter price"
+        step=".01"
+        type="number"
+      />
+
+      <app-files-uploader
+        [multiple]="true"
+        accept=".jpg, .jpeg, .png"
+        name="productImages"
+      />
+
+      <app-checkbox formControlName="promo" label="Promo" />
+
+      <app-checkbox formControlName="active" label="Active" />
+
+      <app-button type="submit"> Create </app-button>
+    </form>
+  </section>
+</main>

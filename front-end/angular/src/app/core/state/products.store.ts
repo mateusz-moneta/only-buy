@@ -84,12 +84,16 @@ export const ProductsStore = signalStore(
             isLoading: true,
           });
         }),
-        switchMap(({ id, payload }) => productsService.editProduct(id, payload)),
+        switchMap(({ id, payload }) =>
+          productsService.editProduct(id, payload),
+        ),
         tap((updatedProduct) => {
           patchState(store, {
             products: store
               .products()
-              .map((product) => (product.id === updatedProduct.id ? updatedProduct : product)),
+              .map((product) =>
+                product.id === updatedProduct.id ? updatedProduct : product,
+              ),
             selectedProduct: updatedProduct,
             isLoading: false,
           });
@@ -107,7 +111,9 @@ export const ProductsStore = signalStore(
           productsService.deleteProduct(id).pipe(
             tap(() => {
               patchState(store, {
-                products: store.products().filter((product) => product.id !== id),
+                products: store
+                  .products()
+                  .filter((product) => product.id !== id),
                 selectedProduct: null,
                 isLoading: false,
               });

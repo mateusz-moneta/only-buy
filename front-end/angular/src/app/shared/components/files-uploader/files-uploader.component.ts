@@ -19,14 +19,17 @@ export class FilesUploaderComponent {
   public readonly chooseImageMessage = input<string>(
     'Choose image for avatar to upload (PNG, JPG)',
   );
-  public readonly emptyMessage = input<string>('No file currently selected for upload');
+  public readonly emptyMessage = input<string>(
+    'No file currently selected for upload',
+  );
   public readonly multiple = input<boolean>(false);
   public readonly name = input.required<string>();
   public readonly placeholder = input<string>('Select file');
 
   public readonly change = output<Event>();
 
-  private readonly fileInput = viewChild<ElementRef<HTMLInputElement>>('fileInput');
+  private readonly fileInput =
+    viewChild<ElementRef<HTMLInputElement>>('fileInput');
 
   files: File[] = [];
 

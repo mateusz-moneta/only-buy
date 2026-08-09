@@ -6,13 +6,17 @@ export const routes: Routes = [
     canActivate: [guestGuard],
     path: 'login',
     loadComponent: () =>
-      import('./domain/login/login.component').then(({ LoginComponent }) => LoginComponent),
+      import('./domain/login/login.component').then(
+        ({ LoginComponent }) => LoginComponent,
+      ),
   },
   {
     canActivate: [authGuard],
     path: 'products',
     loadChildren: () =>
-      import('./domain/products/products.routes').then(({ PRODUCTS_ROUTES }) => PRODUCTS_ROUTES),
+      import('./domain/products/products.routes').then(
+        ({ PRODUCTS_ROUTES }) => PRODUCTS_ROUTES,
+      ),
   },
   {
     canActivate: [guestGuard],
@@ -26,7 +30,9 @@ export const routes: Routes = [
     canActivate: [adminGuard],
     path: 'users',
     loadComponent: () =>
-      import('./domain/users/users.component').then(({ UsersComponent }) => UsersComponent),
+      import('./domain/users/users.component').then(
+        ({ UsersComponent }) => UsersComponent,
+      ),
   },
   {
     canActivate: [authGuard],

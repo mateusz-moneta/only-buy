@@ -5,7 +5,7 @@
     }
 
     @if (images()[imageIndex()]?.path; as path) {
-      <img alt="" class="w-100" [src]="path" />
+      <img class="w-100" [src]="path" alt="" />
     }
   </div>
 
@@ -14,8 +14,13 @@
 
     <div [innerHTML]="description() | safeHtml"></div>
 
-    <app-rates [confirmedRating]="confirmedRating()" (selectRates)="selectRates.emit($event)" />
+    <app-rates
+      [confirmedRating]="confirmedRating()"
+      (selectRates)="selectRates.emit($event)"
+    />
 
-    <app-button (callback)="showDetails.emit()" type="button"> Show details </app-button>
+    <app-button (callback)="showDetails.emit()" type="button">
+      Show details
+    </app-button>
   </div>
 </div>

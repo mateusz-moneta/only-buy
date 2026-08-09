@@ -2,7 +2,12 @@
   <header class="users__header">
     <div>
       <app-button (callback)="goToDashboard()" type="button" variant="text">
-        <img alt="Left arrow" ngSrc="/icons/left-arrow.svg" width="30" height="30" />
+        <img
+          alt="Left arrow"
+          height="30"
+          ngSrc="/icons/left-arrow.svg"
+          width="30"
+        />
       </app-button>
     </div>
 
@@ -13,7 +18,9 @@
 
   <section class="users__table">
     @if (loading()) {
-      <div class="users__spinner d-flex align-items-center justify-content-center h-100">
+      <div
+        class="users__spinner d-flex align-items-center justify-content-center h-100"
+      >
         <app-spinner />
       </div>
     } @else {
@@ -40,9 +47,9 @@
               <td>
                 <div class="d-flex align-items-center justify-content-center">
                   <app-checkbox
+                    [checked]="user.active"
                     [disabled]="user.username === currentUsername()"
                     (changeValue)="onChangeValue(user.id, $event)"
-                    [checked]="user.active"
                   />
                 </div>
               </td>

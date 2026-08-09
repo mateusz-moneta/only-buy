@@ -41,7 +41,9 @@ export const UsersStore = signalStore(
             isLoading: true,
           });
         }),
-        switchMap((payload: UpdateActive) => usersService.updateUserActive(payload)),
+        switchMap((payload: UpdateActive) =>
+          usersService.updateUserActive(payload),
+        ),
         tap((user: User) => {
           patchState(store, {
             users: store.users().map((currentUser: User) => {

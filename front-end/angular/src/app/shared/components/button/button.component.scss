@@ -5,11 +5,11 @@
 }
 
 button {
-  border: none;
-  font-size: 1.4rem;
   outline: none;
+  border: none;
   padding: 1.6rem;
   width: 100%;
+  font-size: 1.4rem;
 
   &.primary {
     background-color: colors.$app-primary-color;
@@ -38,10 +38,10 @@ button {
   }
 
   &.text {
-    background: transparent;
-    border: none;
-    color: colors.$gray-4;
     outline: none;
+    border: none;
+    background: transparent;
     padding: 0;
+    color: colors.$gray-4;
   }
 }

@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonComponent, SpinnerComponent } from '@shared/components';
 import { ProductsStore } from '@core/state';
@@ -23,7 +28,9 @@ export class ProductDetailsComponent implements OnInit {
 
   public ngOnInit(): void {
     if (!this.product()) {
-      this.productsStore.loadProduct({ id: this.activatedRoute.snapshot.params['id'] });
+      this.productsStore.loadProduct({
+        id: this.activatedRoute.snapshot.params['id'],
+      });
     }
   }
 

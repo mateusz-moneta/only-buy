@@ -18,16 +18,22 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             authStore.logout();
             router.navigate(['/login']);
 
-            snackbarService.error('Your session has expired. Please log in again.');
+            snackbarService.error(
+              'Your session has expired. Please log in again.',
+            );
           } else {
-            snackbarService.error(error.error.message ?? 'Invalid credentials.');
+            snackbarService.error(
+              error.error.message ?? 'Invalid credentials.',
+            );
           }
 
           break;
         }
 
         case 403:
-          snackbarService.error('You do not have permission to perform this action.');
+          snackbarService.error(
+            'You do not have permission to perform this action.',
+          );
           break;
 
         case 404:
@@ -35,7 +41,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
           break;
 
         case 500:
-          snackbarService.error('An unexpected server error occurred.');
+          snackbarService.error('An unexpected server errors occurred.');
           break;
 
         default:
