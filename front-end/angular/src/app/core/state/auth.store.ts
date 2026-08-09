@@ -5,6 +5,7 @@ import { catchError, EMPTY, of, pipe, switchMap, tap } from 'rxjs';
 import { Login, LoginRequest, RefreshTokenRequest, Role } from '../models';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { Router } from '@angular/router';
+import { UserData } from '../models/user-data';
 
 export interface AuthUser {
   username: string;
@@ -78,9 +79,13 @@ export const AuthStore = signalStore(
             });
           }),
           switchMap((payload: RefreshTokenRequest) => authService.refreshToken(payload)),
-          tap((accessToken: string) => {
+          tap((userData: UserData) => {
             patchState(store, {
-              accessToken,
+              accessToken: userData.accessToken,
+              user: {
+                role: userData.role,
+                username: userData.username,
+              },
               isLoading: false,
             });
           }),

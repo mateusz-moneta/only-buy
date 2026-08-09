@@ -5,7 +5,8 @@ export const routes: Routes = [
   {
     canActivate: [guestGuard],
     path: 'login',
-    loadComponent: () => import('./domain/login/login').then(({ Login }) => Login),
+    loadComponent: () =>
+      import('./domain/login/login.component').then(({ LoginComponent }) => LoginComponent),
   },
   {
     canActivate: [authGuard],
@@ -21,11 +22,17 @@ export const routes: Routes = [
   {
     canActivate: [authGuard],
     path: '',
-    loadComponent: () => import('./domain/dashboard/dashboard').then(({ Dashboard }) => Dashboard),
+    loadComponent: () =>
+      import('./domain/dashboard/dashboard.component').then(
+        ({ DashboardComponent }) => DashboardComponent,
+      ),
     pathMatch: 'full',
   },
   {
     path: '**',
-    loadComponent: () => import('./domain/not-found/not-found').then(({ NotFound }) => NotFound),
+    loadComponent: () =>
+      import('./domain/not-found/not-found.component').then(
+        ({ NotFoundComponent }) => NotFoundComponent,
+      ),
   },
 ];

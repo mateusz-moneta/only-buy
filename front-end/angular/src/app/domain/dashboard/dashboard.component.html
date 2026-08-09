@@ -1,0 +1,45 @@
+<header>
+  <div>
+    <app-search placeholder="SearchComponent" />
+  </div>
+
+  <div>
+    <app-checkbox label="Active" />
+  </div>
+
+  <div>
+    <app-checkbox label="Promo" />
+  </div>
+
+  <div>
+    @if (isAuthenticated()) {
+      <app-avatar />
+    } @else {
+      <app-button type="button" variant="secondary"> Log in </app-button>
+    }
+  </div>
+</header>
+
+<main class="container-fluid">
+  @if (loading()) {
+    <div class="d-flex align-items-center justify-content-center w-100 h-100">
+      <app-spinner />
+    </div>
+  } @else {
+    <div class="row">
+      @for (product of products(); track product.id) {
+        <div class="col-md-4 col-12 mt-md-4 mt-4 pl-4 pr-4">
+          <app-product
+            [confirmedRating]="0"
+            [description]="product.description ?? ''"
+            [images]="product.images ?? []"
+            [isPromo]="product.isPromo ?? false"
+            [name]="product.name ?? ''"
+          />
+        </div>
+      } @empty {
+        <app-empty-state />
+      }
+    </div>
+  }
+</main>

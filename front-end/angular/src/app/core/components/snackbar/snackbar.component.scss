@@ -1,0 +1,50 @@
+@use 'assets/colors' as colors;
+
+.snackbar {
+  align-items: center;
+  border-radius: 0.6rem;
+  bottom: 2rem;
+  box-shadow: 0 0.4rem 1.5rem rgb(0 0 0 / 15%);
+  display: flex;
+  gap: 2rem;
+  justify-content: space-between;
+  min-width: 30rem;
+  padding: 1.4rem 1.8rem;
+  position: fixed;
+  right: 2rem;
+  z-index: 9999;
+
+  &--success {
+    background-color: colors.$success;
+    color: colors.$white;
+  }
+
+  &--error {
+    background-color: colors.$error;
+    color: colors.$white;
+  }
+
+  &--warning {
+    background-color: colors.$warning;
+    color: colors.$black;
+  }
+
+  &--info {
+    background-color: colors.$info;
+    color: colors.$black;
+  }
+
+  &__message {
+    font-size: 1.4rem;
+  }
+
+  &__close {
+    background: transparent;
+    border: 0;
+    color: inherit;
+    cursor: pointer;
+    font-size: 2rem;
+    line-height: 1;
+    padding: 0;
+  }
+}

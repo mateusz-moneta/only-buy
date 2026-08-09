@@ -1,0 +1,20 @@
+<div class="rates">
+  @for (value of [1, 2, 3, 4, 5]; track value) {
+    <button
+      (click)="handleClick(value)"
+      (mouseenter)="handleMouseEnter(value)"
+      (mouseleave)="handleMouseLeave()"
+    >
+      <img
+        class="rates__item"
+        [class.rates__item--filled]="value <= (rating() || confirmedRating() || 0)"
+        [src]="
+          '/icons/' +
+          (value <= (rating() || confirmedRating() || 0) ? 'star-filled' : 'star') +
+          '.svg'
+        "
+        alt=""
+      />
+    </button>
+  }
+</div>

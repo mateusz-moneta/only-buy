@@ -1,8 +1,5 @@
-import { Role } from './role';
+import { UserData } from './user-data';
 
-export interface Login {
-  username: string;
-  role: Role;
-  accessToken: string;
+export interface Login extends UserData {
   refreshToken: string;
 }

@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`_Input > should match snapshot 1`] = `"<div _ngcontent-a-c1709607587="" class="input"><label _ngcontent-a-c1709607587=""></label><input _ngcontent-a-c1709607587="" type="text" placeholder=""></div>"`;

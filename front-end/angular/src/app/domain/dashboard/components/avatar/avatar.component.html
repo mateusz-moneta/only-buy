@@ -1,0 +1,19 @@
+<div (click)="openMenu()" class="avatar">
+  @if (src(); as src) {
+    <img [src]="src" alt="AvatarComponent of user" />
+  }
+
+  @if (isOpenMenu()) {
+    <div (mouseleave)="closeMenu()" class="avatar__menu">
+      <ul>
+        @if (role() === 'ADMIN') {
+          <li>
+            <a href="/products-creator">Creator of product</a>
+          </li>
+        }
+
+        <li (click)="logout.emit()">Log out</li>
+      </ul>
+    </div>
+  }
+</div>

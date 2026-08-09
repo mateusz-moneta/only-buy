@@ -1,0 +1,10 @@
+@use 'assets/colors' as colors;
+
+input {
+  border: 0.15rem solid colors.$gray-1;
+  border-radius: 0.8rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  padding: 1.2rem;
+  width: 100%;
+}

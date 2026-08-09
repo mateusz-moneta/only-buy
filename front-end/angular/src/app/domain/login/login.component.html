@@ -1,0 +1,32 @@
+<div class="container">
+  <header>
+    <h1>LoginComponent</h1>
+  </header>
+
+  <main>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div>
+        <app-input label="Username" placeholder="Enter username" formControlName="username" />
+      </div>
+
+      <div class="mt-4">
+        <app-input
+          label="Password"
+          placeholder="Enter password"
+          type="password"
+          formControlName="password"
+        />
+      </div>
+
+      <div class="mt-5 w-100">
+        <app-button type="submit"> Log in </app-button>
+      </div>
+
+      <div class="mt-4">
+        <app-button type="button" variant="text">
+          <u>Forgot password?</u>
+        </app-button>
+      </div>
+    </form>
+  </main>
+</div>

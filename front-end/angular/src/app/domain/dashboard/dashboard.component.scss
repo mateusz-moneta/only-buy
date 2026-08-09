@@ -1,0 +1,24 @@
+@use 'assets/colors' as colors;
+
+header {
+  background: colors.$white;
+  display: grid;
+  grid-template-columns: minmax(0, 40rem) minmax(0, 8rem) minmax(0, 8rem) minmax(0, 1fr);
+  grid-column-gap: 2rem;
+  padding: 3rem 5.5rem;
+
+  > div {
+    align-items: center;
+    display: flex;
+    width: 100%;
+
+    > app-search {
+      width: 100%;
+    }
+  }
+}
+
+main {
+  background: colors.$gray-1;
+  padding: 5rem 5.5rem;
+}

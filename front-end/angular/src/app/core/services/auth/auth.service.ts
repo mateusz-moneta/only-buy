@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Login, LoginRequest, RefreshTokenRequest, RegisterRequest } from '../../models';
+import { UserData } from '../../models/user-data';
 
 @Injectable({
   providedIn: 'root',
@@ -13,10 +14,8 @@ export class AuthService {
     return this.httpClient.post<Login>('/api/auth/login', payload);
   }
 
-  public refreshToken(payload: RefreshTokenRequest): Observable<string> {
-    return this.httpClient.post<string>('/api/auth/refresh-token', payload, {
-      responseType: 'text',
-    });
+  public refreshToken(payload: RefreshTokenRequest): Observable<UserData> {
+    return this.httpClient.post<UserData>('/api/auth/refresh-token', payload);
   }
 
   public register(payload: RegisterRequest): Observable<string> {

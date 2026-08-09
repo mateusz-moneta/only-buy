@@ -1,0 +1,21 @@
+<div class="product">
+  <div class="product__image">
+    @if (isPromo()) {
+      <div class="product__promo">Promo</div>
+    }
+
+    @if (images()[imageIndex()]?.path; as path) {
+      <img alt="" class="w-100" [src]="path" />
+    }
+  </div>
+
+  <div class="product__content">
+    <h4>{{ name() }}</h4>
+
+    <div [innerHTML]="description() | safeHtml"></div>
+
+    <app-rates [confirmedRating]="confirmedRating()" (selectRates)="selectRates.emit($event)" />
+
+    <app-button (callback)="showDetails.emit()" type="button"> Show details </app-button>
+  </div>
+</div>
