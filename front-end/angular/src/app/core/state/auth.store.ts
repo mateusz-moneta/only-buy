@@ -71,6 +71,14 @@ export const AuthStore = signalStore(
           }),
         ),
       ),
+      logout: () => {
+        tokenStorageService.removeRefreshToken();
+
+        patchState(store, {
+          accessToken: null,
+          isAuthenticated: false,
+        });
+      },
       refreshToken: rxMethod<RefreshTokenRequest>(
         pipe(
           tap(() => {
@@ -82,11 +90,12 @@ export const AuthStore = signalStore(
           tap((userData: UserData) => {
             patchState(store, {
               accessToken: userData.accessToken,
+              isAuthenticated: true,
+              isLoading: false,
               user: {
                 role: userData.role,
                 username: userData.username,
               },
-              isLoading: false,
             });
           }),
           catchError(() => {

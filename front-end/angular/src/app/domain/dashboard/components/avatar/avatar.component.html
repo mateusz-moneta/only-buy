@@ -8,7 +8,11 @@
       <ul>
         @if (role() === 'ADMIN') {
           <li>
-            <a href="/products-creator">Creator of product</a>
+            <a routerLink="/products-creator">Creator of product</a>
+          </li>
+
+          <li>
+            <a routerLink="/users">Users</a>
           </li>
         }
 

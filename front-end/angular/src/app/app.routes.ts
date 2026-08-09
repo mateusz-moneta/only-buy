@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, guestGuard } from './core/guards';
+import { adminGuard, authGuard, guestGuard } from './core/guards';
 
 export const routes: Routes = [
   {
@@ -17,7 +17,16 @@ export const routes: Routes = [
   {
     canActivate: [guestGuard],
     path: 'register',
-    loadComponent: () => import('./domain/register/register').then(({ Register }) => Register),
+    loadComponent: () =>
+      import('./domain/register/register.component').then(
+        ({ RegisterComponent }) => RegisterComponent,
+      ),
+  },
+  {
+    canActivate: [adminGuard],
+    path: 'users',
+    loadComponent: () =>
+      import('./domain/users/users.component').then(({ UsersComponent }) => UsersComponent),
   },
   {
     canActivate: [authGuard],

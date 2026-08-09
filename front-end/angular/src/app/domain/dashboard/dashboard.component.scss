@@ -1,6 +1,6 @@
 @use 'assets/colors' as colors;
 
-header {
+section {
   background: colors.$white;
   display: grid;
   grid-template-columns: minmax(0, 40rem) minmax(0, 8rem) minmax(0, 8rem) minmax(0, 1fr);

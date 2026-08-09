@@ -1,11 +1,13 @@
-import { Component, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { Role } from '@core/models';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-avatar',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './avatar.component.html',
   styleUrl: './avatar.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
 })
 export class AvatarComponent {

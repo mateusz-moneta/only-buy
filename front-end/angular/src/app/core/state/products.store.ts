@@ -26,6 +26,22 @@ export const ProductsStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
   withMethods((store, productsService = inject(ProductsService)) => ({
+    loadProduct: rxMethod<{ id: string }>(
+      pipe(
+        tap(() => {
+          patchState(store, {
+            isLoading: true,
+          });
+        }),
+        switchMap(({ id }) => productsService.getProduct(id)),
+        tap((product: Product) => {
+          patchState(store, {
+            selectedProduct: product,
+            isLoading: false,
+          });
+        }),
+      ),
+    ),
     loadProducts: rxMethod<void>(
       pipe(
         tap(() => {

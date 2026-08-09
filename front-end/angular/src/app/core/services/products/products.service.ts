@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
 import {
   CreateProductRateRequest,
   ProductRate,
@@ -15,27 +16,33 @@ import {
 export class ProductsService {
   private readonly httpClient = inject(HttpClient);
 
+  private readonly basePath = '/api/products';
+
   public createProduct(payload: CreateProductRequest): Observable<Product> {
-    return this.httpClient.post<Product>('/api/products', payload);
+    return this.httpClient.post<Product>(this.basePath, payload);
   }
 
   public createProductRate(payload: CreateProductRateRequest): Observable<ProductRate> {
-    return this.httpClient.post<ProductRate>('/api/products/rate', payload);
+    return this.httpClient.post<ProductRate>(`${this.basePath}/rate`, payload);
   }
 
   public deleteProduct(id: string): Observable<void> {
-    return this.httpClient.delete<void>(`/api/products/${id}`);
+    return this.httpClient.delete<void>(`${this.basePath}/${id}`);
   }
 
   public editProduct(id: string, payload: CreateProductRequest): Observable<Product> {
-    return this.httpClient.put<Product>(`/api/products/${id}`, payload);
+    return this.httpClient.put<Product>(`${this.basePath}/${id}`, payload);
   }
 
   public editProductRate(payload: EditProductRateRequest): Observable<ProductRate> {
-    return this.httpClient.patch<ProductRate>(`/api/products/rate`, payload);
+    return this.httpClient.patch<ProductRate>(`${this.basePath}/rate`, payload);
+  }
+
+  public getProduct(id: string): Observable<Product> {
+    return this.httpClient.get<Product>(`${this.basePath}/${id}`);
   }
 
   public getProducts(): Observable<Product[]> {
-    return this.httpClient.get<Product[]>('/api/products');
+    return this.httpClient.get<Product[]>(this.basePath);
   }
 }

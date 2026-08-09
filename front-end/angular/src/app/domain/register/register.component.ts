@@ -6,12 +6,12 @@ import { ButtonComponent, FilesUploaderComponent, InputComponent } from '../../s
 @Component({
   selector: 'app-register',
   imports: [ButtonComponent, InputComponent, ReactiveFormsModule, FilesUploaderComponent],
-  templateUrl: './register.html',
-  styleUrl: './register.scss',
+  templateUrl: './register.component.html',
+  styleUrl: './register.component.scss',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Register {
+export class RegisterComponent {
   protected readonly form = RegisterFormBuilder.build();
 
   protected onSubmit(): void {}
