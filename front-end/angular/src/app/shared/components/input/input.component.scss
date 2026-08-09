@@ -14,5 +14,21 @@
     margin-top: 0.8rem;
     padding: 1.6rem;
     width: 100%;
+
+    &.input__field--error,
+    &::placeholder {
+      border-color: colors.$error;
+    }
+  }
+
+  &__error,
+  &__label--error {
+    color: colors.$error;
+  }
+
+  &__error {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-top: 0.5rem;
   }
 }

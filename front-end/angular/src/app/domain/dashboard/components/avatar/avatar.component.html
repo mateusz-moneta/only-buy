@@ -8,7 +8,7 @@
       <ul>
         @if (role() === 'ADMIN') {
           <li>
-            <a routerLink="/products-creator">Creator of product</a>
+            <a routerLink="/products/new">Creator of product</a>
           </li>
 
           <li>
@@ -16,7 +16,9 @@
           </li>
         }
 
-        <li (click)="logout.emit()">Log out</li>
+        <li>
+          <button (click)="logout.emit()" type="button">Log out</button>
+        </li>
       </ul>
     </div>
   }

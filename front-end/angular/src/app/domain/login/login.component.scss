@@ -1,0 +1,13 @@
+@use 'assets/colors' as colors;
+
+.login {
+  &__link {
+    display: flex;
+    justify-content: center;
+
+    > a {
+      color: colors.$gray-4;
+      font-size: 1.4rem;
+    }
+  }
+}

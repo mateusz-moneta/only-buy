@@ -1,7 +1,8 @@
 <div class="input">
-  <label>{{ label() }}</label>
+  <label [class.input__label--error]="showError()">{{ label() }}</label>
 
   <input
+    [class.input__field--error]="showError()"
     [type]="type()"
     [placeholder]="placeholder()"
     [value]="value"
@@ -9,4 +10,36 @@
     (input)="onInput($event)"
     (blur)="onTouched()"
   />
+
+  @if (showError()) {
+    <div class="input__error">
+      @if (errors?.['required']) {
+        <span>This field is required.</span>
+      }
+
+      @if (errors?.['email']) {
+        <span>Please enter a valid e-mail address.</span>
+      }
+
+      @if (errors?.['minlength']) {
+        <span>
+          Minimum length is
+          {{ errors?.['minlength'].requiredLength }}
+          characters.
+        </span>
+      }
+
+      @if (errors?.['maxlength']) {
+        <span>
+          Maximum length is
+          {{ errors?.['maxlength'].requiredLength }}
+          characters.
+        </span>
+      }
+
+      @if (errors?.['passwordMismatch']) {
+        <span>Passwords do not match.</span>
+      }
+    </div>
+  }
 </div>

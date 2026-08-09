@@ -3,19 +3,19 @@
 .avatar {
   background-color: colors.$gray-2;
   border-radius: 50%;
-  height: 48px;
+  height: 3rem;
   position: relative;
-  width: 48px;
+  width: 3rem;
 
   &__menu {
     background-color: colors.$white;
-    box-shadow: 0 8px 16px 0 colors.$gray-2;
-    left: 30px;
-    position: absolute;
-    top: 50px;
-    min-width: 160px;
-    position: absolute;
+    box-shadow: 0 0.5rem 1rem 0 colors.$gray-2;
+    left: 2rem;
+    min-width: 15rem;
     overflow: auto;
+    position: absolute;
+    top: 3rem;
+    z-index: 2;
 
     > ul {
       list-style: none;
@@ -33,9 +33,17 @@
           background-color: colors.$gray-1;
         }
 
-        > a {
+        > a,
+        > button {
           color: colors.$black;
           text-decoration: none;
+        }
+
+        > button {
+          background: none;
+          border: none;
+          outline: none;
+          padding: 0;
         }
       }
     }
