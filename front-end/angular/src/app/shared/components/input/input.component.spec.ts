@@ -1,6 +1,6 @@
-import { InputComponent } from './input.component';
-import { createComponentFactory, Spectator } from '@ngneat/spectator';
+import { Spectator, createComponentFactory } from '@ngneat/spectator';
 import { beforeEach, expect, it } from 'vitest';
+import { InputComponent } from './input.component';
 
 describe(InputComponent.name, () => {
   const createComponent = createComponentFactory({

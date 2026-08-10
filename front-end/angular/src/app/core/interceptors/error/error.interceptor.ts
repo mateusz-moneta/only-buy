@@ -2,8 +2,8 @@ import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
-import { SnackbarService } from '../../services';
 import { AuthStore } from '@core/state';
+import { SnackbarService } from '../../services';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const authStore = inject(AuthStore);
@@ -19,11 +19,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             router.navigate(['/login']);
 
             snackbarService.error(
-              'Your session has expired. Please log in again.',
+              'Your session has expired. Please log in again.'
             );
           } else {
             snackbarService.error(
-              error.error.message ?? 'Invalid credentials.',
+              error.error.message ?? 'Invalid credentials.'
             );
           }
 
@@ -32,7 +32,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
         case 403:
           snackbarService.error(
-            'You do not have permission to perform this action.',
+            'You do not have permission to perform this action.'
           );
           break;
 
@@ -50,6 +50,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       }
 
       return throwError(() => error);
-    }),
+    })
   );
 };

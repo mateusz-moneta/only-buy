@@ -1,27 +1,37 @@
 @use 'assets/colors' as colors;
 
+:host {
+  display: block;
+  height: 100%;
+}
+
 .product {
+  background-color: colors.$white;
+  border-radius: 0.5rem;
   display: flex;
   flex-direction: column;
-  background-color: colors.$white;
+  height: 100%;
   padding: 0;
-  height: 41rem;
 
   &__image {
+    height: 30rem;
     position: relative;
-    height: 18rem;
 
     > img {
-      object-fit: contain;
+      object-fit: cover;
+
+      &.product__image--error {
+        object-fit: contain;
+      }
     }
   }
 
   &__promo {
-    position: absolute;
-    left: 0;
     background: colors.$orange;
-    padding: 0.3rem 1.5rem;
     color: colors.$white;
+    left: 0;
+    padding: 0.3rem 1.5rem;
+    position: absolute;
   }
 
   &__content {
@@ -33,25 +43,25 @@
 
     > h4 {
       color: colors.$black;
-      font-weight: 500;
       font-size: 1.8rem;
+      font-weight: 500;
     }
 
     > p {
-      margin: 0;
       color: colors.$gray-4;
-      font-weight: 500;
       font-size: 1.4rem;
+      font-weight: 500;
       line-height: 1.6rem;
+      margin: 0;
     }
 
     > button {
-      border-radius: 0.4rem;
       background-color: colors.$app-primary-color;
-      padding: 0.85rem;
+      border-radius: 0.4rem;
       color: colors.$white;
-      font-weight: 500;
       font-size: 1.4rem;
+      font-weight: 500;
+      padding: 0.85rem;
     }
   }
 }

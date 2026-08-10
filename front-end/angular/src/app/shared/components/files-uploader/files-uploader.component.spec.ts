@@ -1,6 +1,5 @@
-import { createComponentFactory, Spectator } from '@ngneat/spectator';
+import { Spectator, createComponentFactory } from '@ngneat/spectator';
 import { beforeEach, describe, expect, it } from 'vitest';
-
 import { FilesUploaderComponent } from './files-uploader.component';
 
 describe(FilesUploaderComponent.name, () => {

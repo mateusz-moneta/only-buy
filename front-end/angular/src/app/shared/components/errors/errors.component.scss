@@ -1,8 +1,8 @@
 @use 'assets/colors' as colors;
 
 .errors {
-  margin-top: 0.5rem;
   color: colors.$error;
-  font-weight: 500;
   font-size: 1.2rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
 }

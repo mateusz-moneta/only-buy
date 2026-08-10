@@ -1,18 +1,18 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { Product } from '@core/models';
 import { AuthStore, ProductsStore } from '@core/state';
+import {
+  ButtonComponent,
+  CheckboxComponent,
+  SpinnerComponent,
+} from '@shared/components';
 import {
   AvatarComponent,
   EmptyStateComponent,
   ProductComponent,
   SearchComponent,
 } from './components';
-import {
-  ButtonComponent,
-  CheckboxComponent,
-  SpinnerComponent,
-} from '@shared/components';
-import { Router } from '@angular/router';
-import { Product } from '@core/models';
 
 @Component({
   selector: 'app-dashboard',

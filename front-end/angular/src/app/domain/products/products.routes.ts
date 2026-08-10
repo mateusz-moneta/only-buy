@@ -5,7 +5,7 @@ export const PRODUCTS_ROUTES: Routes = [
     path: 'new',
     loadComponent: () =>
       import('./new-product/new-product.component').then(
-        ({ NewProductComponent }) => NewProductComponent,
+        ({ NewProductComponent }) => NewProductComponent
       ),
   },
   {
@@ -15,14 +15,14 @@ export const PRODUCTS_ROUTES: Routes = [
         path: 'edit',
         loadComponent: () =>
           import('./edit-product/edit-product.component').then(
-            ({ EditProductComponent }) => EditProductComponent,
+            ({ EditProductComponent }) => EditProductComponent
           ),
       },
       {
         path: '',
         loadComponent: () =>
           import('./product-details/product-details.component').then(
-            ({ ProductDetailsComponent }) => ProductDetailsComponent,
+            ({ ProductDetailsComponent }) => ProductDetailsComponent
           ),
       },
     ],

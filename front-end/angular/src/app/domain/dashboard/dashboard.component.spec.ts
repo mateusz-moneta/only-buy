@@ -1,9 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { DashboardComponent } from './dashboard.component';
-import { createComponentFactory, Spectator } from '@ngneat/spectator';
-import { FilesUploaderComponent } from '../../shared/components';
+import { Spectator, createComponentFactory } from '@ngneat/spectator';
 import { beforeEach, expect, it } from 'vitest';
+import { DashboardComponent } from './dashboard.component';
 
 describe(DashboardComponent.name, () => {
   const createComponent = createComponentFactory({

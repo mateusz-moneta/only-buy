@@ -6,7 +6,6 @@
       (mouseleave)="handleMouseLeave()"
     >
       <img
-        class="rates__item"
         [class.rates__item--filled]="
           value <= (rating() || confirmedRating() || 0)
         "
@@ -17,6 +16,7 @@
             : 'star') +
           '.svg'
         "
+        class="rates__item"
         alt=""
       />
     </button>

@@ -1,7 +1,8 @@
-import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { inject } from '@angular/core';
-import { AuthService, TokenStorageService } from '../services';
-import { catchError, EMPTY, of, pipe, switchMap, tap } from 'rxjs';
+import { Router } from '@angular/router';
+import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
+import { rxMethod } from '@ngrx/signals/rxjs-interop';
+import { EMPTY, catchError, pipe, switchMap, tap } from 'rxjs';
 import {
   Login,
   LoginRequest,
@@ -9,9 +10,8 @@ import {
   RegisterRequest,
   Role,
 } from '../models';
-import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { Router } from '@angular/router';
 import { UserData } from '../models/user-data';
+import { AuthService, TokenStorageService } from '../services';
 
 export interface AuthUser {
   username: string;
@@ -40,7 +40,7 @@ export const AuthStore = signalStore(
       store,
       authService = inject(AuthService),
       router = inject(Router),
-      tokenStorageService = inject(TokenStorageService),
+      tokenStorageService = inject(TokenStorageService)
     ) => ({
       login: rxMethod<LoginRequest>(
         pipe(
@@ -61,8 +61,8 @@ export const AuthStore = signalStore(
                 });
 
                 return EMPTY;
-              }),
-            ),
+              })
+            )
           ),
           tap((login: Login) => {
             tokenStorageService.setRefreshToken(login.refreshToken);
@@ -77,8 +77,8 @@ export const AuthStore = signalStore(
             });
 
             router.navigate(['/']);
-          }),
-        ),
+          })
+        )
       ),
       logout: () => {
         tokenStorageService.removeRefreshToken();
@@ -103,13 +103,13 @@ export const AuthStore = signalStore(
                 });
 
                 return EMPTY;
-              }),
-            ),
+              })
+            )
           ),
           tap(() => {
             router.navigate(['/login']);
-          }),
-        ),
+          })
+        )
       ),
       refreshToken: rxMethod<RefreshTokenRequest>(
         pipe(
@@ -119,7 +119,7 @@ export const AuthStore = signalStore(
             });
           }),
           switchMap((payload: RefreshTokenRequest) =>
-            authService.refreshToken(payload),
+            authService.refreshToken(payload)
           ),
           tap((userData: UserData) => {
             patchState(store, {
@@ -143,9 +143,9 @@ export const AuthStore = signalStore(
             });
 
             return EMPTY;
-          }),
-        ),
+          })
+        )
       ),
-    }),
-  ),
+    })
+  )
 );

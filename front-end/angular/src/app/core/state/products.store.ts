@@ -39,8 +39,8 @@ export const ProductsStore = signalStore(
             selectedProduct: product,
             isLoading: false,
           });
-        }),
-      ),
+        })
+      )
     ),
     loadProducts: rxMethod<void>(
       pipe(
@@ -55,8 +55,8 @@ export const ProductsStore = signalStore(
             products,
             isLoading: false,
           });
-        }),
-      ),
+        })
+      )
     ),
     createProduct: rxMethod<CreateProductRequest>(
       pipe(
@@ -65,14 +65,16 @@ export const ProductsStore = signalStore(
             isLoading: true,
           });
         }),
-        switchMap((payload) => productsService.createProduct(payload)),
-        tap((product) => {
+        switchMap((payload: CreateProductRequest) =>
+          productsService.createProduct(payload)
+        ),
+        tap((product: Product) => {
           patchState(store, {
             products: [...store.products(), product],
             isLoading: false,
           });
-        }),
-      ),
+        })
+      )
     ),
     editProduct: rxMethod<{
       id: string;
@@ -85,20 +87,20 @@ export const ProductsStore = signalStore(
           });
         }),
         switchMap(({ id, payload }) =>
-          productsService.editProduct(id, payload),
+          productsService.editProduct(id, payload)
         ),
         tap((updatedProduct) => {
           patchState(store, {
             products: store
               .products()
               .map((product) =>
-                product.id === updatedProduct.id ? updatedProduct : product,
+                product.id === updatedProduct.id ? updatedProduct : product
               ),
             selectedProduct: updatedProduct,
             isLoading: false,
           });
-        }),
-      ),
+        })
+      )
     ),
     deleteProduct: rxMethod<string>(
       pipe(
@@ -117,10 +119,10 @@ export const ProductsStore = signalStore(
                 selectedProduct: null,
                 isLoading: false,
               });
-            }),
-          ),
-        ),
-      ),
+            })
+          )
+        )
+      )
     ),
     selectProduct(product: Product | null): void {
       patchState(store, {
@@ -133,10 +135,10 @@ export const ProductsStore = signalStore(
       });
     },
     createProductRate: rxMethod<CreateProductRateRequest>(
-      pipe(switchMap((payload) => productsService.createProductRate(payload))),
+      pipe(switchMap((payload) => productsService.createProductRate(payload)))
     ),
     editProductRate: rxMethod<EditProductRateRequest>(
-      pipe(switchMap((payload) => productsService.editProductRate(payload))),
+      pipe(switchMap((payload) => productsService.editProductRate(payload)))
     ),
-  })),
+  }))
 );

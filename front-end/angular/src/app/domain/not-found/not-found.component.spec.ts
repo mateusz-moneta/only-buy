@@ -1,6 +1,6 @@
-import { NotFoundComponent } from './not-found.component';
-import { createComponentFactory, Spectator } from '@ngneat/spectator';
+import { Spectator, createComponentFactory } from '@ngneat/spectator';
 import { beforeEach, expect, it } from 'vitest';
+import { NotFoundComponent } from './not-found.component';
 
 describe(NotFoundComponent.name, () => {
   const createComponent = createComponentFactory({

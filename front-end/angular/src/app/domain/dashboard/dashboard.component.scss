@@ -1,18 +1,22 @@
 @use 'assets/colors' as colors;
 
 section {
+  background: colors.$white;
   display: grid;
   grid-template-columns:
     minmax(0, 40rem) minmax(0, 8rem) minmax(0, 8rem)
     minmax(0, 1fr);
-  background: colors.$white;
   grid-column-gap: 2rem;
   padding: 3rem 5.5rem;
 
   > div {
-    display: flex;
     align-items: center;
+    display: flex;
     width: 100%;
+
+    &:last-of-type {
+      justify-content: flex-end;
+    }
 
     > app-search {
       width: 100%;

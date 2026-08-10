@@ -1,18 +1,18 @@
 @use 'assets/colors' as colors;
 
 .snackbar {
+  align-items: center;
+  border-radius: 0.6rem;
+  bottom: 2rem;
+  box-shadow: 0 0.4rem 1.5rem rgb(0 0 0 / 15%);
   display: flex;
+  gap: 2rem;
+  justify-content: space-between;
+  min-width: 30rem;
+  padding: 1.4rem 1.8rem;
   position: fixed;
   right: 2rem;
-  bottom: 2rem;
-  justify-content: space-between;
-  align-items: center;
-  gap: 2rem;
   z-index: 9999;
-  box-shadow: 0 0.4rem 1.5rem rgb(0 0 0 / 15%);
-  border-radius: 0.6rem;
-  padding: 1.4rem 1.8rem;
-  min-width: 30rem;
 
   &--success {
     background-color: colors.$success;
@@ -39,12 +39,12 @@
   }
 
   &__close {
-    cursor: pointer;
-    border: 0;
     background: transparent;
-    padding: 0;
+    border: 0;
     color: inherit;
+    cursor: pointer;
     font-size: 2rem;
     line-height: 1;
+    padding: 0;
   }
 }

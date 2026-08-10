@@ -1,13 +1,13 @@
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import {
   ApplicationConfig,
   provideAppInitializer,
   provideBrowserGlobalErrorListeners,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { routes } from './app.routes';
 import { appInitializer } from '@core/initializers';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor, errorInterceptor } from '@core/interceptors';
+import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [

@@ -1,10 +1,10 @@
-<div class="avatar" (click)="openMenu()">
+<div (click)="openMenu()" class="avatar">
   @if (src(); as src) {
     <img [src]="src" alt="AvatarComponent of user" />
   }
 
   @if (isOpenMenu()) {
-    <div class="avatar__menu" (mouseleave)="closeMenu()">
+    <div (mouseleave)="closeMenu()" class="avatar__menu">
       <ul>
         @if (role() === 'ADMIN') {
           <li>

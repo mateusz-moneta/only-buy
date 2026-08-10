@@ -1,6 +1,6 @@
-import { ButtonComponent } from './button.component';
-import { createComponentFactory, Spectator } from '@ngneat/spectator';
+import { Spectator, createComponentFactory } from '@ngneat/spectator';
 import { beforeEach, expect, it } from 'vitest';
+import { ButtonComponent } from './button.component';
 
 describe(ButtonComponent.name, () => {
   const createComponent = createComponentFactory({

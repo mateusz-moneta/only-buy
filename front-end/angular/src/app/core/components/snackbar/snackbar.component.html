@@ -1,20 +1,20 @@
 @if (snackbarService.snackbar(); as snackbar) {
   <div
-    class="snackbar"
     [class.snackbar--error]="snackbar.type === 'error'"
     [class.snackbar--info]="snackbar.type === 'info'"
     [class.snackbar--success]="snackbar.type === 'success'"
     [class.snackbar--warning]="snackbar.type === 'warning'"
+    class="snackbar"
   >
     <span class="snackbar__message">
       {{ snackbar.message }}
     </span>
 
     <button
-      class="snackbar__close"
       (click)="snackbarService.close()"
-      aria-label="Close"
+      class="snackbar__close"
       type="button"
+      aria-label="Close"
     >
       ×
     </button>

@@ -1,13 +1,15 @@
+import { NgOptimizedImage } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
-  inject,
   OnInit,
+  computed,
+  inject,
+  signal,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ButtonComponent, SpinnerComponent } from '@shared/components';
 import { ProductsStore } from '@core/state';
-import { NgOptimizedImage } from '@angular/common';
+import { ButtonComponent, SpinnerComponent } from '@shared/components';
 import { SafeHtmlPipe } from '@shared/pipes';
 
 @Component({
@@ -23,8 +25,20 @@ export class ProductDetailsComponent implements OnInit {
   private readonly productsStore = inject(ProductsStore);
   private readonly router = inject(Router);
 
+  protected readonly imageIndex = signal<number>(0);
   protected readonly loading = this.productsStore.isLoading;
   protected readonly product = this.productsStore.selectedProduct;
+
+  protected readonly image = computed(() => {
+    const images = this.product()?.images ?? [];
+    const image = images[this.imageIndex()];
+
+    if (image) {
+      return image;
+    }
+
+    return null;
+  });
 
   public ngOnInit(): void {
     if (!this.product()) {

@@ -7,16 +7,20 @@
 
   &__content {
     > div {
-      margin-top: 2rem;
-
-      > h2 {
-        margin-bottom: 1rem;
-      }
-
-      > p {
+      p,
+      .product__safe-html {
         font-size: 1.4rem;
         text-align: justify;
       }
+    }
+  }
+
+  &__image {
+    height: 30rem;
+    position: relative;
+
+    > img {
+      object-fit: cover;
     }
   }
 }

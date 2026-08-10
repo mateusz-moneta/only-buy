@@ -3,24 +3,24 @@
     {{ chooseImageMessage() }}
   </p>
 
-  <button class="btn btn-secondary" (click)="openFileDialog()" type="button">
+  <button (click)="openFileDialog()" class="btn btn-secondary" type="button">
     {{ placeholder() }}
   </button>
 
   <input
-    class="d-none"
-    #fileInput
     [accept]="accept()"
     [multiple]="multiple()"
     [name]="name()"
     (change)="onFileChange($event)"
+    class="d-none"
     type="file"
+    #fileInput
   />
 
   @if (files.length) {
     <div class="files-uploader__files">
       @for (file of files; track file.name) {
-        <img class="w-100" [alt]="file.name" [src]="getPreviewUrl(file)" />
+        <img [alt]="file.name" [src]="getPreviewUrl(file)" class="w-100" />
       }
     </div>
   } @else {

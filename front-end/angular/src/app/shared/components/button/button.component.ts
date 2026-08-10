@@ -14,6 +14,7 @@ import { ButtonType, Variant } from './models';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ButtonComponent {
+  public readonly styleClass = input<string>('');
   public readonly type = input<ButtonType>('button');
   public readonly variant = input<Variant>('primary');
 

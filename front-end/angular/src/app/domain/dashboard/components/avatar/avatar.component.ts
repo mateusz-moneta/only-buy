@@ -5,8 +5,8 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { Role } from '@core/models';
 import { RouterLink } from '@angular/router';
+import { Role } from '@core/models';
 
 @Component({
   selector: 'app-avatar',

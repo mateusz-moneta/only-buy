@@ -1,8 +1,8 @@
 import { inject } from '@angular/core';
-import { AuthStore } from '../../state';
-import { EMPTY, filter, Observable, take } from 'rxjs';
-import { TokenStorageService } from '../../services';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { EMPTY, Observable, filter, take } from 'rxjs';
+import { TokenStorageService } from '../../services';
+import { AuthStore } from '../../state';
 
 export function appInitializer(): Observable<boolean> {
   const authStore = inject(AuthStore);
@@ -20,6 +20,6 @@ export function appInitializer(): Observable<boolean> {
 
   return toObservable(authStore.isLoading).pipe(
     filter((isLoading: boolean) => !isLoading),
-    take(1),
+    take(1)
   );
 }

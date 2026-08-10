@@ -1,6 +1,6 @@
-import { RegisterComponent } from './register.component';
-import { createComponentFactory, Spectator } from '@ngneat/spectator';
+import { Spectator, createComponentFactory } from '@ngneat/spectator';
 import { beforeEach, expect, it } from 'vitest';
+import { RegisterComponent } from './register.component';
 
 describe(RegisterComponent.name, () => {
   const createComponent = createComponentFactory({

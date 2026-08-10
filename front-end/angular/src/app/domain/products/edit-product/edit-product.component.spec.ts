@@ -1,6 +1,6 @@
-import { EditProductComponent } from './edit-product.component';
-import { createComponentFactory, Spectator } from '@ngneat/spectator';
+import { Spectator, createComponentFactory } from '@ngneat/spectator';
 import { beforeEach, expect, it } from 'vitest';
+import { EditProductComponent } from './edit-product.component';
 
 describe(EditProductComponent.name, () => {
   const createComponent = createComponentFactory({

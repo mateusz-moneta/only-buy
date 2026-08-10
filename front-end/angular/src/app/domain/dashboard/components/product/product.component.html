@@ -5,7 +5,7 @@
     }
 
     @if (images()[imageIndex()]?.path; as path) {
-      <img class="w-100" [src]="path" alt="" />
+      <img [ngSrc]="path" (error)="onImageError($event)" alt="" fill />
     }
   </div>
 
@@ -14,12 +14,14 @@
 
     <div [innerHTML]="description() | safeHtml"></div>
 
-    <app-rates
-      [confirmedRating]="confirmedRating()"
-      (selectRates)="selectRates.emit($event)"
-    />
+    <div class="my-3">
+      <app-rates
+        [confirmedRating]="confirmedRating()"
+        (selectRates)="selectRates.emit($event)"
+      />
+    </div>
 
-    <app-button (callback)="showDetails.emit()" type="button">
+    <app-button (callback)="showDetails.emit()" type="button" styleClass="py-3">
       Show details
     </app-button>
   </div>

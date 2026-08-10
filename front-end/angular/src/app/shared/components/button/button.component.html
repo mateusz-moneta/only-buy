@@ -1,3 +1,7 @@
-<button [class]="variant()" [type]="type()" (click)="callback.emit()">
+<button
+  [class]="[variant(), styleClass()].join(' ')"
+  [type]="type()"
+  (click)="callback.emit()"
+>
   <ng-content />
 </button>

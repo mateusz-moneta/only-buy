@@ -17,16 +17,16 @@ import {
 export class FilesUploaderComponent {
   public readonly accept = input<string>('');
   public readonly chooseImageMessage = input<string>(
-    'Choose image for avatar to upload (PNG, JPG)',
+    'Choose image for avatar to upload (PNG, JPG)'
   );
   public readonly emptyMessage = input<string>(
-    'No file currently selected for upload',
+    'No file currently selected for upload'
   );
   public readonly multiple = input<boolean>(false);
   public readonly name = input.required<string>();
   public readonly placeholder = input<string>('Select file');
 
-  public readonly change = output<Event>();
+  public readonly change = output<File[]>();
 
   private readonly fileInput =
     viewChild<ElementRef<HTMLInputElement>>('fileInput');
@@ -46,6 +46,6 @@ export class FilesUploaderComponent {
 
     this.files = input.files ? Array.from(input.files) : [];
 
-    this.change.emit(event);
+    this.change.emit(this.files);
   }
 }

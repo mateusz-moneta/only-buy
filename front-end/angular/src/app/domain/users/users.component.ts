@@ -1,21 +1,21 @@
+import { DatePipe, NgOptimizedImage, TitleCasePipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  OnInit,
   computed,
   inject,
-  OnInit,
 } from '@angular/core';
-import { UsersService } from './services';
-import { UsersStore } from './state';
-import { DatePipe, NgOptimizedImage, TitleCasePipe } from '@angular/common';
+import { Router } from '@angular/router';
 import { STANDARD_DATE } from '@core/constants';
+import { AuthStore } from '@core/state';
 import {
   ButtonComponent,
   CheckboxComponent,
   SpinnerComponent,
 } from '@shared/components';
-import { Router } from '@angular/router';
-import { AuthStore } from '@core/state';
+import { UsersService } from './services';
+import { UsersStore } from './state';
 
 @Component({
   selector: 'app-users',

@@ -1,6 +1,6 @@
-import { CheckboxComponent } from './checkbox.component';
-import { createComponentFactory, Spectator } from '@ngneat/spectator';
+import { Spectator, createComponentFactory } from '@ngneat/spectator';
 import { beforeEach, expect, it } from 'vitest';
+import { CheckboxComponent } from './checkbox.component';
 
 describe(CheckboxComponent.name, () => {
   const createComponent = createComponentFactory({

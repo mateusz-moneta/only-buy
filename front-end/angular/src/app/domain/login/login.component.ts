@@ -1,9 +1,9 @@
 import { Component, inject } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { AuthStore } from '@core/state';
 import { ButtonComponent, InputComponent } from '@shared/components';
 import { LoginFormBuilder } from './builders';
-import { ReactiveFormsModule } from '@angular/forms';
-import { AuthStore } from '@core/state';
-import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-login',

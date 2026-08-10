@@ -4,12 +4,10 @@ import {
   forwardRef,
   input,
 } from '@angular/core';
-
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-
+import { ErrorsComponent } from '@shared/components';
 import { BaseInput } from '../../abstracts';
 import { InputType } from './models';
-import { ErrorsComponent } from '@shared/components';
 
 @Component({
   selector: 'app-input',

@@ -7,7 +7,7 @@ export const routes: Routes = [
     path: 'login',
     loadComponent: () =>
       import('./domain/login/login.component').then(
-        ({ LoginComponent }) => LoginComponent,
+        ({ LoginComponent }) => LoginComponent
       ),
   },
   {
@@ -15,7 +15,7 @@ export const routes: Routes = [
     path: 'products',
     loadChildren: () =>
       import('./domain/products/products.routes').then(
-        ({ PRODUCTS_ROUTES }) => PRODUCTS_ROUTES,
+        ({ PRODUCTS_ROUTES }) => PRODUCTS_ROUTES
       ),
   },
   {
@@ -23,7 +23,7 @@ export const routes: Routes = [
     path: 'register',
     loadComponent: () =>
       import('./domain/register/register.component').then(
-        ({ RegisterComponent }) => RegisterComponent,
+        ({ RegisterComponent }) => RegisterComponent
       ),
   },
   {
@@ -31,7 +31,7 @@ export const routes: Routes = [
     path: 'users',
     loadComponent: () =>
       import('./domain/users/users.component').then(
-        ({ UsersComponent }) => UsersComponent,
+        ({ UsersComponent }) => UsersComponent
       ),
   },
   {
@@ -39,7 +39,7 @@ export const routes: Routes = [
     path: '',
     loadComponent: () =>
       import('./domain/dashboard/dashboard.component').then(
-        ({ DashboardComponent }) => DashboardComponent,
+        ({ DashboardComponent }) => DashboardComponent
       ),
     pathMatch: 'full',
   },
@@ -47,7 +47,7 @@ export const routes: Routes = [
     path: '**',
     loadComponent: () =>
       import('./domain/not-found/not-found.component').then(
-        ({ NotFoundComponent }) => NotFoundComponent,
+        ({ NotFoundComponent }) => NotFoundComponent
       ),
   },
 ];

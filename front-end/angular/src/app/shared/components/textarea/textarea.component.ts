@@ -4,8 +4,8 @@ import {
   forwardRef,
   input,
 } from '@angular/core';
-import { BaseInput } from '@shared/abstracts';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { BaseInput } from '@shared/abstracts';
 import { ErrorsComponent } from '@shared/components';
 
 @Component({

@@ -1,6 +1,6 @@
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { RegisterForm } from '../models';
 import { passwordMatchValidator } from '@core/validators';
+import { RegisterForm } from '../models';
 
 export class RegisterFormBuilder {
   public static build(): FormGroup<RegisterForm> {
@@ -26,7 +26,7 @@ export class RegisterFormBuilder {
       },
       {
         validators: passwordMatchValidator,
-      },
+      }
     );
   }
 }

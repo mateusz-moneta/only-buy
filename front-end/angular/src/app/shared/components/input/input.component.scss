@@ -1,26 +1,26 @@
 @use 'assets/colors' as colors;
 
 .input {
-  margin: 0.8rem 0;
   color: colors.$black;
-  font-weight: 700;
   font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0.8rem 0;
 
   > input {
-    margin-top: 0.8rem;
     border: 0.1rem solid colors.$gray-2;
     border-radius: 0.8rem;
-    padding: 1.6rem;
-    width: 100%;
     color: colors.$gray-4;
     font-weight: 500;
+    margin-top: 0.8rem;
+    padding: 1.6rem;
+    width: 100%;
 
     &.input__field--error {
       border-color: colors.$error;
-    }
 
-    &::placeholder {
-      color: colors.$error;
+      &::placeholder {
+        color: colors.$error;
+      }
     }
   }
 

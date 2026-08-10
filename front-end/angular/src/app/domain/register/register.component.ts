@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { RegisterFormBuilder } from './builders';
 import { ReactiveFormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { AuthStore } from '@core/state';
 import {
   ButtonComponent,
   FilesUploaderComponent,
   InputComponent,
 } from '@shared/components';
-import { AuthStore } from '@core/state';
-import { RouterLink } from '@angular/router';
+import { RegisterFormBuilder } from './builders';
 
 @Component({
   selector: 'app-register',

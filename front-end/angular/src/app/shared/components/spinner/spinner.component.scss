@@ -1,13 +1,13 @@
 .spinner {
-  display: flex;
-  justify-content: center;
   align-items: center;
+  display: flex;
   height: 100%;
+  justify-content: center;
 
   > img {
     animation: rotate 1s linear infinite;
-    width: 5rem;
     height: 5rem;
+    width: 5rem;
   }
 }
 

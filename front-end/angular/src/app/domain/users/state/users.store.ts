@@ -31,8 +31,8 @@ export const UsersStore = signalStore(
             users,
             isLoading: false,
           });
-        }),
-      ),
+        })
+      )
     ),
     updateUserActive: rxMethod<UpdateActive>(
       pipe(
@@ -42,7 +42,7 @@ export const UsersStore = signalStore(
           });
         }),
         switchMap((payload: UpdateActive) =>
-          usersService.updateUserActive(payload),
+          usersService.updateUserActive(payload)
         ),
         tap((user: User) => {
           patchState(store, {
@@ -55,8 +55,8 @@ export const UsersStore = signalStore(
             }),
             isLoading: false,
           });
-        }),
-      ),
+        })
+      )
     ),
-  })),
+  }))
 );

@@ -1,13 +1,12 @@
-import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-
 import {
   CreateProductRateRequest,
-  ProductRate,
   CreateProductRequest,
   EditProductRateRequest,
   Product,
+  ProductRate,
 } from '../../models';
 
 @Injectable({
@@ -19,11 +18,29 @@ export class ProductsService {
   private readonly basePath = '/api/products';
 
   public createProduct(payload: CreateProductRequest): Observable<Product> {
-    return this.httpClient.post<Product>(this.basePath, payload);
+    const formData = new FormData();
+
+    formData.append('code', payload.code);
+    formData.append('description', payload.description);
+    formData.append('isActive', String(payload.isActive));
+    formData.append('isPromo', String(payload.isPromo));
+    formData.append('name', payload.name);
+
+    console.log(payload);
+
+    (payload.productImages ?? []).forEach((image: File) => {
+      formData.append('productImages', image);
+    });
+
+    return this.httpClient.post<Product>(`${this.basePath}/new`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   }
 
   public createProductRate(
-    payload: CreateProductRateRequest,
+    payload: CreateProductRateRequest
   ): Observable<ProductRate> {
     return this.httpClient.post<ProductRate>(`${this.basePath}/rate`, payload);
   }
@@ -34,13 +51,13 @@ export class ProductsService {
 
   public editProduct(
     id: string,
-    payload: CreateProductRequest,
+    payload: CreateProductRequest
   ): Observable<Product> {
     return this.httpClient.put<Product>(`${this.basePath}/${id}`, payload);
   }
 
   public editProductRate(
-    payload: EditProductRateRequest,
+    payload: EditProductRateRequest
   ): Observable<ProductRate> {
     return this.httpClient.patch<ProductRate>(`${this.basePath}/rate`, payload);
   }

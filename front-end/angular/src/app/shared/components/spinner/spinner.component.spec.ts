@@ -1,6 +1,6 @@
-import { SpinnerComponent } from './spinner.component';
-import { createComponentFactory, Spectator } from '@ngneat/spectator';
+import { Spectator, createComponentFactory } from '@ngneat/spectator';
 import { beforeEach, expect, it } from 'vitest';
+import { SpinnerComponent } from './spinner.component';
 
 describe(SpinnerComponent.name, () => {
   const createComponent = createComponentFactory({

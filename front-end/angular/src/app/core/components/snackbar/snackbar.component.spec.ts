@@ -1,6 +1,6 @@
-import { SnackbarComponent } from './snackbar.component';
-import { createComponentFactory, Spectator } from '@ngneat/spectator';
+import { Spectator, createComponentFactory } from '@ngneat/spectator';
 import { beforeEach, expect, it } from 'vitest';
+import { SnackbarComponent } from './snackbar.component';
 
 describe(SnackbarComponent.name, () => {
   const createComponent = createComponentFactory({

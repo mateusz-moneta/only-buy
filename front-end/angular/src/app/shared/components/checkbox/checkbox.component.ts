@@ -6,8 +6,8 @@ import {
   output,
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { BaseInput } from '../../abstracts';
 import { ErrorsComponent } from '@shared/components';
+import { BaseInput } from '../../abstracts';
 
 @Component({
   selector: 'app-checkbox',

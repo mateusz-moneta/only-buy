@@ -1,5 +1,8 @@
+import { NgOptimizedImage } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ProductsStore } from '@core/state';
 import {
   ButtonComponent,
   CheckboxComponent,
@@ -7,10 +10,7 @@ import {
   InputComponent,
   TextareaComponent,
 } from '@shared/components';
-import { NgOptimizedImage } from '@angular/common';
 import { NewProductFormBuilder } from './builders';
-import { ReactiveFormsModule } from '@angular/forms';
-import { ProductsStore } from '@core/state';
 
 @Component({
   selector: 'app-new-product',
@@ -36,6 +36,10 @@ export class NewProductComponent {
 
   protected async goToDashboard(): Promise<void> {
     await this.router.navigate(['/']);
+  }
+
+  protected onProductImagesChange(images: File[]): void {
+    this.form.controls.images.setValue(images, { emitEvent: false });
   }
 
   protected onSubmit(): void {

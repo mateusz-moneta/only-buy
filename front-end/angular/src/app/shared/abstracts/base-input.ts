@@ -1,19 +1,17 @@
 import {
   AfterViewInit,
   DestroyRef,
+  Directive,
   Injector,
   inject,
   signal,
-  Directive,
 } from '@angular/core';
-
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   ControlValueAccessor,
   NgControl,
   ValidationErrors,
 } from '@angular/forms';
-
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Directive()
 export abstract class BaseInput<T>
