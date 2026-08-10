@@ -17,9 +17,11 @@ export class ProductComponent {
   public readonly confirmedRating = input<number>(0);
   public readonly description = input<string>('');
   public readonly images = input<ProductImage[]>([]);
+  public readonly isAdmin = input<boolean>(false);
   public readonly isPromo = input<boolean>();
   public readonly name = input<string>();
 
+  public readonly remove = output<void>();
   public readonly selectRates = output<number>();
   public readonly showDetails = output<void>();
 

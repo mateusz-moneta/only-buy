@@ -17,7 +17,9 @@ export class ProductRateEntity extends BaseEntity {
   @Column({ type: 'smallint' })
   rating: number;
 
-  @ManyToOne(() => ProductEntity, (product) => product.rates)
+  @ManyToOne(() => ProductEntity, (product) => product.rates, {
+    onDelete: 'CASCADE',
+  })
   product: ProductEntity;
 
   @ManyToOne(() => UserEntity, (user) => user.rates)

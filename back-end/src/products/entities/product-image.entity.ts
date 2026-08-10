@@ -20,7 +20,9 @@ export class ProductImageEntity extends BaseEntity {
   @CreateDateColumn()
   uploadedDate: Date;
 
-  @ManyToOne(() => ProductEntity, (productEntity) => productEntity.images)
+  @ManyToOne(() => ProductEntity, (product) => product.images, {
+    onDelete: 'CASCADE',
+  })
   product: ProductEntity;
 
   constructor(partial: Partial<ProductImageEntity>) {

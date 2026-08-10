@@ -22,13 +22,28 @@
         />
       </div>
 
-      <app-button
-        (callback)="showDetails.emit()"
-        type="button"
-        styleClass="py-3"
-      >
-        Show details
-      </app-button>
+      <div class="mt-4">
+        <app-button
+          (callback)="showDetails.emit()"
+          type="button"
+          styleClass="py-3"
+        >
+          Show details
+        </app-button>
+      </div>
+
+      @if (isAdmin()) {
+        <div class="mt-3">
+          <app-button
+            (callback)="remove.emit()"
+            type="button"
+            styleClass="py-3"
+            variant="secondary"
+          >
+            Remove product
+          </app-button>
+        </div>
+      }
     </div>
   </div>
 </div>

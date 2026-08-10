@@ -1,15 +1,17 @@
 <section aria-label="Product filters">
-  <div>
-    <app-search placeholder="Search" />
-  </div>
+  <form [formGroup]="searchForm">
+    <div>
+      <app-search formControlName="keyword" placeholder="Search" />
+    </div>
 
-  <div>
-    <app-checkbox label="Active" />
-  </div>
+    <div>
+      <app-checkbox formControlName="isActive" label="Active" />
+    </div>
 
-  <div>
-    <app-checkbox label="Promo" />
-  </div>
+    <div>
+      <app-checkbox formControlName="isPromo" label="Promo" />
+    </div>
+  </form>
 
   <div>
     @if (isAuthenticated()) {
@@ -35,8 +37,10 @@
             [confirmedRating]="product.rating"
             [description]="product.description ?? ''"
             [images]="product.images ?? []"
+            [isAdmin]="user()?.role === 'ADMIN'"
             [isPromo]="product.isPromo ?? false"
             [name]="product.name ?? ''"
+            (remove)="onRemoveProduct(product.id)"
             (selectRates)="onSelectRates(product, $event)"
             (showDetails)="onShowDetails(product)"
           />

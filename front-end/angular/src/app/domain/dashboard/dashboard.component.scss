@@ -2,25 +2,31 @@
 
 section {
   background: colors.$white;
-  display: grid;
-  grid-template-columns:
-    minmax(0, 40rem) minmax(0, 8rem) minmax(0, 8rem)
-    minmax(0, 1fr);
-  grid-column-gap: 2rem;
+  display: flex;
+  justify-content: space-between;
   padding: 3rem 5.5rem;
 
-  > div {
-    align-items: center;
-    display: flex;
-    width: 100%;
+  > form {
+    display: grid;
+    grid-template-columns: minmax(0, 40rem) minmax(0, 8rem) minmax(0, 8rem);
+    grid-column-gap: 2rem;
+    min-width: 60%;
 
-    &:last-of-type {
-      justify-content: flex-end;
+    > div:not(:first-of-type) {
+      align-items: center;
+      display: flex;
     }
 
     > app-search {
       width: 100%;
     }
+  }
+
+  > div {
+    align-items: center;
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
   }
 }
 

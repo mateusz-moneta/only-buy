@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import {
@@ -66,7 +66,11 @@ export class ProductsService {
     return this.httpClient.get<Product>(`${this.basePath}/${id}`);
   }
 
-  public getProducts(): Observable<Product[]> {
-    return this.httpClient.get<Product[]>(this.basePath);
+  public getProducts(isActive = true, isPromo = true): Observable<Product[]> {
+    return this.httpClient.get<Product[]>(this.basePath, {
+      params: new HttpParams()
+        .append('isActive', isActive)
+        .append('isPromo', isPromo),
+    });
   }
 }

@@ -1,4 +1,6 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Product } from '@core/models';
 import { AuthStore, ProductsStore } from '@core/state';
@@ -7,6 +9,7 @@ import {
   CheckboxComponent,
   SpinnerComponent,
 } from '@shared/components';
+import { SearchFormBuilder } from './builders';
 import {
   AvatarComponent,
   EmptyStateComponent,
@@ -24,6 +27,7 @@ import {
     ProductComponent,
     SearchComponent,
     SpinnerComponent,
+    ReactiveFormsModule,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
@@ -31,16 +35,33 @@ import {
 })
 export class DashboardComponent implements OnInit {
   private readonly authStore = inject(AuthStore);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly productsStore = inject(ProductsStore);
   private readonly router = inject(Router);
 
   protected readonly isAuthenticated = this.authStore.isAuthenticated;
   protected readonly loading = this.productsStore.isLoading;
   protected readonly products = this.productsStore.products;
+  protected readonly searchForm = SearchFormBuilder.build();
   protected readonly user = this.authStore.user;
 
   public ngOnInit(): void {
-    this.productsStore.loadProducts();
+    this.productsStore.loadProducts({});
+    this.handleForm();
+  }
+
+  private handleForm(): void {
+    this.searchForm.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((values) => {
+        const { isActive, isPromo, keyword } = values;
+
+        this.productsStore.loadProducts({
+          isActive,
+          isPromo,
+          keyword,
+        });
+      });
   }
 
   protected onLogin(): void {
@@ -51,6 +72,10 @@ export class DashboardComponent implements OnInit {
     this.redirectToLoginPage();
 
     this.authStore.logout();
+  }
+
+  protected onRemoveProduct(productId: string): void {
+    this.productsStore.deleteProduct({ productId });
   }
 
   protected onShowDetails(product: Product): void {

@@ -1,4 +1,5 @@
 import { inject } from '@angular/core';
+import { isActive } from '@angular/router';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { catchError, of, pipe, switchMap, tap } from 'rxjs';
@@ -43,14 +44,22 @@ export const ProductsStore = signalStore(
         })
       )
     ),
-    loadProducts: rxMethod<void>(
+    loadProducts: rxMethod<
+      Partial<{
+        isActive: boolean;
+        isPromo: boolean;
+        keyword: string;
+      }>
+    >(
       pipe(
         tap(() => {
           patchState(store, {
             isLoading: true,
           });
         }),
-        switchMap(() => productsService.getProducts()),
+        switchMap(({ isActive, isPromo, keyword }) =>
+          productsService.getProducts(isActive, isPromo)
+        ),
         tap((products) => {
           patchState(store, {
             products,
@@ -103,23 +112,30 @@ export const ProductsStore = signalStore(
         })
       )
     ),
-    deleteProduct: rxMethod<string>(
+    deleteProduct: rxMethod<{ productId: string }>(
       pipe(
         tap(() => {
           patchState(store, {
             isLoading: true,
           });
         }),
-        switchMap((id) =>
-          productsService.deleteProduct(id).pipe(
+        switchMap(({ productId }) =>
+          productsService.deleteProduct(productId).pipe(
             tap(() => {
               patchState(store, {
                 products: store
                   .products()
-                  .filter((product) => product.id !== id),
+                  .filter((product) => product.id !== productId),
                 selectedProduct: null,
                 isLoading: false,
               });
+            }),
+            catchError(() => {
+              patchState(store, {
+                isLoading: false,
+              });
+
+              return of(null);
             })
           )
         )
@@ -137,10 +153,16 @@ export const ProductsStore = signalStore(
     },
     createProductRate: rxMethod<CreateProductRateRequest>(
       pipe(
+        tap(() => {
+          patchState(store, {
+            isLoading: true,
+          });
+        }),
         switchMap((payload) =>
           productsService.createProductRate(payload).pipe(
             tap((productRate: ProductRate) => {
               patchState(store, {
+                isLoading: false,
                 products: store.products().map((product) => {
                   if (product.id === payload.productId) {
                     return {
@@ -154,17 +176,29 @@ export const ProductsStore = signalStore(
                 }),
               });
             }),
-            catchError(() => of(null))
+            catchError(() => {
+              patchState(store, {
+                isLoading: false,
+              });
+
+              return of(null);
+            })
           )
         )
       )
     ),
     editProductRate: rxMethod<EditProductRateRequest>(
       pipe(
+        tap(() => {
+          patchState(store, {
+            isLoading: true,
+          });
+        }),
         switchMap((payload) =>
           productsService.editProductRate(payload).pipe(
             tap((productRate: ProductRate) => {
               patchState(store, {
+                isLoading: false,
                 products: store.products().map((product) => {
                   if (product.id === payload.productId) {
                     return {
@@ -178,7 +212,13 @@ export const ProductsStore = signalStore(
                 }),
               });
             }),
-            catchError(() => of(null))
+            catchError(() => {
+              patchState(store, {
+                isLoading: true,
+              });
+
+              return of(null);
+            })
           )
         )
       )
