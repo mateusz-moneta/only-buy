@@ -10,7 +10,7 @@ export class SearchFormBuilder {
       isPromo: new FormControl(false, {
         nonNullable: true,
       }),
-      keyword: new FormControl('', {
+      phrase: new FormControl('', {
         nonNullable: true,
       }),
     });

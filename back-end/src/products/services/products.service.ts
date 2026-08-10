@@ -57,6 +57,7 @@ export class ProductsService {
   async findAll(
     isActive?: boolean,
     isPromo?: boolean,
+    phrase?: string,
     username?: string,
   ): Promise<Product[]> {
     let query = this.productsRepository
@@ -71,6 +72,15 @@ export class ProductsService {
 
     if (isPromo !== undefined) {
       query = query.andWhere('product.isPromo = :isPromo', { isPromo });
+    }
+
+    if (phrase) {
+      query = query.andWhere(
+          'product.name ILIKE :phrase',
+          {
+            phrase: `%${phrase}%`,
+          },
+      );
     }
 
     const products = await query.getMany();

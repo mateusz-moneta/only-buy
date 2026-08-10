@@ -16,6 +16,7 @@ import {
   ProductComponent,
   SearchComponent,
 } from './components';
+import {debounceTime} from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -52,14 +53,17 @@ export class DashboardComponent implements OnInit {
 
   private handleForm(): void {
     this.searchForm.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+        debounceTime(500),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe((values) => {
-        const { isActive, isPromo, keyword } = values;
+        const { isActive, isPromo, phrase } = values;
 
         this.productsStore.loadProducts({
           isActive,
           isPromo,
-          keyword,
+          phrase,
         });
       });
   }

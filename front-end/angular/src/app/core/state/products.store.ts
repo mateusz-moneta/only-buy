@@ -48,7 +48,7 @@ export const ProductsStore = signalStore(
       Partial<{
         isActive: boolean;
         isPromo: boolean;
-        keyword: string;
+        phrase: string;
       }>
     >(
       pipe(
@@ -57,8 +57,8 @@ export const ProductsStore = signalStore(
             isLoading: true,
           });
         }),
-        switchMap(({ isActive, isPromo, keyword }) =>
-          productsService.getProducts(isActive, isPromo)
+        switchMap(({ isActive, isPromo, phrase }) =>
+          productsService.getProducts(isActive, isPromo, phrase)
         ),
         tap((products) => {
           patchState(store, {
