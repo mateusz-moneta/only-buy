@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`_SearchComponent > should match snapshot 1`] = `"<input _ngcontent-a-c995452017="" type="search" placeholder="">"`;

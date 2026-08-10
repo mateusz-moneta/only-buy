@@ -1,5 +1,5 @@
-import { ProductImage } from './product-image';
 import { ProductRate } from './product-rate';
+import { ProductImage } from './product-image';
 
 export interface Product extends ProductRate {
   id: string;
@@ -10,6 +10,4 @@ export interface Product extends ProductRate {
   isActive: boolean;
   isPromo: boolean;
   images: ProductImage[];
-  createdDate: string;
-  updatedDate: string;
 }

@@ -14,15 +14,21 @@
 
     <div [innerHTML]="description() | safeHtml"></div>
 
-    <div class="my-3">
-      <app-rates
-        [confirmedRating]="confirmedRating()"
-        (selectRates)="selectRates.emit($event)"
-      />
-    </div>
+    <div>
+      <div class="my-3">
+        <app-rates
+          [confirmedRating]="confirmedRating()"
+          (selectRates)="selectRates.emit($event)"
+        />
+      </div>
 
-    <app-button (callback)="showDetails.emit()" type="button" styleClass="py-3">
-      Show details
-    </app-button>
+      <app-button
+        (callback)="showDetails.emit()"
+        type="button"
+        styleClass="py-3"
+      >
+        Show details
+      </app-button>
+    </div>
   </div>
 </div>

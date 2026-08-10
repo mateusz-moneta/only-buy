@@ -11,6 +11,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ProductsStore } from '@core/state';
 import { ButtonComponent, SpinnerComponent } from '@shared/components';
 import { SafeHtmlPipe } from '@shared/pipes';
+import { handleImageError } from '@shared/utils';
 
 @Component({
   selector: 'app-product-details',
@@ -50,5 +51,9 @@ export class ProductDetailsComponent implements OnInit {
 
   protected async goToDashboard(): Promise<void> {
     await this.router.navigate(['/']);
+  }
+
+  protected onImageError(event: Event): void {
+    handleImageError(event);
   }
 }

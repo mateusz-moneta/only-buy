@@ -32,11 +32,12 @@
       @for (product of products(); track product.id) {
         <div class="col-md-4 col-12 mt-md-4 mt-4 pl-4 pr-4">
           <app-product
-            [confirmedRating]="0"
+            [confirmedRating]="product.rating"
             [description]="product.description ?? ''"
             [images]="product.images ?? []"
             [isPromo]="product.isPromo ?? false"
             [name]="product.name ?? ''"
+            (selectRates)="onSelectRates(product, $event)"
             (showDetails)="onShowDetails(product)"
           />
         </div>

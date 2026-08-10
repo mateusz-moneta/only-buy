@@ -10,7 +10,6 @@ import {
   Put,
   Query,
   Req,
-  UnauthorizedException,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
@@ -19,6 +18,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
 
+import { Product } from './models';
 import {
   CreateProductDto,
   CreateProductRateDto,
@@ -28,7 +28,9 @@ import {
 import { ProductEntity } from './entities';
 import { ProductRatesService, ProductsService } from './services';
 import { RolesGuard } from '../auth/guards';
-import { Admin } from '../auth/decorators';
+import { Admin, CurrentUser } from '../auth/decorators';
+import { ProductRate } from './models';
+import { User } from '../users/models';
 
 @ApiTags('products')
 @Controller('products')
@@ -49,8 +51,6 @@ export class ProductsController {
     @UploadedFiles() productImages: Express.Multer.File[],
     @Req() req: { body: CreateProductDto },
   ): Promise<ProductEntity> {
-    console.log(req.body);
-    console.log(productImages);
     return this.productsService.createProduct(req.body, productImages);
   }
 
@@ -59,14 +59,15 @@ export class ProductsController {
   @ApiResponse({
     status: 200,
     description: 'The found records',
-    type: ProductEntity,
+    type: 'Product',
     isArray: true,
   })
   findAll(
     @Query('isActive') isActive: boolean,
     @Query('isPromo') isPromo: boolean,
-  ): Promise<ProductEntity[]> {
-    return this.productsService.findAll(isActive, isPromo);
+    @CurrentUser() user: User,
+  ): Promise<Product[]> {
+    return this.productsService.findAll(isActive, isPromo, user.username);
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -78,8 +79,11 @@ export class ProductsController {
     type: 'Product',
   })
   @ApiParam({ name: 'id' })
-  find(@Param('id') id: string): Promise<ProductEntity | null> {
-    return this.productsService.findOneById(id);
+  find(
+    @Param('id') id: string,
+    @CurrentUser() user: User,
+  ): Promise<Product | null> {
+    return this.productsService.findOneById(id, user.username);
   }
 
   @UseGuards(RolesGuard)
@@ -120,22 +124,16 @@ export class ProductsController {
   @ApiResponse({
     status: 200,
     description: 'The create of rate',
-    type: 'boolean',
+    type: 'ProductRate',
   })
   createRate(
     @Body() createRateDto: CreateProductRateDto,
-    @Req() request: Request,
-  ): Promise<boolean> {
-    const token = request.headers['authorization'].replace('Bearer ', '');
-    const decodedToken = this.jwtService.decode(token);
-
-    if (!decodedToken || !decodedToken.hasOwnProperty('username')) {
-      throw new UnauthorizedException('Invalid token or missing username');
-    }
-
-    const { username } = decodedToken;
-
-    return this.productRatesService.createProductRate(createRateDto, username);
+    @CurrentUser() user: User,
+  ): Promise<ProductRate> {
+    return this.productRatesService.createProductRate(
+      createRateDto,
+      user.username,
+    );
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -144,21 +142,15 @@ export class ProductsController {
   @ApiResponse({
     status: 200,
     description: 'The update of rate',
-    type: 'boolean',
+    type: 'ProductRate',
   })
   updateProductRate(
     @Body() updateRateDto: UpdateProductRateDto,
-    @Req() request: Request,
-  ): Promise<boolean> {
-    const token = request.headers['authorization'].replace('Bearer ', '');
-    const decodedToken = this.jwtService.decode(token);
-
-    if (!decodedToken || !decodedToken.hasOwnProperty('username')) {
-      throw new UnauthorizedException('Invalid token or missing username');
-    }
-
-    const { username } = decodedToken;
-
-    return this.productRatesService.updateProductRate(updateRateDto, username);
+    @CurrentUser() user: User,
+  ): Promise<ProductRate> {
+    return this.productRatesService.updateProductRate(
+      updateRateDto,
+      user.username,
+    );
   }
 }

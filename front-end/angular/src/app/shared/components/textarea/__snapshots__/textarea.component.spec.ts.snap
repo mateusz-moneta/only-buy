@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`_TextareaComponent > should match snapshot 1`] = `"<label _ngcontent-a-c1737321694="" class="textarea">  <textarea _ngcontent-a-c1737321694="" name="" placeholder=""></textarea><!--container--></label>"`;

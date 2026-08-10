@@ -1,12 +1,13 @@
 import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, switchMap, tap } from 'rxjs';
+import { catchError, of, pipe, switchMap, tap } from 'rxjs';
 import {
   CreateProductRateRequest,
   CreateProductRequest,
   EditProductRateRequest,
   Product,
+  ProductRate,
 } from '../models';
 import { ProductsService } from '../services';
 
@@ -135,10 +136,52 @@ export const ProductsStore = signalStore(
       });
     },
     createProductRate: rxMethod<CreateProductRateRequest>(
-      pipe(switchMap((payload) => productsService.createProductRate(payload)))
+      pipe(
+        switchMap((payload) =>
+          productsService.createProductRate(payload).pipe(
+            tap((productRate: ProductRate) => {
+              patchState(store, {
+                products: store.products().map((product) => {
+                  if (product.id === payload.productId) {
+                    return {
+                      ...product,
+                      averageRating: productRate.averageRating,
+                      rating: productRate.rating,
+                    };
+                  }
+
+                  return product;
+                }),
+              });
+            }),
+            catchError(() => of(null))
+          )
+        )
+      )
     ),
     editProductRate: rxMethod<EditProductRateRequest>(
-      pipe(switchMap((payload) => productsService.editProductRate(payload)))
+      pipe(
+        switchMap((payload) =>
+          productsService.editProductRate(payload).pipe(
+            tap((productRate: ProductRate) => {
+              patchState(store, {
+                products: store.products().map((product) => {
+                  if (product.id === payload.productId) {
+                    return {
+                      ...product,
+                      averageRating: productRate.averageRating,
+                      rating: productRate.rating,
+                    };
+                  }
+
+                  return product;
+                }),
+              });
+            }),
+            catchError(() => of(null))
+          )
+        )
+      )
     ),
   }))
 );

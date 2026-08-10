@@ -3,6 +3,7 @@ import { Component, input, output, signal } from '@angular/core';
 import { ProductImage } from '@core/models';
 import { ButtonComponent } from '@shared/components';
 import { SafeHtmlPipe } from '@shared/pipes';
+import { handleImageError } from '@shared/utils';
 import { RatesComponent } from '../rates/rates.component';
 
 @Component({
@@ -25,9 +26,6 @@ export class ProductComponent {
   protected readonly imageIndex = signal<number>(0);
 
   protected onImageError(event: Event): void {
-    const image = event.target as HTMLImageElement;
-
-    image.src = '/images/placeholder.png';
-    image.className = 'product__image--error';
+    handleImageError(event);
   }
 }

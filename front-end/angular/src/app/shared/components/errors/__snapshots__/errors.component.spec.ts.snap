@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`_ErrorsComponent > should match snapshot 1`] = `"<div _ngcontent-a-c2045959799="" class="errors"><!--container--><!--container--><!--container--><!--container--><!--container--></div>"`;

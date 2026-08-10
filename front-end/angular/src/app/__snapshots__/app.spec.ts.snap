@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`_App > should match snapshot 1`] = `"<router-outlet></router-outlet><!--container--><app-snackbar _nghost-a-c3651209804=""><!--container--></app-snackbar>"`;

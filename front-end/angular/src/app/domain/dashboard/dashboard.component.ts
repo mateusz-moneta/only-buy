@@ -59,6 +59,22 @@ export class DashboardComponent implements OnInit {
     this.router.navigate(['/products', product.id]);
   }
 
+  protected onSelectRates(product: Product, rating: number): void {
+    if (product.rating) {
+      this.productsStore.editProductRate({
+        productId: product.id,
+        rating,
+      });
+
+      return;
+    }
+
+    this.productsStore.createProductRate({
+      productId: product.id,
+      rating,
+    });
+  }
+
   private redirectToLoginPage(): void {
     this.router.navigate(['/login']);
   }

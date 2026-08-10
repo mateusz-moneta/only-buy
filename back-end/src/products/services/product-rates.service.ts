@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -6,6 +10,7 @@ import { CreateProductRateDto, UpdateProductRateDto } from '../dto';
 import { ProductRateEntity } from '../entities';
 import { ProductsService } from './products.service';
 import { UsersService } from 'src/users/services';
+import { ProductRate } from '../models';
 
 @Injectable()
 export class ProductRatesService {
@@ -19,43 +24,88 @@ export class ProductRatesService {
   async createProductRate(
     createProductRate: CreateProductRateDto,
     username: string,
-  ): Promise<boolean> {
+  ): Promise<ProductRate> {
     const product = await this.productsService.findOneById(
       createProductRate.productId,
     );
+
     const user = await this.usersService.findOneByUsername(username);
 
     if (!product || !user) {
-      throw new Error('ProductComponent or User not found');
+      throw new NotFoundException('Product or user not found');
     }
 
-    await this.productRatesRepository.create({
-      rating: createProductRate.rating,
-      product: product,
-      user: user,
+    const existingRate = await this.productRatesRepository.findOne({
+      where: {
+        product: {
+          id: product.id,
+        },
+        user: {
+          id: user.id,
+        },
+      },
     });
 
-    return true;
+    if (existingRate) {
+      throw new ConflictException('You have already rated this product');
+    }
+
+    const productRateEntity = this.productRatesRepository.create({
+      rating: createProductRate.rating,
+      product,
+      user,
+    });
+
+    await productRateEntity.save();
+
+    const result = await this.productRatesRepository
+      .createQueryBuilder('productRate')
+      .select('AVG(productRate.rating)', 'averageRating')
+      .where('productRate.productId = :productId', {
+        productId: product.id,
+      })
+      .getRawOne<{ averageRating: string }>();
+
+    return {
+      rating: productRateEntity.rating,
+      averageRating: Number(result.averageRating),
+    };
   }
 
   async updateProductRate(
     updateProductRate: UpdateProductRateDto,
     username: string,
-  ): Promise<boolean> {
-    try {
-      const productRate = await this.productRatesRepository.findOne({
-        where: {
-          product: { id: updateProductRate.productId },
-          user: { username },
+  ): Promise<ProductRate> {
+    const productRate = await this.productRatesRepository.findOne({
+      where: {
+        product: {
+          id: updateProductRate.productId,
         },
-      });
-      await this.productRatesRepository.update(productRate.id, {
-        rating: updateProductRate.rating,
-      });
+        user: {
+          username,
+        },
+      },
+    });
 
-      return true;
-    } catch (exception) {
-      return false;
+    if (!productRate) {
+      throw new NotFoundException('Product rate not found');
     }
+
+    productRate.rating = updateProductRate.rating;
+
+    await this.productRatesRepository.save(productRate);
+
+    const result = await this.productRatesRepository
+      .createQueryBuilder('productRate')
+      .select('AVG(productRate.rating)', 'averageRating')
+      .where('productRate.productId = :productId', {
+        productId: updateProductRate.productId,
+      })
+      .getRawOne<{ averageRating: string }>();
+
+    return {
+      rating: productRate.rating,
+      averageRating: Number(result.averageRating),
+    };
   }
 }

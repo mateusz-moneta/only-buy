@@ -1,10 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PassportModule } from '@nestjs/passport';
-import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from '@hapi/joi';
-import { join } from 'path';
 
 @Module({
   imports: [
@@ -19,11 +17,6 @@ import { join } from 'path';
         SECRET: Joi.string(),
       }),
       isGlobal: true,
-    }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),
-      serveRoot: '/uploads',
-      exclude: ['/api*'],
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],

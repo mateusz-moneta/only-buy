@@ -25,7 +25,12 @@
 
         @if (image(); as image) {
           <div class="product__image my-5">
-            <img [ngSrc]="image.path" alt="" fill />
+            <img
+              [ngSrc]="image.path"
+              (error)="onImageError($event)"
+              alt=""
+              fill
+            />
           </div>
         }
 
@@ -48,6 +53,18 @@
           <h2>Price</h2>
 
           <p class="mt-3">{{ product()?.price }} PLN</p>
+        </div>
+
+        <div class="mt-4">
+          <h2>Your rating</h2>
+
+          <p class="mt-3">{{ product()?.rating }} / 5</p>
+        </div>
+
+        <div class="mt-4">
+          <h2>Average rating</h2>
+
+          <p class="mt-3">{{ product()?.averageRating }} / 5</p>
         </div>
       }
     </div>
