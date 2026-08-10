@@ -1,21 +1,23 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Spectator, createComponentFactory } from '@ngneat/spectator';
+import { beforeEach, expect, it } from 'vitest';
 import { TextareaComponent } from './textarea.component';
 
-describe('TextareaComponent', () => {
-  let component: TextareaComponent;
-  let fixture: ComponentFixture<TextareaComponent>;
+describe(TextareaComponent.name, () => {
+  const createComponent = createComponentFactory({
+    component: TextareaComponent,
+  });
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [TextareaComponent],
-    }).compileComponents();
+  let spectator: Spectator<TextareaComponent>;
 
-    fixture = TestBed.createComponent(TextareaComponent);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
+  beforeEach(() => {
+    spectator = createComponent();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(spectator.component).toBeTruthy();
+  });
+
+  it('should match snapshot', () => {
+    expect(spectator.element.innerHTML).toMatchSnapshot();
   });
 });

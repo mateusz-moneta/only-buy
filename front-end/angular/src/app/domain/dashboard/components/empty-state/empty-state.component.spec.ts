@@ -1,21 +1,23 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Spectator, createComponentFactory } from '@ngneat/spectator';
+import { beforeEach, expect, it } from 'vitest';
 import { EmptyStateComponent } from './empty-state.component';
 
-describe('EmptyState', () => {
-  let component: EmptyStateComponent;
-  let fixture: ComponentFixture<EmptyStateComponent>;
+describe(EmptyStateComponent.name, () => {
+  const createComponent = createComponentFactory({
+    component: EmptyStateComponent,
+  });
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [EmptyStateComponent],
-    }).compileComponents();
+  let spectator: Spectator<EmptyStateComponent>;
 
-    fixture = TestBed.createComponent(EmptyStateComponent);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
+  beforeEach(() => {
+    spectator = createComponent();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(spectator.component).toBeTruthy();
+  });
+
+  it('should match snapshot', () => {
+    expect(spectator.element.innerHTML).toMatchSnapshot();
   });
 });
