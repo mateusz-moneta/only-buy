@@ -48,10 +48,10 @@ export class ProductsController {
   @UseInterceptors(FilesInterceptor('productImages'))
   @ApiOperation({ summary: 'Create the product' })
   create(
+    @Body() createProductDto: CreateProductDto,
     @UploadedFiles() productImages: Express.Multer.File[],
-    @Req() req: { body: CreateProductDto },
   ): Promise<ProductEntity> {
-    return this.productsService.createProduct(req.body, productImages);
+    return this.productsService.createProduct(createProductDto, productImages);
   }
 
   @Get()

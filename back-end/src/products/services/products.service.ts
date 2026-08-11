@@ -35,15 +35,17 @@ export class ProductsService {
     if (productImages?.length) {
       await Promise.all(
         productImages.map(async (productImage) => {
-          const path = this.uploadService.saveFile(
+          const filePath = this.uploadService.saveFile(
             productImage,
             `product-images/${savedProduct.id}`,
           );
+
           const savedProductImage =
             await this.productImagesService.createProductImage({
               productId: savedProduct.id,
-              path,
+              path: filePath,
             });
+
           savedProductImage.product = savedProduct;
 
           await savedProductImage.save();

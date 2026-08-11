@@ -61,5 +61,7 @@ export class NewProductComponent {
       isPromo: promo ?? false,
       productImages: images ?? [],
     });
+
+    this.router.navigate(['/']);
   }
 }

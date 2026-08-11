@@ -76,14 +76,21 @@ export const ProductsStore = signalStore(
           });
         }),
         switchMap((payload: CreateProductRequest) =>
-          productsService.createProduct(payload)
-        ),
-        tap((product: Product) => {
-          patchState(store, {
-            products: [...store.products(), product],
-            isLoading: false,
-          });
-        })
+          productsService.createProduct(payload).pipe(
+            tap(() => {
+              patchState(store, {
+                isLoading: false,
+              });
+            }),
+            catchError(() => {
+              patchState(store, {
+                isLoading: false,
+              });
+
+              return of(null);
+            })
+          )
+        )
       )
     ),
     editProduct: rxMethod<{

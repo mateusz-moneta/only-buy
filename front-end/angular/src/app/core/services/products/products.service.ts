@@ -25,18 +25,13 @@ export class ProductsService {
     formData.append('isActive', String(payload.isActive));
     formData.append('isPromo', String(payload.isPromo));
     formData.append('name', payload.name);
-
-    console.log(payload);
+    formData.append('price', payload.price);
 
     (payload.productImages ?? []).forEach((image: File) => {
       formData.append('productImages', image);
     });
 
-    return this.httpClient.post<Product>(`${this.basePath}/new`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    return this.httpClient.post<Product>(`${this.basePath}/new`, formData);
   }
 
   public createProductRate(

@@ -1,3 +1,4 @@
+import { NgOptimizedImage } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -7,7 +8,6 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Role } from '@core/models';
-import {NgOptimizedImage} from '@angular/common';
 
 @Component({
   selector: 'app-avatar',
