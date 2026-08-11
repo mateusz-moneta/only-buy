@@ -13,9 +13,9 @@ import {
   ProductImagesService,
   ProductRatesService,
   ProductsService,
-  UploadService,
 } from './services';
 import { UsersModule } from '../users';
+import { UploadsModule } from '../uploads';
 
 @Module({
   controllers: [ProductsController],
@@ -26,6 +26,7 @@ import { UsersModule } from '../users';
       ProductImageEntity,
       ProductRateEntity,
     ]),
+    UploadsModule,
     UsersModule,
   ],
   providers: [
@@ -33,7 +34,6 @@ import { UsersModule } from '../users';
     ProductImagesService,
     ProductRatesService,
     ProductsService,
-    UploadService,
   ],
 })
 export class ProductsModule {}

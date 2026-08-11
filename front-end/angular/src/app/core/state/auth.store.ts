@@ -14,6 +14,7 @@ import { UserData } from '../models/user-data';
 import { AuthService, TokenStorageService } from '../services';
 
 export interface AuthUser {
+  avatar: string | null;
   username: string;
   role: Role;
 }
@@ -29,7 +30,7 @@ const initialState: AuthState = {
   accessToken: null,
   user: null,
   isAuthenticated: false,
-  isLoading: false,
+  isLoading: true,
 };
 
 export const AuthStore = signalStore(
@@ -71,6 +72,7 @@ export const AuthStore = signalStore(
               accessToken: login.accessToken,
               isAuthenticated: true,
               user: {
+                avatar: login.avatar,
                 role: login.role,
                 username: login.username,
               },
@@ -127,6 +129,7 @@ export const AuthStore = signalStore(
               isAuthenticated: true,
               isLoading: false,
               user: {
+                avatar: userData.avatar,
                 role: userData.role,
                 username: userData.username,
               },

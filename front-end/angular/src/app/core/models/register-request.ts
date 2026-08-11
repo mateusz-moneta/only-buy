@@ -1,5 +1,5 @@
 export interface RegisterRequest {
-  avatar?: string;
+  avatar?: File | null;
   email: string;
   password: string;
   username: string;

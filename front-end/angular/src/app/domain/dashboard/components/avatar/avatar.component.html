@@ -1,6 +1,6 @@
-<div (click)="openMenu()" class="avatar">
-  @if (src(); as src) {
-    <img [src]="src" alt="AvatarComponent of user" />
+<div (click)="openMenu()" class="avatar" role="button">
+  @if (avatar(); as src) {
+    <img [ngSrc]="src" alt="AvatarComponent of user" fill />
   }
 
   @if (isOpenMenu()) {

@@ -7,10 +7,12 @@ import { RegisterUserDto } from '../dto';
 import { RolesService } from '../../roles/services';
 import { UserEntity } from '../entities';
 import { User } from '../models';
+import { UploadService } from '../../uploads/services';
 
 @Injectable()
 export class UsersService {
   constructor(
+    private readonly uploadService: UploadService,
     @InjectRepository(UserEntity)
     private readonly usersRepository: Repository<UserEntity>,
     private readonly rolesService: RolesService,
@@ -71,22 +73,44 @@ export class UsersService {
       .getRawOne();
   }
 
-  async register(registerUserDto: RegisterUserDto): Promise<boolean> {
+  async register(
+    registerUserDto: RegisterUserDto,
+    avatar?: Express.Multer.File,
+  ): Promise<boolean> {
     try {
-      const saltOrRounds = 10;
-      const { password } = registerUserDto;
-      const hash = await bcrypt.hash(password, saltOrRounds);
-      const role = await this.rolesService.findOneById(1);
+      const { username, email, password } = registerUserDto;
+
+      const existingUser = await this.usersRepository.findOne({
+        where: [{ username }, { email }],
+      });
+
+      if (existingUser) {
+        return false;
+      }
+
+      const role = await this.rolesService.findOneByName('STANDARD');
+
+      if (!role) {
+        return false;
+      }
+
+      const hash = await bcrypt.hash(password, 10);
 
       const user = new UserEntity({
-        ...registerUserDto,
+        username,
+        email,
         password: hash,
         refreshToken: null,
         role,
+        avatar: avatar ? this.uploadService.saveFile(avatar, 'avatars') : null,
       });
 
-      return !!(await user.save());
+      await user.save();
+
+      return true;
     } catch (exception: unknown) {
+      console.error('User registration failed:', exception);
+
       return false;
     }
   }

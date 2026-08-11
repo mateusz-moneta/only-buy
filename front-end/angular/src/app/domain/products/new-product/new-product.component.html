@@ -62,7 +62,7 @@
       <div class="mt-5">
         <app-files-uploader
           [multiple]="true"
-          (change)="onProductImagesChange($event)"
+          (changeFiles)="onProductImagesChange($event)"
           name="productImages"
           accept=".jpg, .jpeg, .png"
         />

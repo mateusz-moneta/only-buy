@@ -28,6 +28,10 @@ export class RegisterComponent {
 
   protected readonly form = RegisterFormBuilder.build();
 
+  protected onFileChange([file]: File[]): void {
+    this.form.controls.avatar.setValue(file, { emitEvent: false });
+  }
+
   protected onSubmit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -42,6 +46,7 @@ export class RegisterComponent {
     }
 
     this.authStore.register({
+      avatar,
       email,
       password,
       username,

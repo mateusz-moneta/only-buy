@@ -66,7 +66,11 @@ export class ProductsService {
     return this.httpClient.get<Product>(`${this.basePath}/${id}`);
   }
 
-  public getProducts(isActive = true, isPromo = true, phrase = ''): Observable<Product[]> {
+  public getProducts(
+    isActive = true,
+    isPromo = true,
+    phrase = ''
+  ): Observable<Product[]> {
     return this.httpClient.get<Product[]>(this.basePath, {
       params: new HttpParams()
         .append('isActive', isActive)

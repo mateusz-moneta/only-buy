@@ -7,18 +7,19 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Role } from '@core/models';
+import {NgOptimizedImage} from '@angular/common';
 
 @Component({
   selector: 'app-avatar',
-  imports: [RouterLink],
+  imports: [NgOptimizedImage, RouterLink],
   templateUrl: './avatar.component.html',
   styleUrl: './avatar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
 })
 export class AvatarComponent {
+  public readonly avatar = input<string | null>(null);
   public readonly role = input<Role>('STANDARD');
-  public readonly src = input<string>('');
 
   public readonly logout = output<void>();
 

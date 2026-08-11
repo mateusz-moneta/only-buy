@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 
 import { CreateProductDto } from '../dto';
 import { ProductEntity } from '../entities';
-import { UploadService } from './upload.service';
+import { UploadService } from '../../uploads/services';
 import { ProductImagesService } from './product-images.service';
 import { Product } from '../models';
 
@@ -37,7 +37,7 @@ export class ProductsService {
         productImages.map(async (productImage) => {
           const path = this.uploadService.saveFile(
             productImage,
-            savedProduct.id,
+            `product-images/${savedProduct.id}`,
           );
           const savedProductImage =
             await this.productImagesService.createProductImage({
@@ -75,12 +75,9 @@ export class ProductsService {
     }
 
     if (phrase) {
-      query = query.andWhere(
-          'product.name ILIKE :phrase',
-          {
-            phrase: `%${phrase}%`,
-          },
-      );
+      query = query.andWhere('product.name ILIKE :phrase', {
+        phrase: `%${phrase}%`,
+      });
     }
 
     const products = await query.getMany();

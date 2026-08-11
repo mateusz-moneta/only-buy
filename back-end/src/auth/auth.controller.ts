@@ -1,4 +1,11 @@
-import { Body, Controller, Post, UnauthorizedException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  UnauthorizedException,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from './services';
@@ -10,6 +17,7 @@ import {
 } from '../users/dto';
 import { UsersService } from '../users/services';
 import { Login, UserData } from '../users/models';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -21,14 +29,18 @@ export class AuthController {
 
   @Public()
   @Post('register')
+  @UseInterceptors(FileInterceptor('avatar'))
   @ApiOperation({ summary: 'Register of user' })
   @ApiResponse({
     status: 200,
     description: 'Status of register',
     type: 'boolean',
   })
-  create(@Body() registerUserDto: RegisterUserDto): Promise<boolean> {
-    return this.usersService.register(registerUserDto);
+  create(
+    @Body() registerUserDto: RegisterUserDto,
+    @UploadedFile() avatar?: Express.Multer.File,
+  ): Promise<boolean> {
+    return this.usersService.register(registerUserDto, avatar);
   }
 
   @Public()

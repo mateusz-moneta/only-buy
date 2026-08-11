@@ -2,6 +2,7 @@ import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { debounceTime } from 'rxjs';
 import { Product } from '@core/models';
 import { AuthStore, ProductsStore } from '@core/state';
 import {
@@ -16,7 +17,6 @@ import {
   ProductComponent,
   SearchComponent,
 } from './components';
-import {debounceTime} from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -53,10 +53,7 @@ export class DashboardComponent implements OnInit {
 
   private handleForm(): void {
     this.searchForm.valueChanges
-      .pipe(
-        debounceTime(500),
-        takeUntilDestroyed(this.destroyRef)
-      )
+      .pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef))
       .subscribe((values) => {
         const { isActive, isPromo, phrase } = values;
 

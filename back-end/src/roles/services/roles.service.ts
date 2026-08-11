@@ -15,7 +15,7 @@ export class RolesService {
     return this.rolesRepository.find();
   }
 
-  findOneById(id: number): Promise<RoleEntity | null> {
-    return this.rolesRepository.findOneBy({ id });
+  findOneByName(name: string): Promise<RoleEntity | null> {
+    return this.rolesRepository.findOneBy({ name });
   }
 }

@@ -68,7 +68,12 @@ export class ProductsController {
     @Query('phrase') phrase: string,
     @CurrentUser() user: User,
   ): Promise<Product[]> {
-    return this.productsService.findAll(isActive, isPromo, phrase, user.username);
+    return this.productsService.findAll(
+      isActive,
+      isPromo,
+      phrase,
+      user.username,
+    );
   }
 
   @UseInterceptors(ClassSerializerInterceptor)

@@ -15,7 +15,11 @@
 
   <div>
     @if (isAuthenticated()) {
-      <app-avatar [role]="user()?.role ?? 'STANDARD'" (logout)="onLogout()" />
+      <app-avatar
+        [avatar]="user()?.avatar ?? null"
+        [role]="user()?.role ?? 'STANDARD'"
+        (logout)="onLogout()"
+      />
     } @else {
       <app-button (callback)="onLogin()" type="button" variant="secondary">
         Log in

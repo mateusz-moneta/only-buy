@@ -1,6 +1,8 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { SnackbarComponent } from '@core/components';
+import { AuthStore } from '@core/state';
+import { SpinnerComponent } from '@shared/components';
 
 @Component({
   selector: 'app-root',

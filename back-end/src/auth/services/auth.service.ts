@@ -45,6 +45,7 @@ export class AuthService {
         const { role, username } = user;
 
         return {
+          avatar: user.avatar ?? null,
           username,
           role: role.name,
           accessToken: await this.generateAccessToken(
@@ -90,9 +91,10 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    const { role, username } = user;
+    const { avatar, role, username } = user;
 
     return {
+      avatar,
       username,
       role: role.name,
       accessToken: await this.generateAccessToken(

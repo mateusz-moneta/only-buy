@@ -26,7 +26,7 @@ export class FilesUploaderComponent {
   public readonly name = input.required<string>();
   public readonly placeholder = input<string>('Select file');
 
-  public readonly change = output<File[]>();
+  public readonly changeFiles = output<File[]>();
 
   private readonly fileInput =
     viewChild<ElementRef<HTMLInputElement>>('fileInput');
@@ -44,8 +44,8 @@ export class FilesUploaderComponent {
   protected onFileChange(event: Event): void {
     const input = event.target as HTMLInputElement;
 
-    this.files = input.files ? Array.from(input.files) : [];
+    this.files = [...(input.files ?? [])];
 
-    this.change.emit(this.files);
+    this.changeFiles.emit(this.files);
   }
 }

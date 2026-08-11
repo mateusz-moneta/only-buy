@@ -1,7 +1,7 @@
 import { FormControl } from '@angular/forms';
 
 export interface RegisterForm {
-  avatar: FormControl<string | null>;
+  avatar: FormControl<File | null>;
   email: FormControl<string>;
   password: FormControl<string>;
   repeatPassword: FormControl<string>;

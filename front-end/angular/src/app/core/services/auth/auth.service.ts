@@ -15,15 +15,30 @@ import { UserData } from '../../models/user-data';
 export class AuthService {
   private readonly httpClient = inject(HttpClient);
 
+  private readonly basePath = '/api/auth';
+
   public login(payload: LoginRequest): Observable<Login> {
-    return this.httpClient.post<Login>('/api/auth/login', payload);
+    return this.httpClient.post<Login>(`${this.basePath}/login`, payload);
   }
 
   public refreshToken(payload: RefreshTokenRequest): Observable<UserData> {
-    return this.httpClient.post<UserData>('/api/auth/refresh-token', payload);
+    return this.httpClient.post<UserData>(
+      `${this.basePath}/refresh-token`,
+      payload
+    );
   }
 
-  public register(payload: RegisterRequest): Observable<string> {
-    return this.httpClient.post<string>('/api/auth/register', payload);
+  public register(payload: RegisterRequest): Observable<boolean> {
+    const formData = new FormData();
+
+    formData.append('email', payload.email);
+    formData.append('password', payload.password);
+    formData.append('username', payload.username);
+
+    if (payload.avatar) {
+      formData.append('avatar', payload.avatar);
+    }
+
+    return this.httpClient.post<boolean>(`${this.basePath}/register`, formData);
   }
 }
