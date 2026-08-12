@@ -10,7 +10,7 @@ import {
   InputComponent,
   TextareaComponent,
 } from '@shared/components';
-import { NewProductFormBuilder } from './builders';
+import { ProductFormBuilder } from '../shared/builders';
 
 @Component({
   selector: 'app-new-product',
@@ -32,7 +32,7 @@ export class NewProductComponent {
   private readonly productsStore = inject(ProductsStore);
   private readonly router = inject(Router);
 
-  protected readonly form = NewProductFormBuilder.build();
+  protected readonly form = ProductFormBuilder.build();
 
   protected async goToDashboard(): Promise<void> {
     await this.router.navigate(['/']);

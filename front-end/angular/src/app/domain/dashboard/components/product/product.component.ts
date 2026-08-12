@@ -21,6 +21,7 @@ export class ProductComponent {
   public readonly isPromo = input<boolean>();
   public readonly name = input<string>();
 
+  public readonly edit = output<void>();
   public readonly remove = output<void>();
   public readonly selectRates = output<number>();
   public readonly showDetails = output<void>();

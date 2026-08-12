@@ -109,6 +109,7 @@ export class ProductsController {
   @UseGuards(RolesGuard)
   @Admin()
   @UseInterceptors(ClassSerializerInterceptor)
+  @UseInterceptors(FilesInterceptor('productImages'))
   @Put(':id')
   @ApiOperation({ summary: 'Update product' })
   @ApiResponse({
@@ -120,8 +121,13 @@ export class ProductsController {
   update(
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto,
+    @UploadedFiles() productImages: Express.Multer.File[],
   ): Promise<ProductEntity> {
-    return null;
+    return this.productsService.updateProduct(
+      id,
+      updateProductDto,
+      productImages,
+    );
   }
 
   @UseInterceptors(ClassSerializerInterceptor)

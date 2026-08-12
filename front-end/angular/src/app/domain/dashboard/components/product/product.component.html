@@ -33,15 +33,28 @@
       </div>
 
       @if (isAdmin()) {
-        <div class="mt-3">
-          <app-button
-            (callback)="remove.emit()"
-            type="button"
-            styleClass="py-3"
-            variant="secondary"
-          >
-            Remove product
-          </app-button>
+        <div class="mt-3 product__actions--admin">
+          <div>
+            <app-button
+              (callback)="edit.emit()"
+              type="button"
+              styleClass="py-3"
+              variant="secondary"
+            >
+              Edit product
+            </app-button>
+          </div>
+
+          <div>
+            <app-button
+              (callback)="remove.emit()"
+              type="button"
+              styleClass="py-3"
+              variant="secondary"
+            >
+              Remove product
+            </app-button>
+          </div>
         </div>
       }
     </div>

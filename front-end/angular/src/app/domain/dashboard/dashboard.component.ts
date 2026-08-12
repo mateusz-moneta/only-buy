@@ -65,6 +65,12 @@ export class DashboardComponent implements OnInit {
       });
   }
 
+  protected onEditProduct(product: Product): void {
+    this.productsStore.selectProduct(product);
+
+    this.router.navigate(['/products', product.id, 'edit']);
+  }
+
   protected onLogin(): void {
     this.redirectToLoginPage();
   }

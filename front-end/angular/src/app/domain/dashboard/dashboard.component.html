@@ -44,6 +44,7 @@
             [isAdmin]="user()?.role === 'ADMIN'"
             [isPromo]="product.isPromo ?? false"
             [name]="product.name ?? ''"
+            (edit)="onEditProduct(product)"
             (remove)="onRemoveProduct(product.id)"
             (selectRates)="onSelectRates(product, $event)"
             (showDetails)="onShowDetails(product)"

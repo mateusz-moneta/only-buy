@@ -1,1 +1,88 @@
-<p>edit-product works!</p>
+<main class="container">
+  <header class="row product__header">
+    <div class="col-md-6 col-sm-3 col-4 d-flex align-items-center">
+      <app-button (callback)="goToDashboard()" type="button" variant="text">
+        <img
+          alt="Left arrow"
+          height="30"
+          ngSrc="/icons/left-arrow.svg"
+          width="30"
+        />
+      </app-button>
+    </div>
+
+    <div class="col-md-6 col-sm-9 col-8 d-flex align-items-center">
+      <h1>Editor of product</h1>
+    </div>
+  </header>
+
+  @if (form(); as form) {
+    <section class="row">
+      <form
+        [formGroup]="form"
+        (ngSubmit)="onSubmit()"
+        class="col-md-6 offset-md-3 col-sm-8 offset-sm-2 col-12"
+      >
+        <div>
+          <app-input
+            type="text"
+            formControlName="name"
+            label="Name"
+            placeholder="Enter name"
+          />
+        </div>
+
+        <div class="mt-3">
+          <app-input
+            type="text"
+            formControlName="code"
+            label="Code"
+            placeholder="Enter code"
+          />
+        </div>
+
+        <div class="mt-3">
+          <app-textarea
+            name="description"
+            formControlName="description"
+            label="Description"
+            placeholder="Enter description"
+          />
+        </div>
+
+        <div class="mt-3">
+          <app-input
+            type="number"
+            formControlName="price"
+            label="Price"
+            placeholder="Enter price"
+            step=".01"
+          />
+        </div>
+
+        <div class="mt-5">
+          <app-files-uploader
+            [multiple]="true"
+            (changeFiles)="onProductImagesChange($event)"
+            name="productImages"
+            accept=".jpg, .jpeg, .png"
+          />
+        </div>
+
+        <div class="mt-5">
+          <app-checkbox formControlName="promo" label="Promo" />
+        </div>
+
+        <div class="mt-3">
+          <app-checkbox formControlName="active" label="Active" />
+        </div>
+
+        <div class="mt-5">
+          <app-button type="submit"> Edit </app-button>
+        </div>
+      </form>
+    </section>
+  } @else {
+    <app-spinner />
+  }
+</main>

@@ -1,4 +1,5 @@
 @use 'assets/colors' as colors;
+@use 'assets/mixins' as mixins;
 
 :host {
   display: block;
@@ -63,6 +64,22 @@
       font-size: 1.4rem;
       font-weight: 500;
       padding: 0.85rem;
+    }
+  }
+
+  &__actions {
+    &--admin {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+
+      @include mixins.respond-min(lg) {
+        flex-direction: row;
+
+        > div {
+          flex: 1;
+        }
+      }
     }
   }
 }

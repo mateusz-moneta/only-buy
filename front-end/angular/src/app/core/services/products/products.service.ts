@@ -5,6 +5,7 @@ import {
   CreateProductRateRequest,
   CreateProductRequest,
   EditProductRateRequest,
+  EditProductRequest,
   Product,
   ProductRate,
 } from '../../models';
@@ -46,9 +47,22 @@ export class ProductsService {
 
   public editProduct(
     id: string,
-    payload: CreateProductRequest
+    payload: EditProductRequest
   ): Observable<Product> {
-    return this.httpClient.put<Product>(`${this.basePath}/${id}`, payload);
+    const formData = new FormData();
+
+    formData.append('code', payload.code);
+    formData.append('description', payload.description);
+    formData.append('isActive', String(payload.isActive));
+    formData.append('isPromo', String(payload.isPromo));
+    formData.append('name', payload.name);
+    formData.append('price', payload.price);
+
+    (payload.productImages ?? []).forEach((image: File) => {
+      formData.append('productImages', image);
+    });
+
+    return this.httpClient.put<Product>(`${this.basePath}/${id}`, formData);
   }
 
   public editProductRate(

@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { CreateProductDto } from '../dto';
+import { CreateProductDto, UpdateProductDto } from '../dto';
 import { ProductEntity } from '../entities';
 import { UploadService } from '../../uploads/services';
 import { ProductImagesService } from './product-images.service';
@@ -161,5 +161,62 @@ export class ProductsService {
 
   async remove(id: string): Promise<void> {
     await this.productsRepository.delete(id);
+  }
+
+  async updateProduct(
+    id: string,
+    updateProduct: UpdateProductDto,
+    productImages: Express.Multer.File[],
+  ): Promise<ProductEntity> {
+    try {
+      const product = await this.productsRepository.findOne({
+        where: { id },
+      });
+
+      if (!product) {
+        throw new NotFoundException('Product not found');
+      }
+
+      product.name = updateProduct.name;
+      product.description = updateProduct.description;
+      product.price = parseFloat(updateProduct.price);
+      product.code = updateProduct.code;
+      product.isActive = updateProduct.isActive === 'true';
+      product.isPromo = updateProduct.isPromo === 'true';
+
+      const savedProduct = await this.productsRepository.save(product);
+
+      if (productImages?.length) {
+        await Promise.all(
+          productImages.map(async (productImage) => {
+            const filePath = this.uploadService.saveFile(
+              productImage,
+              `product-images/${savedProduct.id}`,
+            );
+
+            const savedProductImage =
+              await this.productImagesService.createProductImage({
+                productId: savedProduct.id,
+                path: filePath,
+              });
+
+            savedProductImage.product = savedProduct;
+
+            await savedProductImage.save();
+          }),
+        );
+      }
+
+      return savedProduct;
+    } catch (error) {
+      console.error('Update product error:', error);
+
+      if (error instanceof Error) {
+        console.error('Message:', error.message);
+        console.error('Stack:', error.stack);
+      }
+
+      throw error;
+    }
   }
 }

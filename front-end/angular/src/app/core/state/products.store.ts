@@ -1,5 +1,4 @@
 import { inject } from '@angular/core';
-import { isActive } from '@angular/router';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { catchError, of, pipe, switchMap, tap } from 'rxjs';
@@ -7,6 +6,7 @@ import {
   CreateProductRateRequest,
   CreateProductRequest,
   EditProductRateRequest,
+  EditProductRequest,
   Product,
   ProductRate,
 } from '../models';
@@ -95,7 +95,7 @@ export const ProductsStore = signalStore(
     ),
     editProduct: rxMethod<{
       id: string;
-      payload: CreateProductRequest;
+      payload: EditProductRequest;
     }>(
       pipe(
         tap(() => {
@@ -104,19 +104,27 @@ export const ProductsStore = signalStore(
           });
         }),
         switchMap(({ id, payload }) =>
-          productsService.editProduct(id, payload)
-        ),
-        tap((updatedProduct) => {
-          patchState(store, {
-            products: store
-              .products()
-              .map((product) =>
-                product.id === updatedProduct.id ? updatedProduct : product
-              ),
-            selectedProduct: updatedProduct,
-            isLoading: false,
-          });
-        })
+          productsService.editProduct(id, payload).pipe(
+            tap((updatedProduct) => {
+              patchState(store, {
+                products: store
+                  .products()
+                  .map((product) =>
+                    product.id === updatedProduct.id ? updatedProduct : product
+                  ),
+                selectedProduct: updatedProduct,
+                isLoading: false,
+              });
+            }),
+            catchError(() => {
+              patchState(store, {
+                isLoading: false,
+              });
+
+              return of(null);
+            })
+          )
+        )
       )
     ),
     deleteProduct: rxMethod<{ productId: string }>(

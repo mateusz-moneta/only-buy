@@ -1,6 +1,6 @@
 import { FormControl } from '@angular/forms';
 
-export interface NewProductForm {
+export interface ProductForm {
   active: FormControl<boolean>;
   code: FormControl<string>;
   description: FormControl<string>;
