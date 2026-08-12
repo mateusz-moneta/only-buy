@@ -1,4 +1,4 @@
-import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import {HttpErrorResponse, HttpInterceptorFn, HttpStatusCode} from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
@@ -13,7 +13,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       switch (error.status) {
-        case 401: {
+        case HttpStatusCode.Unauthorized: {
           if (authStore.isAuthenticated()) {
             authStore.logout();
             router.navigate(['/login']);
@@ -30,17 +30,17 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
           break;
         }
 
-        case 403:
+        case HttpStatusCode.Forbidden:
           snackbarService.error(
             'You do not have permission to perform this action.'
           );
           break;
 
-        case 404:
+        case HttpStatusCode.NotFound:
           snackbarService.error('The requested resource was not found.');
           break;
 
-        case 500:
+        case HttpStatusCode.InternalServerError:
           snackbarService.error('An unexpected server errors occurred.');
           break;
 

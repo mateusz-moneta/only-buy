@@ -132,8 +132,8 @@ export class ProductsService {
       const deletedImageIds = Array.isArray(updateProduct.deletedImageIds)
         ? updateProduct.deletedImageIds
         : updateProduct.deletedImageIds
-        ? [updateProduct.deletedImageIds]
-        : [];
+          ? [updateProduct.deletedImageIds]
+          : [];
 
       const savedProduct = await queryRunner.manager.save(product);
 
@@ -216,7 +216,8 @@ export class ProductsService {
         : 0;
 
     const userRating = username
-      ? ratings.find((rate) => rate.user?.username === username)?.rating ?? null
+      ? (ratings.find((rate) => rate.user?.username === username)?.rating ??
+        null)
       : null;
 
     return {
@@ -227,12 +228,10 @@ export class ProductsService {
       code: product.code,
       isActive: product.isActive,
       isPromo: product.isPromo,
-      images: product.images.map(
-        (image: ProductImageEntity): ProductImage => ({
-          id: image.id,
-          path: image.path,
-        }),
-      ),
+      images: product.images.map((image: ProductImageEntity): ProductImage => ({
+        id: image.id,
+        path: image.path,
+      })),
       averageRating: Number(averageRating.toFixed(2)),
       rating: userRating,
     };

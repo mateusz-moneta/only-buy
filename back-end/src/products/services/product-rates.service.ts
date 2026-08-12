@@ -9,7 +9,7 @@ import { Repository } from 'typeorm';
 import { CreateProductRateDto, UpdateProductRateDto } from '../dto';
 import { ProductRateEntity } from '../entities';
 import { ProductsService } from './products.service';
-import { UsersService } from 'src/users/services';
+import { UsersService } from '../../users/services';
 import { ProductRate } from '../models';
 
 @Injectable()
