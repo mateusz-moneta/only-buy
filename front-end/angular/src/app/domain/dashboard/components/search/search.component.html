@@ -1,4 +1,4 @@
-<div class="search-input">
+<div [class.search-input--empty]="!currentValue" class="search-input">
   <input
     [disabled]="isControlDisabled"
     [placeholder]="placeholder()"
