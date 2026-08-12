@@ -8,13 +8,14 @@ section {
 
   > form {
     display: grid;
-    grid-template-columns: minmax(0, 40rem) minmax(0, 8rem) minmax(0, 8rem);
-    grid-column-gap: 2rem;
+    grid-template-columns: minmax(0, 40rem) minmax(0, 10rem) minmax(0, 8rem);
+    grid-column-gap: 3rem;
     min-width: 60%;
 
     > div:not(:first-of-type) {
       align-items: center;
       display: flex;
+      justify-content: end;
     }
 
     > app-search {

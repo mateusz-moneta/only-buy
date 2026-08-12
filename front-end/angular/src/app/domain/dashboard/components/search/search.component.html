@@ -1,8 +1,14 @@
-<input
-  [disabled]="disabled"
-  [placeholder]="placeholder()"
-  [value]="value"
-  (blur)="onTouched()"
-  (input)="onInput($event)"
-  type="search"
-/>
+<div class="search-input">
+  <input
+    [disabled]="isControlDisabled"
+    [placeholder]="placeholder()"
+    [value]="currentValue"
+    (blur)="onTouched()"
+    (input)="onInput($event)"
+    type="search"
+  />
+
+  @if (!currentValue) {
+    <img class="search-input__icon" src="/icons/loupe.svg" alt="" />
+  }
+</div>

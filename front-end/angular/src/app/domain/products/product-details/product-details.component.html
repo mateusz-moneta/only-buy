@@ -19,7 +19,11 @@
   <section class="row product__content">
     <div class="col-md-6 col-sm-8 col-12 offset-sm-2 offset-md-3">
       @if (loading()) {
-        <app-spinner />
+        <div
+          class="d-flex align-items-center justify-content-center w-100 h-100"
+        >
+          <app-spinner />
+        </div>
       } @else {
         <h1>{{ product()?.name }}</h1>
 

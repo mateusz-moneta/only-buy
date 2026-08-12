@@ -4,6 +4,7 @@ import {
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
 } from '@angular/forms';
+import { BaseInput } from '@shared/abstracts';
 
 @Component({
   selector: 'app-search',
@@ -19,39 +20,18 @@ import {
   ],
   standalone: true,
 })
-export class SearchComponent {
+export class SearchComponent extends BaseInput<string> {
+  public readonly disabled = input<boolean>(false);
   public readonly placeholder = input<string>('');
 
-  disabled = false;
-  value = '';
-
-  private onChange: (value: string) => void = () => {};
-  protected onTouched: () => void = () => {};
-
-  writeValue(value: string | null): void {
-    this.value = value ?? '';
+  protected get isControlDisabled(): boolean {
+    return this.disabled() || this.isDisabled;
   }
 
-  registerOnChange(fn: (value: string) => void): void {
-    this.onChange = fn;
-  }
-
-  registerOnTouched(fn: () => void): void {
-    this.onTouched = fn;
-  }
-
-  setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
-  }
-
-  onInput(event: Event): void {
+  protected onInput(event: Event): void {
     const value = (event.target as HTMLInputElement).value;
 
-    this.value = value;
+    this.currentValue = value;
     this.onChange(value);
-  }
-
-  onBlur(): void {
-    this.onTouched();
   }
 }

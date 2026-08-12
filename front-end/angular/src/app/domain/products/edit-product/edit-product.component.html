@@ -77,7 +77,7 @@
 
             @for (image of previousImages; track image.id) {
               <div>
-                <div class="edit-product__image">
+                <div class="edit-product__image mt-5">
                   <img [alt]="image.id" [ngSrc]="image.path" fill />
                 </div>
 
@@ -109,6 +109,8 @@
       </form>
     </section>
   } @else {
-    <app-spinner />
+    <div class="d-flex align-items-center justify-content-center w-100 h-100">
+      <app-spinner />
+    </div>
   }
 </main>
