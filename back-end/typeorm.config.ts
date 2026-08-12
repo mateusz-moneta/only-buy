@@ -3,7 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { config } from 'dotenv';
 import { CreateRoles1701095733886, CreateUser1701097096009 } from "./migrations";
 import { RoleEntity } from "./src/roles/entities";
-import { UserEntity } from "./src/users/entities";
+import {RefreshTokenEntity, UserEntity} from "./src/users/entities";
+import {ProductEntity, ProductImageEntity, ProductRateEntity} from './src/products/entities';
 
 config();
 
@@ -16,6 +17,13 @@ export default new DataSource({
     username: configService.get('POSTGRES_USER'),
     password: configService.get('POSTGRES_PASSWORD'),
     database: configService.get('POSTGRES_DB'),
-    entities: [RoleEntity, UserEntity],
+    entities: [
+        RoleEntity,
+        UserEntity,
+        ProductEntity,
+        ProductImageEntity,
+        ProductRateEntity,
+        RefreshTokenEntity
+    ],
     migrations: [CreateRoles1701095733886, CreateUser1701097096009]
 });
