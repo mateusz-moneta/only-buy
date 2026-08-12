@@ -33,11 +33,12 @@
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.1.28",
     "@nestjs/serve-static": "^5.0.3",
-    "@nestjs/swagger": "^11.2.0",
+    "@nestjs/swagger": "^11.4.6",
     "@nestjs/typeorm": "^11.0.3",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
+    "js-yaml": "^5.2.2",
     "multer": "^2.2.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.16.3",
@@ -72,6 +73,9 @@
     "tsconfig-paths": "^4.2.0",
     "typeorm-ts-node-commonjs": "^0.3.20",
     "typescript": "^6.0.3"
+  },
+  "overrides": {
+    "js-yaml": "5.2.2"
   },
   "jest": {
     "moduleFileExtensions": [
