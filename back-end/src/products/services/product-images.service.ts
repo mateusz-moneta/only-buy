@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 import { CreateProductImageDto } from '../dto';
 import { ProductImageEntity } from '../entities';
@@ -21,8 +21,25 @@ export class ProductImagesService {
     return this.productImagesRepository.save(productImage);
   }
 
+  async delete(id: string): Promise<void> {
+    await this.productImagesRepository.delete(id);
+  }
+
   findAll(): Promise<ProductImageEntity[]> {
     return this.productImagesRepository.find();
+  }
+
+  async findByIds(
+    ids: string[],
+    productId: string,
+  ): Promise<ProductImageEntity[]> {
+    return this.productImagesRepository
+      .createQueryBuilder('image')
+      .where('image.id IN (:...ids)', { ids })
+      .andWhere('image.productId = :productId', {
+        productId,
+      })
+      .getMany();
   }
 
   findOneById(id: string): Promise<ProductImageEntity | null> {

@@ -4,6 +4,14 @@ import * as path from 'path';
 
 @Injectable()
 export class UploadService {
+  deleteFile(filePath: string): void {
+    const absolutePath = path.join(process.cwd(), filePath);
+
+    if (fs.existsSync(absolutePath)) {
+      fs.unlinkSync(absolutePath);
+    }
+  }
+
   saveFile(file: Express.Multer.File, folder: string): string {
     this.validateFile(file);
 

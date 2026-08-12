@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { CreateProductDto, UpdateProductDto } from '../dto';
-import { ProductEntity } from '../entities';
+import { ProductEntity, ProductImageEntity } from '../entities';
 import { UploadService } from '../../uploads/services';
 import { ProductImagesService } from './product-images.service';
 import { Product } from '../models';
@@ -168,8 +168,17 @@ export class ProductsService {
     updateProduct: UpdateProductDto,
     productImages: Express.Multer.File[],
   ): Promise<ProductEntity> {
+    const queryRunner =
+      this.productsRepository.manager.connection.createQueryRunner();
+
+    const createdFiles: string[] = [];
+    const deletedFiles: string[] = [];
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
     try {
-      const product = await this.productsRepository.findOne({
+      const product = await queryRunner.manager.findOne(ProductEntity, {
         where: { id },
       });
 
@@ -184,39 +193,69 @@ export class ProductsService {
       product.isActive = updateProduct.isActive === 'true';
       product.isPromo = updateProduct.isPromo === 'true';
 
-      const savedProduct = await this.productsRepository.save(product);
+      const deletedImageIds = Array.isArray(updateProduct.deletedImageIds)
+        ? updateProduct.deletedImageIds
+        : updateProduct.deletedImageIds
+        ? [updateProduct.deletedImageIds]
+        : [];
 
-      if (productImages?.length) {
-        await Promise.all(
-          productImages.map(async (productImage) => {
-            const filePath = this.uploadService.saveFile(
-              productImage,
-              `product-images/${savedProduct.id}`,
-            );
+      const savedProduct = await queryRunner.manager.save(product);
 
-            const savedProductImage =
-              await this.productImagesService.createProductImage({
-                productId: savedProduct.id,
-                path: filePath,
-              });
+      if (deletedImageIds.length) {
+        const images = await queryRunner.manager
+          .createQueryBuilder(ProductImageEntity, 'image')
+          .where('image.id IN (:...ids)', {
+            ids: deletedImageIds,
+          })
+          .andWhere('image.productId = :productId', { productId: id })
+          .getMany();
 
-            savedProductImage.product = savedProduct;
+        for (const image of images) {
+          deletedFiles.push(image.path);
 
-            await savedProductImage.save();
-          }),
-        );
+          await queryRunner.manager.delete(ProductImageEntity, image.id);
+        }
       }
 
-      return savedProduct;
-    } catch (error) {
-      console.error('Update product error:', error);
+      if (productImages?.length) {
+        for (const productImage of productImages) {
+          const filePath = this.uploadService.saveFile(
+            productImage,
+            `product-images/${savedProduct.id}`,
+          );
 
-      if (error instanceof Error) {
-        console.error('Message:', error.message);
-        console.error('Stack:', error.stack);
+          createdFiles.push(filePath);
+
+          const image = new ProductImageEntity({
+            path: filePath,
+            product: savedProduct,
+          });
+
+          await queryRunner.manager.save(image);
+        }
+      }
+
+      await queryRunner.commitTransaction();
+
+      for (const filePath of deletedFiles) {
+        this.uploadService.deleteFile(filePath);
+      }
+
+      return await this.productsRepository
+        .createQueryBuilder('product')
+        .leftJoinAndSelect('product.images', 'images')
+        .where('product.id = :id', { id })
+        .getOne();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+
+      for (const filePath of createdFiles) {
+        this.uploadService.deleteFile(filePath);
       }
 
       throw error;
+    } finally {
+      await queryRunner.release();
     }
   }
 }

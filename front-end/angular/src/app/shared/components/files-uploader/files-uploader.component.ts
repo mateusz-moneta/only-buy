@@ -6,6 +6,7 @@ import {
   output,
   viewChild,
 } from '@angular/core';
+import { ButtonComponent } from '@shared/components';
 
 @Component({
   selector: 'app-files-uploader',
@@ -13,6 +14,7 @@ import {
   templateUrl: './files-uploader.component.html',
   styleUrl: './files-uploader.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [ButtonComponent],
 })
 export class FilesUploaderComponent {
   public readonly accept = input<string>('');
@@ -39,6 +41,12 @@ export class FilesUploaderComponent {
 
   protected openFileDialog(): void {
     this.fileInput()?.nativeElement.click();
+  }
+
+  protected onDelete(index: number) {
+    this.files = this.files.filter((_, i) => i !== index);
+
+    this.changeFiles.emit(this.files);
   }
 
   protected onFileChange(event: Event): void {

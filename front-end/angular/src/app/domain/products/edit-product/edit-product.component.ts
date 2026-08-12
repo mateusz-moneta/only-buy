@@ -1,7 +1,8 @@
 import { NgOptimizedImage } from '@angular/common';
 import { Component, OnInit, effect, inject, signal } from '@angular/core';
-import { FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ProductImage } from '@core/models';
 import { ProductsStore } from '@core/state';
 import {
   ButtonComponent,
@@ -39,11 +40,15 @@ export class EditProductComponent implements OnInit {
   protected readonly loading = this.productsStore.isLoading;
   protected readonly product = this.productsStore.selectedProduct;
 
+  protected readonly deletedImageIds = signal<string[]>([]);
+  protected readonly previousImages = signal<ProductImage[]>([]);
+
   private readonly initFormEffect = effect(() => {
     const product = this.product();
 
     if (product) {
       this.form.set(ProductFormBuilder.build(product));
+      this.previousImages.set(product.images ?? []);
       this.initFormEffect.destroy();
     }
   });
@@ -58,6 +63,19 @@ export class EditProductComponent implements OnInit {
 
   protected async goToDashboard(): Promise<void> {
     await this.router.navigate(['/']);
+  }
+
+  protected onDeletePreviousPhoto(id: string): void {
+    this.deletedImageIds.set([...this.deletedImageIds(), id]);
+    this.previousImages.set(
+      this.previousImages().filter(
+        ({ id: currentImageId }) => currentImageId !== id
+      )
+    );
+
+    if (!this.previousImages().length) {
+      this.form()?.controls.images.setValidators([Validators.required]);
+    }
   }
 
   protected onProductImagesChange(images: File[]): void {
@@ -80,11 +98,14 @@ export class EditProductComponent implements OnInit {
       return;
     }
 
+    const deletedImageIds = this.deletedImageIds();
+
     this.productsStore.editProduct({
       id,
       payload: {
         isActive: active ?? false,
         code: code ?? '',
+        ...(deletedImageIds ? { deletedImageIds } : {}),
         description: description ?? '',
         name: name ?? '',
         price: price ?? '0',
@@ -93,6 +114,6 @@ export class EditProductComponent implements OnInit {
       },
     });
 
-    // this.router.navigate(['/']);
+    this.router.navigate(['/']);
   }
 }

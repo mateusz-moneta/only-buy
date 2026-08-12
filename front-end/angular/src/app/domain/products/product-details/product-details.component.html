@@ -55,17 +55,21 @@
           <p class="mt-3">{{ product()?.price }} PLN</p>
         </div>
 
-        <div class="mt-4">
-          <h2>Your rating</h2>
+        @if (product()?.rating; as rating) {
+          <div class="mt-4">
+            <h2>Your rating</h2>
 
-          <p class="mt-3">{{ product()?.rating }} / 5</p>
-        </div>
+            <p class="mt-3">{{ rating }} / 5</p>
+          </div>
+        }
 
-        <div class="mt-4">
-          <h2>Average rating</h2>
+        @if (product()?.averageRating; as averageRating) {
+          <div class="mt-4">
+            <h2>Average rating</h2>
 
-          <p class="mt-3">{{ product()?.averageRating }} / 5</p>
-        </div>
+            <p class="mt-3">{{ averageRating }} / 5</p>
+          </div>
+        }
       }
     </div>
   </section>

@@ -58,7 +58,11 @@ export class ProductsService {
     formData.append('name', payload.name);
     formData.append('price', payload.price);
 
-    (payload.productImages ?? []).forEach((image: File) => {
+    (payload.deletedImageIds ?? []).forEach((id: string): void => {
+      formData.append('deletedImageIds', id);
+    });
+
+    (payload.productImages ?? []).forEach((image: File): void => {
       formData.append('productImages', image);
     });
 

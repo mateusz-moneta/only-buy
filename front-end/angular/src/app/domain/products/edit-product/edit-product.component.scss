@@ -1,0 +1,11 @@
+.edit-product {
+  &__image {
+    aspect-ratio: 1 / 1;
+    position: relative;
+    width: 100%;
+
+    > img {
+      object-fit: cover;
+    }
+  }
+}

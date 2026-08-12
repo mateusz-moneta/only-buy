@@ -21,6 +21,16 @@
     <div class="files-uploader__files">
       @for (file of files; track file.name) {
         <img [alt]="file.name" [src]="getPreviewUrl(file)" class="w-100" />
+
+        <div class="d-flex justify-content-center">
+          <app-button
+            (callback)="onDelete($index)"
+            type="button"
+            variant="secondary"
+          >
+            Delete
+          </app-button>
+        </div>
       }
     </div>
   } @else {
