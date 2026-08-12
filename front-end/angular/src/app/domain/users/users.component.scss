@@ -5,6 +5,20 @@
   flex-direction: column;
   min-height: 100vh;
 
+  &__avatar {
+    background-color: colors.$gray-2;
+    border-radius: 50%;
+    height: 5rem;
+    position: relative;
+    width: 5rem;
+
+    > img {
+      height: auto;
+      object-fit: cover;
+      width: 100%;
+    }
+  }
+
   &__header {
     display: grid;
     grid-template-columns: auto 1fr;

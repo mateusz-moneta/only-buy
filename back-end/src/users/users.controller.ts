@@ -10,13 +10,10 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-
 import { User } from './models';
 import { UsersService } from './services';
 import { Admin } from '../auth/decorators';
 import { RolesGuard } from '../auth/guards';
-import { UpdateProductDto } from '../products/dto';
-import { ProductEntity } from '../products/entities';
 import { UpdateActiveStateDto } from './dto';
 
 @ApiTags('users')

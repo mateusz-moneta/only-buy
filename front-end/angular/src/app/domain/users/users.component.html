@@ -38,7 +38,13 @@
         <tbody>
           @for (user of users(); track user.id) {
             <tr>
-              <td></td>
+              <td>
+                <div class="users__avatar">
+                  @if (user.avatar; as avatar) {
+                    <img [ngSrc]="avatar" alt="Avatar of user" fill />
+                  }
+                </div>
+              </td>
               <td>{{ user.username }}</td>
               <td>{{ user.email }}</td>
               <td>{{ user.role | titlecase }}</td>
