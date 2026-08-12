@@ -167,7 +167,8 @@ export class ProductsService {
     id: string,
     updateProduct: UpdateProductDto,
     productImages: Express.Multer.File[],
-  ): Promise<ProductEntity> {
+    username?: string,
+  ): Promise<Product> {
     const queryRunner =
       this.productsRepository.manager.connection.createQueryRunner();
 
@@ -241,11 +242,45 @@ export class ProductsService {
         this.uploadService.deleteFile(filePath);
       }
 
-      return await this.productsRepository
+      const result = await this.productsRepository
         .createQueryBuilder('product')
         .leftJoinAndSelect('product.images', 'images')
+        .leftJoinAndSelect('product.rates', 'rates')
+        .leftJoinAndSelect('rates.user', 'user')
         .where('product.id = :id', { id })
         .getOne();
+
+      if (!result) {
+        throw new NotFoundException('Product not found');
+      }
+
+      const ratings = result.rates ?? [];
+
+      const averageRating =
+        ratings.length > 0
+          ? ratings.reduce((sum, rate) => sum + rate.rating, 0) / ratings.length
+          : 0;
+
+      const userRating = username
+        ? ratings.find((rate) => rate.user?.username === username)?.rating ??
+          null
+        : null;
+
+      return {
+        id: result.id,
+        name: result.name,
+        description: result.description,
+        price: result.price,
+        code: result.code,
+        isActive: result.isActive,
+        isPromo: result.isPromo,
+        images: result.images.map((image) => ({
+          id: image.id,
+          path: image.path,
+        })),
+        averageRating: Number(averageRating.toFixed(2)),
+        rating: userRating,
+      };
     } catch (error) {
       await queryRunner.rollbackTransaction();
 

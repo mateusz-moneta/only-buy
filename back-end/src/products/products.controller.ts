@@ -122,11 +122,13 @@ export class ProductsController {
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto,
     @UploadedFiles() productImages: Express.Multer.File[],
-  ): Promise<ProductEntity> {
+    @CurrentUser() user: User,
+  ): Promise<Product> {
     return this.productsService.updateProduct(
       id,
       updateProductDto,
       productImages,
+      user.username,
     );
   }
 
