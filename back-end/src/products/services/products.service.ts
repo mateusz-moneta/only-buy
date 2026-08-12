@@ -1,12 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-
 import { CreateProductDto, UpdateProductDto } from '../dto';
 import { ProductEntity, ProductImageEntity } from '../entities';
 import { UploadService } from '../../uploads/services';
 import { ProductImagesService } from './product-images.service';
-import { Product } from '../models';
+import { Product, ProductImage } from '../models';
 
 @Injectable()
 export class ProductsService {
@@ -62,11 +61,7 @@ export class ProductsService {
     phrase?: string,
     username?: string,
   ): Promise<Product[]> {
-    let query = this.productsRepository
-      .createQueryBuilder('product')
-      .leftJoinAndSelect('product.images', 'images')
-      .leftJoinAndSelect('product.rates', 'rates')
-      .leftJoinAndSelect('rates.user', 'user');
+    let query = this.getProductQuery();
 
     if (isActive !== undefined) {
       query = query.andWhere('product.isActive = :isActive', { isActive });
@@ -84,46 +79,11 @@ export class ProductsService {
 
     const products = await query.getMany();
 
-    return products.map((product) => {
-      const ratings = product.rates ?? [];
-
-      const averageRating =
-        ratings.length > 0
-          ? ratings.reduce((sum, rate) => sum + rate.rating, 0) / ratings.length
-          : 0;
-
-      const userRating = username
-        ? ratings.find((rate) => rate.user?.username === username)?.rating ??
-          null
-        : null;
-
-      return {
-        id: product.id,
-        name: product.name,
-        description: product.description,
-        price: product.price,
-        code: product.code,
-        isActive: product.isActive,
-        isPromo: product.isPromo,
-
-        images: product.images.map((image) => ({
-          id: image.id,
-          path: image.path,
-        })),
-
-        averageRating: Number(averageRating.toFixed(2)),
-
-        rating: userRating,
-      };
-    });
+    return products.map((product) => this.mapProduct(product, username));
   }
 
   async findOneById(id: string, username?: string): Promise<Product | null> {
-    const product = await this.productsRepository
-      .createQueryBuilder('product')
-      .leftJoinAndSelect('product.images', 'images')
-      .leftJoinAndSelect('product.rates', 'rates')
-      .leftJoinAndSelect('rates.user', 'user')
+    const product = await this.getProductQuery()
       .where('product.id = :id', { id })
       .getOne();
 
@@ -131,32 +91,7 @@ export class ProductsService {
       return null;
     }
 
-    const ratings = product.rates ?? [];
-
-    const averageRating =
-      ratings.length > 0
-        ? ratings.reduce((sum, rate) => sum + rate.rating, 0) / ratings.length
-        : 0;
-
-    const userRating = username
-      ? ratings.find((rate) => rate.user?.username === username)?.rating ?? null
-      : null;
-
-    return {
-      id: product.id,
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      code: product.code,
-      isActive: product.isActive,
-      isPromo: product.isPromo,
-      images: product.images.map((image) => ({
-        id: image.id,
-        path: image.path,
-      })),
-      averageRating: Number(averageRating.toFixed(2)),
-      rating: userRating,
-    };
+    return this.mapProduct(product, username);
   }
 
   async remove(id: string): Promise<void> {
@@ -242,11 +177,7 @@ export class ProductsService {
         this.uploadService.deleteFile(filePath);
       }
 
-      const result = await this.productsRepository
-        .createQueryBuilder('product')
-        .leftJoinAndSelect('product.images', 'images')
-        .leftJoinAndSelect('product.rates', 'rates')
-        .leftJoinAndSelect('rates.user', 'user')
+      const result = await this.getProductQuery()
         .where('product.id = :id', { id })
         .getOne();
 
@@ -254,33 +185,7 @@ export class ProductsService {
         throw new NotFoundException('Product not found');
       }
 
-      const ratings = result.rates ?? [];
-
-      const averageRating =
-        ratings.length > 0
-          ? ratings.reduce((sum, rate) => sum + rate.rating, 0) / ratings.length
-          : 0;
-
-      const userRating = username
-        ? ratings.find((rate) => rate.user?.username === username)?.rating ??
-          null
-        : null;
-
-      return {
-        id: result.id,
-        name: result.name,
-        description: result.description,
-        price: result.price,
-        code: result.code,
-        isActive: result.isActive,
-        isPromo: result.isPromo,
-        images: result.images.map((image) => ({
-          id: image.id,
-          path: image.path,
-        })),
-        averageRating: Number(averageRating.toFixed(2)),
-        rating: userRating,
-      };
+      return this.mapProduct(result, username);
     } catch (error) {
       await queryRunner.rollbackTransaction();
 
@@ -292,5 +197,44 @@ export class ProductsService {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  private getProductQuery() {
+    return this.productsRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.images', 'images')
+      .leftJoinAndSelect('product.rates', 'rates')
+      .leftJoinAndSelect('rates.user', 'user');
+  }
+
+  private mapProduct(product: ProductEntity, username?: string): Product {
+    const ratings = product.rates ?? [];
+
+    const averageRating =
+      ratings.length > 0
+        ? ratings.reduce((sum, rate) => sum + rate.rating, 0) / ratings.length
+        : 0;
+
+    const userRating = username
+      ? ratings.find((rate) => rate.user?.username === username)?.rating ?? null
+      : null;
+
+    return {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      code: product.code,
+      isActive: product.isActive,
+      isPromo: product.isPromo,
+      images: product.images.map(
+        (image: ProductImageEntity): ProductImage => ({
+          id: image.id,
+          path: image.path,
+        }),
+      ),
+      averageRating: Number(averageRating.toFixed(2)),
+      rating: userRating,
+    };
   }
 }

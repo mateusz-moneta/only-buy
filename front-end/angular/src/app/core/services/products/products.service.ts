@@ -19,20 +19,10 @@ export class ProductsService {
   private readonly basePath = '/api/products';
 
   public createProduct(payload: CreateProductRequest): Observable<Product> {
-    const formData = new FormData();
-
-    formData.append('code', payload.code);
-    formData.append('description', payload.description);
-    formData.append('isActive', String(payload.isActive));
-    formData.append('isPromo', String(payload.isPromo));
-    formData.append('name', payload.name);
-    formData.append('price', payload.price);
-
-    (payload.productImages ?? []).forEach((image: File) => {
-      formData.append('productImages', image);
-    });
-
-    return this.httpClient.post<Product>(`${this.basePath}/new`, formData);
+    return this.httpClient.post<Product>(
+      `${this.basePath}/new`,
+      this.productFormData(payload)
+    );
   }
 
   public createProductRate(
@@ -49,24 +39,10 @@ export class ProductsService {
     id: string,
     payload: EditProductRequest
   ): Observable<Product> {
-    const formData = new FormData();
-
-    formData.append('code', payload.code);
-    formData.append('description', payload.description);
-    formData.append('isActive', String(payload.isActive));
-    formData.append('isPromo', String(payload.isPromo));
-    formData.append('name', payload.name);
-    formData.append('price', payload.price);
-
-    (payload.deletedImageIds ?? []).forEach((id: string): void => {
-      formData.append('deletedImageIds', id);
-    });
-
-    (payload.productImages ?? []).forEach((image: File): void => {
-      formData.append('productImages', image);
-    });
-
-    return this.httpClient.put<Product>(`${this.basePath}/${id}`, formData);
+    return this.httpClient.put<Product>(
+      `${this.basePath}/${id}`,
+      this.productFormData(payload)
+    );
   }
 
   public editProductRate(
@@ -90,5 +66,30 @@ export class ProductsService {
         .append('isPromo', isPromo)
         .append('phrase', phrase),
     });
+  }
+
+  private productFormData(
+    payload: CreateProductRequest | EditProductRequest
+  ): FormData {
+    const formData = new FormData();
+
+    formData.append('code', payload.code);
+    formData.append('description', payload.description);
+    formData.append('isActive', String(payload.isActive));
+    formData.append('isPromo', String(payload.isPromo));
+    formData.append('name', payload.name);
+    formData.append('price', payload.price);
+
+    payload.productImages?.forEach((image: File) => {
+      formData.append('productImages', image);
+    });
+
+    if ('deletedImageIds' in payload) {
+      payload.deletedImageIds?.forEach((id: string) => {
+        formData.append('deletedImageIds', id);
+      });
+    }
+
+    return formData;
   }
 }

@@ -27,216 +27,166 @@ const initialState: ProductsState = {
 export const ProductsStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  withMethods((store, productsService = inject(ProductsService)) => ({
-    loadProduct: rxMethod<{ id: string }>(
-      pipe(
-        tap(() => {
-          patchState(store, {
-            isLoading: true,
-          });
-        }),
-        switchMap(({ id }) => productsService.getProduct(id)),
-        tap((product: Product) => {
-          patchState(store, {
-            selectedProduct: product,
-            isLoading: false,
-          });
-        })
-      )
-    ),
-    loadProducts: rxMethod<
-      Partial<{
-        isActive: boolean;
-        isPromo: boolean;
-        phrase: string;
-      }>
-    >(
-      pipe(
-        tap(() => {
-          patchState(store, {
-            isLoading: true,
-          });
-        }),
-        switchMap(({ isActive, isPromo, phrase }) =>
-          productsService.getProducts(isActive, isPromo, phrase)
+  withMethods((store, productsService = inject(ProductsService)) => {
+    const setLoading = (isLoading: boolean): void => {
+      patchState(store, { isLoading });
+    };
+
+    const handleError = () => {
+      setLoading(false);
+
+      return of(null);
+    };
+
+    const updateProductRate = (
+      productId: string,
+      productRate: ProductRate
+    ): void => {
+      patchState(store, {
+        products: store.products().map((product) =>
+          product.id === productId
+            ? {
+                ...product,
+                averageRating: productRate.averageRating,
+                rating: productRate.rating,
+              }
+            : product
         ),
-        tap((products) => {
-          patchState(store, {
-            products,
-            isLoading: false,
-          });
-        })
-      )
-    ),
-    createProduct: rxMethod<CreateProductRequest>(
-      pipe(
-        tap(() => {
-          patchState(store, {
-            isLoading: true,
-          });
-        }),
-        switchMap((payload: CreateProductRequest) =>
-          productsService.createProduct(payload).pipe(
-            tap(() => {
-              patchState(store, {
-                isLoading: false,
-              });
-            }),
-            catchError(() => {
-              patchState(store, {
-                isLoading: false,
-              });
-
-              return of(null);
-            })
-          )
-        )
-      )
-    ),
-    editProduct: rxMethod<{
-      id: string;
-      payload: EditProductRequest;
-    }>(
-      pipe(
-        tap(() => {
-          patchState(store, {
-            isLoading: true,
-          });
-        }),
-        switchMap(({ id, payload }) =>
-          productsService.editProduct(id, payload).pipe(
-            tap((updatedProduct) => {
-              patchState(store, {
-                products: store
-                  .products()
-                  .map((product) =>
-                    product.id === updatedProduct.id ? updatedProduct : product
-                  ),
-                selectedProduct: updatedProduct,
-                isLoading: false,
-              });
-            }),
-            catchError(() => {
-              patchState(store, {
-                isLoading: false,
-              });
-
-              return of(null);
-            })
-          )
-        )
-      )
-    ),
-    deleteProduct: rxMethod<{ productId: string }>(
-      pipe(
-        tap(() => {
-          patchState(store, {
-            isLoading: true,
-          });
-        }),
-        switchMap(({ productId }) =>
-          productsService.deleteProduct(productId).pipe(
-            tap(() => {
-              patchState(store, {
-                products: store
-                  .products()
-                  .filter((product) => product.id !== productId),
-                selectedProduct: null,
-                isLoading: false,
-              });
-            }),
-            catchError(() => {
-              patchState(store, {
-                isLoading: false,
-              });
-
-              return of(null);
-            })
-          )
-        )
-      )
-    ),
-    selectProduct(product: Product | null): void {
-      patchState(store, {
-        selectedProduct: product,
       });
-    },
-    clearSelectedProduct(): void {
-      patchState(store, {
-        selectedProduct: null,
-      });
-    },
-    createProductRate: rxMethod<CreateProductRateRequest>(
-      pipe(
-        tap(() => {
-          patchState(store, {
-            isLoading: true,
-          });
-        }),
-        switchMap((payload) =>
-          productsService.createProductRate(payload).pipe(
-            tap((productRate: ProductRate) => {
-              patchState(store, {
-                isLoading: false,
-                products: store.products().map((product) => {
-                  if (product.id === payload.productId) {
-                    return {
-                      ...product,
-                      averageRating: productRate.averageRating,
-                      rating: productRate.rating,
-                    };
-                  }
+    };
 
-                  return product;
-                }),
-              });
-            }),
-            catchError(() => {
-              patchState(store, {
-                isLoading: false,
-              });
+    return {
+      loadProduct: rxMethod<{ id: string }>(
+        pipe(
+          tap(() => setLoading(true)),
+          switchMap(({ id }) => productsService.getProduct(id)),
+          tap((product: Product) => {
+            patchState(store, {
+              selectedProduct: product,
+            });
 
-              return of(null);
-            })
+            setLoading(false);
+          })
+        )
+      ),
+      loadProducts: rxMethod<
+        Partial<{
+          isActive: boolean;
+          isPromo: boolean;
+          phrase: string;
+        }>
+      >(
+        pipe(
+          tap(() => setLoading(true)),
+          switchMap(({ isActive, isPromo, phrase }) =>
+            productsService.getProducts(isActive, isPromo, phrase)
+          ),
+          tap((products) => {
+            patchState(store, { products });
+            setLoading(false);
+          })
+        )
+      ),
+      createProduct: rxMethod<CreateProductRequest>(
+        pipe(
+          tap(() => setLoading(true)),
+          switchMap((payload) =>
+            productsService.createProduct(payload).pipe(
+              tap(() => setLoading(false)),
+              catchError(handleError)
+            )
           )
         )
-      )
-    ),
-    editProductRate: rxMethod<EditProductRateRequest>(
-      pipe(
-        tap(() => {
-          patchState(store, {
-            isLoading: true,
-          });
-        }),
-        switchMap((payload) =>
-          productsService.editProductRate(payload).pipe(
-            tap((productRate: ProductRate) => {
-              patchState(store, {
-                isLoading: false,
-                products: store.products().map((product) => {
-                  if (product.id === payload.productId) {
-                    return {
-                      ...product,
-                      averageRating: productRate.averageRating,
-                      rating: productRate.rating,
-                    };
-                  }
+      ),
+      editProduct: rxMethod<{
+        id: string;
+        payload: EditProductRequest;
+      }>(
+        pipe(
+          tap(() => setLoading(true)),
+          switchMap(({ id, payload }) =>
+            productsService.editProduct(id, payload).pipe(
+              tap((updatedProduct) => {
+                patchState(store, {
+                  products: store
+                    .products()
+                    .map((product) =>
+                      product.id === updatedProduct.id
+                        ? updatedProduct
+                        : product
+                    ),
+                  selectedProduct: updatedProduct,
+                });
 
-                  return product;
-                }),
-              });
-            }),
-            catchError(() => {
-              patchState(store, {
-                isLoading: true,
-              });
-
-              return of(null);
-            })
+                setLoading(false);
+              }),
+              catchError(handleError)
+            )
           )
         )
-      )
-    ),
-  }))
+      ),
+      deleteProduct: rxMethod<{
+        productId: string;
+      }>(
+        pipe(
+          tap(() => setLoading(true)),
+          switchMap(({ productId }) =>
+            productsService.deleteProduct(productId).pipe(
+              tap(() => {
+                patchState(store, {
+                  products: store
+                    .products()
+                    .filter((product) => product.id !== productId),
+                  selectedProduct: null,
+                });
+
+                setLoading(false);
+              }),
+              catchError(handleError)
+            )
+          )
+        )
+      ),
+      selectProduct(product: Product | null): void {
+        patchState(store, {
+          selectedProduct: product,
+        });
+      },
+      clearSelectedProduct(): void {
+        patchState(store, {
+          selectedProduct: null,
+        });
+      },
+      createProductRate: rxMethod<CreateProductRateRequest>(
+        pipe(
+          tap(() => setLoading(true)),
+          switchMap((payload) =>
+            productsService.createProductRate(payload).pipe(
+              tap((productRate: ProductRate) => {
+                updateProductRate(payload.productId, productRate);
+
+                setLoading(false);
+              }),
+              catchError(handleError)
+            )
+          )
+        )
+      ),
+      editProductRate: rxMethod<EditProductRateRequest>(
+        pipe(
+          tap(() => setLoading(true)),
+          switchMap((payload) =>
+            productsService.editProductRate(payload).pipe(
+              tap((productRate: ProductRate) => {
+                updateProductRate(payload.productId, productRate);
+
+                setLoading(false);
+              }),
+              catchError(handleError)
+            )
+          )
+        )
+      ),
+    };
+  })
 );
