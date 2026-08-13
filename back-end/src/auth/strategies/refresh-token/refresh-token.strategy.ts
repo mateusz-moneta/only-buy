@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
-import { AuthService } from '../services';
+import { AuthService } from '../../services';
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(
@@ -18,8 +18,11 @@ export class RefreshTokenStrategy extends PassportStrategy(
     });
   }
 
-  validate(req: Request, payload: any) {
-    const isValid = this.authService.validateRefreshToken(payload.token);
+  async validate(
+    req: Request,
+    payload: { sub: string; token: string },
+  ): Promise<{ userId: string }> {
+    const isValid = await this.authService.validateRefreshToken(payload.token);
 
     if (!isValid) {
       throw new UnauthorizedException('Invalid refresh token');

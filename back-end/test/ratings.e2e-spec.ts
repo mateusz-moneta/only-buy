@@ -5,7 +5,7 @@ import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { ValidationPipe } from '@nestjs/common/pipes';
 
-describe('Ratings integration', () => {
+describe('Ratings', () => {
   let app: INestApplication;
   let accessToken: string;
   let productId: string;

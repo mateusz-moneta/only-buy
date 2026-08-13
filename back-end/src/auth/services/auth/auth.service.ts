@@ -6,17 +6,11 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
-import { JwtPayload } from '../payloads';
-import {
-  Login,
-  RefreshToken,
-  RefreshUser,
-  Role,
-  UserData,
-} from '../../users/models';
-import { LoginUserDto } from '../../users/dto';
-import { RefreshTokenService, UsersService } from '../../users/services';
-import { UserEntity } from '../../users/entities';
+import { JwtPayload } from '../../payloads';
+import { Login, RefreshToken, RefreshUser, Role } from '../../../users/models';
+import { LoginUserDto } from '../../../users/dto';
+import { RefreshTokenService, UsersService } from '../../../users/services';
+import { UserEntity } from '../../../users/entities';
 
 @Injectable()
 export class AuthService {

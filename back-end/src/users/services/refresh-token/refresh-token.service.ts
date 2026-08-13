@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { RefreshTokenEntity } from '../entities';
-import { UsersService } from './users.service';
+import { RefreshTokenEntity } from '../../entities';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class RefreshTokenService {

@@ -6,11 +6,11 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { CreateProductRateDto, UpdateProductRateDto } from '../dto';
-import { ProductRateEntity } from '../entities';
-import { ProductsService } from './products.service';
-import { UsersService } from '../../users/services';
-import { ProductRate } from '../models';
+import { CreateProductRateDto, UpdateProductRateDto } from '../../dto';
+import { ProductRateEntity } from '../../entities';
+import { ProductsService } from '../products/products.service';
+import { UsersService } from '../../../users/services';
+import { ProductRate } from '../../models';
 
 @Injectable()
 export class ProductRatesService {

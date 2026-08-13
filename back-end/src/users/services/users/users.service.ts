@@ -7,11 +7,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import 'multer';
-import { RegisterUserDto } from '../dto';
-import { RolesService } from '../../roles/services';
-import { UserEntity } from '../entities';
-import { RegisterUser, User } from '../models';
-import { UploadService } from '../../uploads/services';
+import { RegisterUserDto } from '../../dto';
+import { RolesService } from '../../../roles/services';
+import { UserEntity } from '../../entities';
+import { RegisterUser, User } from '../../models';
+import { UploadService } from '../../../uploads/services';
 
 @Injectable()
 export class UsersService {

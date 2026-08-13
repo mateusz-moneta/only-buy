@@ -5,7 +5,7 @@ import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { ValidationPipe } from '@nestjs/common/pipes';
 
-describe('Auth integration', () => {
+describe('Auth', () => {
   let app: INestApplication;
 
   beforeAll(async () => {

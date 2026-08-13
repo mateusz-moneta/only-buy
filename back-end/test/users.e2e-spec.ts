@@ -5,7 +5,7 @@ import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { ValidationPipe } from '@nestjs/common/pipes';
 
-describe('Users integration', () => {
+describe('Users', () => {
   let app: INestApplication;
   let adminAccessToken: string;
   let userAccessToken: string;
