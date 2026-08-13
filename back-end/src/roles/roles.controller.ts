@@ -2,6 +2,8 @@ import {
   ClassSerializerInterceptor,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -15,7 +17,8 @@ export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
   @UseInterceptors(ClassSerializerInterceptor)
-  @Get('')
+  @Get()
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'List of roles' })
   @ApiResponse({
     status: 200,

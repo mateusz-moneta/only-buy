@@ -60,7 +60,7 @@ export class ProductRatesService {
 
     const result = await this.productRatesRepository
       .createQueryBuilder('productRate')
-      .select('AVG(productRate.rating)', 'averageRating')
+      .select('ROUND(AVG(productRate.rating))', 'averageRating')
       .where('productRate.productId = :productId', {
         productId: product.id,
       })

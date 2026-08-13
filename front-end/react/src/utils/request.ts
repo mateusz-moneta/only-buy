@@ -54,7 +54,7 @@ export const request = async (
 };
 
 async function refreshAccessToken(userContext: React.ContextType<typeof UserContext>) {
-  request(`${apiUrl}/auth/refresh-token`, {
+  request(`${apiUrl}/auth/refresh`, {
     refreshToken: userContext?.user?.refreshToken
   })
     .then((response) => response.text())

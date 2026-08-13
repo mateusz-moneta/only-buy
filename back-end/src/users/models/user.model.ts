@@ -1,9 +1,9 @@
-export interface User {
+import { RegisterUser } from './register-user.model';
+
+export interface User extends RegisterUser {
   id: string;
   active: boolean;
   avatar: string;
-  username: string;
-  email: string;
   role: string;
   createdDate: Date;
   updatedDate: Date;

@@ -7,11 +7,16 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
 import { JwtPayload } from '../payloads';
-import { Login, RefreshToken, Role } from '../../users/models';
+import {
+  Login,
+  RefreshToken,
+  RefreshUser,
+  Role,
+  UserData,
+} from '../../users/models';
 import { LoginUserDto } from '../../users/dto';
 import { RefreshTokenService, UsersService } from '../../users/services';
 import { UserEntity } from '../../users/entities';
-import { UserData } from '../../users/models/user-data.model';
 
 @Injectable()
 export class AuthService {
@@ -21,9 +26,7 @@ export class AuthService {
     private readonly usersService: UsersService,
   ) {}
 
-  async login(
-    loginUserDto: LoginUserDto,
-  ): Promise<Login | UnauthorizedException> {
+  async login(loginUserDto: LoginUserDto): Promise<Login> {
     const { password, username } = loginUserDto;
     const user = await this.usersService.findOneByUsername(username);
 
@@ -32,7 +35,7 @@ export class AuthService {
         throw new UnauthorizedException('Account is inactive');
       }
 
-      const isMatch = bcrypt.compare(password, user.password);
+      const isMatch = await bcrypt.compare(password, user.password);
 
       if (isMatch) {
         const refreshToken = this.generateRefreshToken();
@@ -56,8 +59,6 @@ export class AuthService {
           refreshToken: refreshToken.token,
         };
       }
-
-      throw new UnauthorizedException('Invalid credentials');
     }
 
     throw new UnauthorizedException('Invalid credentials');
@@ -75,12 +76,12 @@ export class AuthService {
 
   async getUserDataFromRefreshToken(
     refreshToken: string,
-  ): Promise<UserData | null> {
+  ): Promise<RefreshUser | null> {
     const existingRefreshToken =
       await this.refreshTokenService.findRefreshTokenByToken(refreshToken);
 
     if (!existingRefreshToken || existingRefreshToken.expiresAt < new Date()) {
-      return null;
+      throw new UnauthorizedException('Invalid or expired refresh token');
     }
 
     const user = await this.usersService.findOneById(

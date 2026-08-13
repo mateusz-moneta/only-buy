@@ -23,7 +23,7 @@ export class AuthService {
 
   public refreshToken(payload: RefreshTokenRequest): Observable<UserData> {
     return this.httpClient.post<UserData>(
-      `${this.basePath}/refresh-token`,
+      `${this.basePath}/refresh`,
       payload
     );
   }

@@ -4,17 +4,18 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
+  NotFoundException,
   Param,
   Patch,
   Post,
   Put,
   Query,
-  Req,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
 
@@ -36,7 +37,6 @@ import { User } from '../users/models';
 @Controller('products')
 export class ProductsController {
   constructor(
-    private readonly jwtService: JwtService,
     private readonly productsService: ProductsService,
     private readonly productRatesService: ProductRatesService,
   ) {}
@@ -55,6 +55,7 @@ export class ProductsController {
   }
 
   @Get()
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all products' })
   @ApiResponse({
     status: 200,
@@ -78,6 +79,7 @@ export class ProductsController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get product' })
   @ApiResponse({
     status: 200,
@@ -85,19 +87,26 @@ export class ProductsController {
     type: 'Product',
   })
   @ApiParam({ name: 'id' })
-  find(
+  async find(
     @Param('id') id: string,
     @CurrentUser() user: User,
-  ): Promise<Product | null> {
-    return this.productsService.findOneById(id, user.username);
+  ): Promise<Product> {
+    const product = await this.productsService.findOneById(id, user.username);
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    return product;
   }
 
   @UseGuards(RolesGuard)
   @Admin()
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Remove product' })
   @ApiResponse({
-    status: 200,
+    status: 204,
     description: 'The remove record',
     type: 'Product',
   })
@@ -111,6 +120,7 @@ export class ProductsController {
   @UseInterceptors(ClassSerializerInterceptor)
   @UseInterceptors(FilesInterceptor('productImages'))
   @Put(':id')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update product' })
   @ApiResponse({
     status: 200,
@@ -136,7 +146,7 @@ export class ProductsController {
   @Post('rate')
   @ApiOperation({ summary: 'Create the rate for product' })
   @ApiResponse({
-    status: 200,
+    status: 201,
     description: 'The create of rate',
     type: 'ProductRate',
   })
@@ -152,6 +162,7 @@ export class ProductsController {
 
   @UseInterceptors(ClassSerializerInterceptor)
   @Patch('rate')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update the rate for product' })
   @ApiResponse({
     status: 200,

@@ -3,6 +3,8 @@ import {
   ClassSerializerInterceptor,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Patch,
   Put,
@@ -24,7 +26,8 @@ export class UsersController {
   @UseGuards(RolesGuard)
   @Admin()
   @UseInterceptors(ClassSerializerInterceptor)
-  @Get('')
+  @Get()
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'List of users' })
   @ApiResponse({
     status: 200,
@@ -40,6 +43,7 @@ export class UsersController {
   @Admin()
   @UseInterceptors(ClassSerializerInterceptor)
   @Patch(':id')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update user' })
   @ApiResponse({
     status: 200,

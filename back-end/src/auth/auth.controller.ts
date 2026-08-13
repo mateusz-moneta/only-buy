@@ -1,8 +1,9 @@
 import {
   Body,
   Controller,
+  HttpCode,
+  HttpStatus,
   Post,
-  UnauthorizedException,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -16,7 +17,7 @@ import {
   GetAccessTokenFromRefreshTokenDto,
 } from '../users/dto';
 import { UsersService } from '../users/services';
-import { Login, UserData } from '../users/models';
+import { Login, RefreshUser, RegisterUser } from '../users/models';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('auth')
@@ -28,37 +29,21 @@ export class AuthController {
   ) {}
 
   @Public()
-  @Post('register')
-  @UseInterceptors(FileInterceptor('avatar'))
-  @ApiOperation({ summary: 'Register of user' })
-  @ApiResponse({
-    status: 200,
-    description: 'Status of register',
-    type: 'boolean',
-  })
-  create(
-    @Body() registerUserDto: RegisterUserDto,
-    @UploadedFile() avatar?: Express.Multer.File,
-  ): Promise<boolean> {
-    return this.usersService.register(registerUserDto, avatar);
-  }
-
-  @Public()
   @Post('login')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login of user' })
   @ApiResponse({
     status: 200,
     description: 'Auth and refresh tokens',
     type: 'Login',
   })
-  login(
-    @Body() loginUserDto: LoginUserDto,
-  ): Promise<Login | UnauthorizedException> {
+  login(@Body() loginUserDto: LoginUserDto): Promise<Login> {
     return this.authService.login(loginUserDto);
   }
 
   @Public()
-  @Post('refresh-token')
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get access token based on refresh token' })
   @ApiResponse({
     status: 200,
@@ -68,9 +53,25 @@ export class AuthController {
   async getAccessFromRefreshToken(
     @Body()
     getAccessTokenFromRefreshTokenDto: GetAccessTokenFromRefreshTokenDto,
-  ): Promise<UserData> {
+  ): Promise<RefreshUser> {
     return this.authService.getUserDataFromRefreshToken(
       getAccessTokenFromRefreshTokenDto.refreshToken,
     );
+  }
+
+  @Public()
+  @Post('register')
+  @UseInterceptors(FileInterceptor('avatar'))
+  @ApiOperation({ summary: 'Register of user' })
+  @ApiResponse({
+    status: 201,
+    description: 'Status of register',
+    type: 'RegisterUser',
+  })
+  create(
+    @Body() registerUserDto: RegisterUserDto,
+    @UploadedFile() avatar?: Express.Multer.File,
+  ): Promise<RegisterUser> {
+    return this.usersService.register(registerUserDto, avatar);
   }
 }

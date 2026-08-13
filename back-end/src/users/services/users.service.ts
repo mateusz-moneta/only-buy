@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -6,7 +10,7 @@ import 'multer';
 import { RegisterUserDto } from '../dto';
 import { RolesService } from '../../roles/services';
 import { UserEntity } from '../entities';
-import { User } from '../models';
+import { RegisterUser, User } from '../models';
 import { UploadService } from '../../uploads/services';
 
 @Injectable()
@@ -76,43 +80,40 @@ export class UsersService {
   async register(
     registerUserDto: RegisterUserDto,
     avatar?: Express.Multer.File,
-  ): Promise<boolean> {
-    try {
-      const { username, email, password } = registerUserDto;
+  ): Promise<RegisterUser> {
+    const { username, email, password } = registerUserDto;
 
-      const existingUser = await this.usersRepository.findOne({
-        where: [{ username }, { email }],
-      });
+    const existingUser = await this.usersRepository.findOne({
+      where: [{ username }, { email }],
+    });
 
-      if (existingUser) {
-        return false;
-      }
-
-      const role = await this.rolesService.findOneByName('STANDARD');
-
-      if (!role) {
-        return false;
-      }
-
-      const hash = await bcrypt.hash(password, 10);
-
-      const user = new UserEntity({
-        username,
-        email,
-        password: hash,
-        refreshToken: null,
-        role,
-        avatar: avatar ? this.uploadService.saveFile(avatar, 'avatars') : null,
-      });
-
-      await user.save();
-
-      return true;
-    } catch (exception: unknown) {
-      console.error('User registration failed:', exception);
-
-      return false;
+    if (existingUser) {
+      throw new ConflictException();
     }
+
+    const role = await this.rolesService.findOneByName('STANDARD');
+
+    if (!role) {
+      throw new InternalServerErrorException('Standard role is not configured');
+    }
+
+    const hash = await bcrypt.hash(password, 10);
+
+    const user = new UserEntity({
+      username,
+      email,
+      password: hash,
+      refreshToken: null,
+      role,
+      avatar: avatar ? this.uploadService.saveFile(avatar, 'avatars') : null,
+    });
+
+    await user.save();
+
+    return {
+      email: user.email,
+      username: user.username,
+    };
   }
 
   async remove(id: number): Promise<void> {

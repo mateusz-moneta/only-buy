@@ -1,5 +1,5 @@
-import { UserData } from './user-data.model';
+import { RefreshUser } from './refresh-user.model';
 
-export interface Login extends UserData {
+export interface Login extends RefreshUser {
   refreshToken: string;
 }
