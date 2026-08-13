@@ -6,8 +6,8 @@ import {
   LoginRequest,
   RefreshTokenRequest,
   RegisterRequest,
+  UserData,
 } from '../../models';
-import { UserData } from '../../models/user-data';
 
 @Injectable({
   providedIn: 'root',
@@ -22,10 +22,7 @@ export class AuthService {
   }
 
   public refreshToken(payload: RefreshTokenRequest): Observable<UserData> {
-    return this.httpClient.post<UserData>(
-      `${this.basePath}/refresh`,
-      payload
-    );
+    return this.httpClient.post<UserData>(`${this.basePath}/refresh`, payload);
   }
 
   public register(payload: RegisterRequest): Observable<boolean> {

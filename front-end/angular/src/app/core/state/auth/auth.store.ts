@@ -9,9 +9,9 @@ import {
   RefreshTokenRequest,
   RegisterRequest,
   Role,
-} from '../models';
-import { UserData } from '../models/user-data';
-import { AuthService, TokenStorageService } from '../services';
+} from '../../models';
+import { UserData } from '../../models/user-data';
+import { AuthService, TokenStorageService } from '../../services';
 
 export interface AuthUser {
   avatar: string | null;

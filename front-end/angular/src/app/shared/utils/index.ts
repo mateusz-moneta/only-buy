@@ -1,1 +1,1 @@
-export * from './image-error.util';
+export * from './image-error/image-error.util';

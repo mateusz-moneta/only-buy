@@ -9,8 +9,8 @@ import {
   EditProductRequest,
   Product,
   ProductRate,
-} from '../models';
-import { ProductsService } from '../services';
+} from '../../models';
+import { ProductsService } from '../../services';
 
 export interface ProductsState {
   isLoading: boolean;

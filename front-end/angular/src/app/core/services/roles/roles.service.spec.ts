@@ -1,15 +1,33 @@
-import { TestBed } from '@angular/core/testing';
+import {
+  HttpMethod,
+  SpectatorHttp,
+  createHttpFactory,
+} from '@ngneat/spectator/vitest';
+import { describe, expect, it } from 'vitest';
 import { RolesService } from './roles.service';
 
 describe(RolesService.name, () => {
-  let service: RolesService;
+  let spectator: SpectatorHttp<RolesService>;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(RolesService);
-  });
+  const createService = createHttpFactory(RolesService);
 
   it('should be created', () => {
-    expect(service).toBeTruthy();
+    spectator = createService();
+
+    expect(spectator.service).toBeTruthy();
+  });
+
+  it('should get roles', () => {
+    spectator = createService();
+
+    const roles = ['ADMIN', 'STANDARD'];
+
+    spectator.service.getRoles().subscribe((response) => {
+      expect(response).toEqual(roles);
+    });
+
+    const request = spectator.expectOne('/api/roles', HttpMethod.GET);
+
+    request.flush(roles);
   });
 });

@@ -25,11 +25,11 @@ import { UsersStore } from './state';
   standalone: true,
   imports: [
     ButtonComponent,
+    CheckboxComponent,
     DatePipe,
     NgOptimizedImage,
     SpinnerComponent,
     TitleCasePipe,
-    CheckboxComponent,
   ],
   providers: [UsersService, UsersStore],
 })

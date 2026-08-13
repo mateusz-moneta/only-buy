@@ -13,9 +13,9 @@ import { RegisterFormBuilder } from './builders';
   selector: 'app-register',
   imports: [
     ButtonComponent,
+    FilesUploaderComponent,
     InputComponent,
     ReactiveFormsModule,
-    FilesUploaderComponent,
     RouterLink,
   ],
   templateUrl: './register.component.html',

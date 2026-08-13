@@ -1,3 +1,5 @@
+import { of } from 'rxjs';
+import { ProductsService } from '@core/services';
 import { Spectator, createComponentFactory } from '@ngneat/spectator';
 import { beforeEach, expect, it } from 'vitest';
 import { DashboardComponent } from './dashboard.component';
@@ -10,7 +12,16 @@ describe(DashboardComponent.name, () => {
   let spectator: Spectator<DashboardComponent>;
 
   beforeEach(() => {
-    spectator = createComponent();
+    spectator = createComponent({
+      providers: [
+        {
+          provide: ProductsService,
+          useValue: {
+            getProducts: vi.fn().mockReturnValue(of([])),
+          },
+        },
+      ],
+    });
   });
 
   it('should create', () => {

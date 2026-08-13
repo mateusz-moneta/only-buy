@@ -12,3 +12,4 @@ export * from './register-request';
 export * from './role';
 export * from './snackbar-data';
 export * from './snackbar-type';
+export * from './user-data';

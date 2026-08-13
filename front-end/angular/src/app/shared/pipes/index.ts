@@ -1,1 +1,1 @@
-export * from './safe-html/safe-html-pipe';
+export * from './safe-html/safe-html.pipe';

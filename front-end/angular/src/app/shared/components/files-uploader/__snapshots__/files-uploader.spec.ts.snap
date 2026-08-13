@@ -1,3 +1,0 @@
-// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
-
-exports[`_FilesUploader > should match snapshot 1`] = `"<div _ngcontent-a-c3030691868="" class="files-uploader"><p _ngcontent-a-c3030691868=""> Choose image for avatar to upload (PNG, JPG) </p><button _ngcontent-a-c3030691868="" type="button" class="btn btn-secondary"> Select file </button><input _ngcontent-a-c3030691868="" type="file" class="d-none" accept="" name="avatar"><!--container--><div _ngcontent-a-c3030691868="" class="files-uploader__preview"><p _ngcontent-a-c3030691868="">No file currently selected for upload</p></div><!--container--></div>"`;
