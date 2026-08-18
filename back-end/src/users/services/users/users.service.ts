@@ -12,14 +12,16 @@ import { RolesService } from '../../../roles/services';
 import { UserEntity } from '../../entities';
 import { RegisterUser, User } from '../../models';
 import { UploadService } from '../../../uploads/services';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
   constructor(
+    private readonly configService: ConfigService,
+    private readonly rolesService: RolesService,
     private readonly uploadService: UploadService,
     @InjectRepository(UserEntity)
     private readonly usersRepository: Repository<UserEntity>,
-    private readonly rolesService: RolesService,
   ) {}
 
   findAll(): Promise<User[]> {
@@ -97,6 +99,7 @@ export class UsersService {
       throw new InternalServerErrorException('Standard role is not configured');
     }
 
+    const saltRounds = this.configService.get<number>('BCRYPT_SALT_ROUNDS', 10);
     const hash = await bcrypt.hash(password, 10);
 
     const user = new UserEntity({

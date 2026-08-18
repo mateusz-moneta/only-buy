@@ -43,7 +43,7 @@ export function setup() {
 
   const accessToken = loginResponse.json('accessToken');
 
-  const productsResponse = http.get(`${BASE_URL}/products`, {
+  const productsResponse = http.get(`${BASE_URL}/products?page=1&limit=20`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -51,8 +51,8 @@ export function setup() {
 
   check(productsResponse, {
     'products status is 200': (r) => r.status === 200,
-    'products list is not empty': (r) =>
-      Array.isArray(r.json()) && r.json().length > 0,
+    'products response has data': (r) => Array.isArray(r.json('data')),
+    'products list is not empty': (r) => r.json('data')?.length > 0,
   });
 
   if (productsResponse.status !== 200) {
@@ -61,9 +61,9 @@ export function setup() {
     );
   }
 
-  const products = productsResponse.json();
+  const products = productsResponse.json('data');
 
-  if (!products.length) {
+  if (!products || products.length === 0) {
     throw new Error('No products available for performance test');
   }
 

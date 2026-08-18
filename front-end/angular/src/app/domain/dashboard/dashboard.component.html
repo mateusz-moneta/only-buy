@@ -56,3 +56,11 @@
     </div>
   }
 </main>
+
+<footer>
+  <app-paginator
+    [page]="pageable().page"
+    [totalPages]="totalPages()"
+    (pageChange)="onPageChange($event)"
+  />
+</footer>

@@ -7,9 +7,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { CreateProductRateDto, UpdateProductRateDto } from '../../dto';
+
 import { ProductRateEntity } from '../../entities';
 import { ProductsService } from '../products/products.service';
-import { UsersService } from '../../../users/services';
 import { ProductRate } from '../../models';
 
 @Injectable()
@@ -17,22 +17,20 @@ export class ProductRatesService {
   constructor(
     @InjectRepository(ProductRateEntity)
     private readonly productRatesRepository: Repository<ProductRateEntity>,
+
     private readonly productsService: ProductsService,
-    private readonly usersService: UsersService,
   ) {}
 
   async createProductRate(
     createProductRate: CreateProductRateDto,
-    username: string,
+    userId: string,
   ): Promise<ProductRate> {
     const product = await this.productsService.findOneById(
       createProductRate.productId,
     );
 
-    const user = await this.usersService.findOneByUsername(username);
-
-    if (!product || !user) {
-      throw new NotFoundException('Product or user not found');
+    if (!product) {
+      throw new NotFoundException('Product not found');
     }
 
     const existingRate = await this.productRatesRepository.findOne({
@@ -41,7 +39,7 @@ export class ProductRatesService {
           id: product.id,
         },
         user: {
-          id: user.id,
+          id: userId,
         },
       },
     });
@@ -52,11 +50,15 @@ export class ProductRatesService {
 
     const productRateEntity = this.productRatesRepository.create({
       rating: createProductRate.rating,
-      product,
-      user,
+      product: {
+        id: product.id,
+      },
+      user: {
+        id: userId,
+      },
     });
 
-    await productRateEntity.save();
+    await this.productRatesRepository.save(productRateEntity);
 
     const result = await this.productRatesRepository
       .createQueryBuilder('productRate')
@@ -64,7 +66,9 @@ export class ProductRatesService {
       .where('productRate.productId = :productId', {
         productId: product.id,
       })
-      .getRawOne<{ averageRating: string }>();
+      .getRawOne<{
+        averageRating: string;
+      }>();
 
     return {
       rating: productRateEntity.rating,
@@ -74,7 +78,7 @@ export class ProductRatesService {
 
   async updateProductRate(
     updateProductRate: UpdateProductRateDto,
-    username: string,
+    userId: string,
   ): Promise<ProductRate> {
     const productRate = await this.productRatesRepository.findOne({
       where: {
@@ -82,7 +86,7 @@ export class ProductRatesService {
           id: updateProductRate.productId,
         },
         user: {
-          username,
+          id: userId,
         },
       },
     });
@@ -101,7 +105,9 @@ export class ProductRatesService {
       .where('productRate.productId = :productId', {
         productId: updateProductRate.productId,
       })
-      .getRawOne<{ averageRating: string }>();
+      .getRawOne<{
+        averageRating: string;
+      }>();
 
     return {
       rating: productRate.rating,

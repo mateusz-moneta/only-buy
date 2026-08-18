@@ -1,0 +1,32 @@
+@if (totalPages() > 1) {
+  <nav class="paginator" aria-label="Pagination">
+    <button
+      [disabled]="page() === 1"
+      (click)="previous()"
+      class="paginator__button"
+      type="button"
+    >
+      Previous
+    </button>
+
+    @for (pageNumber of pages(); track pageNumber) {
+      <button
+        [class.paginator__button--active]="pageNumber === page()"
+        (click)="goToPage(pageNumber)"
+        class="paginator__button"
+        type="button"
+      >
+        {{ pageNumber }}
+      </button>
+    }
+
+    <button
+      [disabled]="page() === totalPages()"
+      (click)="next()"
+      class="paginator__button"
+      type="button"
+    >
+      Next
+    </button>
+  </nav>
+}

@@ -8,6 +8,7 @@ import { AuthStore, ProductsStore } from '@core/state';
 import {
   ButtonComponent,
   CheckboxComponent,
+  PaginatorComponent,
   SpinnerComponent,
 } from '@shared/components';
 import { SearchFormBuilder } from './builders';
@@ -25,6 +26,7 @@ import {
     ButtonComponent,
     CheckboxComponent,
     EmptyStateComponent,
+    PaginatorComponent,
     ProductComponent,
     SearchComponent,
     SpinnerComponent,
@@ -42,13 +44,19 @@ export class DashboardComponent implements OnInit {
 
   protected readonly isAuthenticated = this.authStore.isAuthenticated;
   protected readonly loading = this.productsStore.isLoading;
+  protected readonly pageable = this.productsStore.pageable;
   protected readonly products = this.productsStore.products;
   protected readonly searchForm = SearchFormBuilder.build();
+  protected readonly totalPages = this.productsStore.totalPages;
   protected readonly user = this.authStore.user;
 
   public ngOnInit(): void {
     this.productsStore.loadProducts({});
     this.handleForm();
+  }
+
+  protected onPageChange(page: number): void {
+    this.productsStore.loadProducts({ page });
   }
 
   private handleForm(): void {

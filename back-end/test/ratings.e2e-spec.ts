@@ -1,8 +1,11 @@
 import { INestApplication } from '@nestjs/common';
+
 import { Test, TestingModule } from '@nestjs/testing';
+
 import request from 'supertest';
 
 import { AppModule } from '../src/app.module';
+
 import { ValidationPipe } from '@nestjs/common/pipes';
 
 describe('Ratings', () => {
@@ -27,6 +30,7 @@ describe('Ratings', () => {
     await app.init();
 
     const username = `rating_user_${Date.now()}`;
+
     const email = `${username}@example.com`;
 
     await request(app.getHttpServer())
@@ -50,12 +54,28 @@ describe('Ratings', () => {
 
     const productsResponse = await request(app.getHttpServer())
       .get('/products')
+      .query({
+        page: 1,
+        limit: 20,
+      })
       .set('Authorization', `Bearer ${accessToken}`)
       .expect(200);
 
-    expect(productsResponse.body.length).toBeGreaterThan(0);
+    expect(productsResponse.body).toEqual(
+      expect.objectContaining({
+        data: expect.any(Array),
+        total: expect.any(Number),
+        page: expect.any(Number),
+        limit: expect.any(Number),
+        totalPages: expect.any(Number),
+      }),
+    );
 
-    productId = productsResponse.body[0].id;
+    expect(productsResponse.body.data.length).toBeGreaterThan(0);
+
+    productId = productsResponse.body.data[0].id;
+
+    expect(productId).toBeDefined();
   });
 
   afterAll(async () => {
@@ -82,6 +102,7 @@ describe('Ratings', () => {
 
   it('TS-18 - should update product average rating', async () => {
     const username = `rating_second_user_${Date.now()}`;
+
     const email = `${username}@example.com`;
 
     await request(app.getHttpServer())
@@ -113,6 +134,8 @@ describe('Ratings', () => {
       .expect(201);
 
     expect(response.body.averageRating).toEqual(expect.any(Number));
+
+    expect(response.body.averageRating).toBe(4);
   });
 
   it('TS-19 - should update existing product rating', async () => {
@@ -131,6 +154,8 @@ describe('Ratings', () => {
         averageRating: expect.any(Number),
       }),
     );
+
+    expect(response.body.averageRating).toBe(3.5);
   });
 
   it('TS-20 - should reject duplicate product rating', async () => {

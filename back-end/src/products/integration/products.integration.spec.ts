@@ -51,15 +51,18 @@ describe('Products integration', () => {
           secret: process.env.SECRET,
         }),
       ],
+
       providers: [
         ProductsService,
         ProductImagesService,
+
         {
           provide: UploadService,
           useValue: {
             saveFile: jest
               .fn()
               .mockReturnValue('uploads/product-images/test-image.jpg'),
+
             deleteFile: jest.fn(),
           },
         },
@@ -71,9 +74,11 @@ describe('Products integration', () => {
     productImagesService =
       module.get<ProductImagesService>(ProductImagesService);
 
-    productsRepository = module.get(getRepositoryToken(ProductEntity));
+    productsRepository = module.get<Repository<ProductEntity>>(
+      getRepositoryToken(ProductEntity),
+    );
 
-    productImagesRepository = module.get(
+    productImagesRepository = module.get<Repository<ProductImageEntity>>(
       getRepositoryToken(ProductImageEntity),
     );
   }, 30000);
@@ -84,11 +89,13 @@ describe('Products integration', () => {
 
   describe('createProduct', () => {
     it('should create product and persist it in database', async () => {
+      const timestamp = Date.now();
+
       const dto = {
-        name: `Integration product ${Date.now()}`,
+        name: `Integration product ${timestamp}`,
         description: 'Integration test product',
         price: '99.99',
-        code: `INT-${Date.now()}`,
+        code: `INT-${timestamp}`,
         isActive: 'true',
         isPromo: 'false',
       };
@@ -163,12 +170,15 @@ describe('Products integration', () => {
   });
 
   describe('findAll', () => {
-    it('should return products persisted in database', async () => {
-      const code = `ALL-${Date.now()}`;
+    it('should return paginated products persisted in database', async () => {
+      const timestamp = Date.now();
+
+      const name = `List product ${timestamp}`;
+      const code = `ALL-${timestamp}`;
 
       await productsRepository.save(
         productsRepository.create({
-          name: `List product ${Date.now()}`,
+          name,
           description: 'List test product',
           price: 29.99,
           code,
@@ -177,11 +187,221 @@ describe('Products integration', () => {
         }),
       );
 
+      const result = await productsService.findAll(
+        undefined,
+        undefined,
+        name,
+        undefined,
+        1,
+        20,
+      );
+
+      expect(result).toBeDefined();
+      expect(result.data).toBeDefined();
+      expect(Array.isArray(result.data)).toBe(true);
+
+      expect(result.data.length).toBe(1);
+
+      expect(result.data[0].code).toBe(code);
+      expect(result.data[0].name).toBe(name);
+
+      expect(result.total).toBe(1);
+      expect(result.page).toBe(1);
+      expect(result.limit).toBe(20);
+      expect(result.totalPages).toBe(1);
+    });
+
+    it('should respect pagination parameters', async () => {
+      const result = await productsService.findAll(
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        1,
+        2,
+      );
+
+      expect(result.page).toBe(1);
+      expect(result.limit).toBe(2);
+
+      expect(result.data.length).toBeLessThanOrEqual(2);
+
+      expect(result.total).toBeGreaterThanOrEqual(result.data.length);
+
+      expect(result.totalPages).toBe(Math.ceil(result.total / 2));
+    });
+
+    it('should use default pagination values', async () => {
       const result = await productsService.findAll();
 
-      expect(result.length).toBeGreaterThan(0);
+      expect(result.page).toBe(1);
+      expect(result.limit).toBe(10);
 
-      expect(result.some((product) => product.code === code)).toBe(true);
+      expect(result.data.length).toBeLessThanOrEqual(20);
+    });
+
+    it('should normalize invalid page number', async () => {
+      const result = await productsService.findAll(
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        0,
+        20,
+      );
+
+      expect(result.page).toBe(1);
+      expect(result.limit).toBe(20);
+    });
+
+    it('should respect maximum limit', async () => {
+      const result = await productsService.findAll(
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        1,
+        1000,
+      );
+
+      expect(result.limit).toBeLessThanOrEqual(100);
+
+      expect(result.data.length).toBeLessThanOrEqual(100);
+    });
+
+    it('should filter products by active status', async () => {
+      const timestamp = Date.now();
+
+      const activeCode = `ACTIVE-${timestamp}`;
+
+      const inactiveCode = `INACTIVE-${timestamp}`;
+
+      await productsRepository.save([
+        productsRepository.create({
+          name: `Active ${timestamp}`,
+          description: 'Active product',
+          price: 10,
+          code: activeCode,
+          isActive: true,
+          isPromo: false,
+        }),
+
+        productsRepository.create({
+          name: `Inactive ${timestamp}`,
+          description: 'Inactive product',
+          price: 10,
+          code: inactiveCode,
+          isActive: false,
+          isPromo: false,
+        }),
+      ]);
+
+      const result = await productsService.findAll(
+        true,
+        undefined,
+        undefined,
+        undefined,
+        1,
+        100,
+      );
+
+      expect(result.data.some((product) => product.code === activeCode)).toBe(
+        true,
+      );
+
+      expect(result.data.some((product) => product.code === inactiveCode)).toBe(
+        false,
+      );
+    });
+
+    it('should filter products by promo status', async () => {
+      const timestamp = Date.now();
+
+      const promoCode = `PROMO-${timestamp}`;
+
+      const regularCode = `REGULAR-${timestamp}`;
+
+      await productsRepository.save([
+        productsRepository.create({
+          name: `Promo ${timestamp}`,
+          description: 'Promo product',
+          price: 10,
+          code: promoCode,
+          isActive: true,
+          isPromo: true,
+        }),
+
+        productsRepository.create({
+          name: `Regular ${timestamp}`,
+          description: 'Regular product',
+          price: 10,
+          code: regularCode,
+          isActive: true,
+          isPromo: false,
+        }),
+      ]);
+
+      const result = await productsService.findAll(
+        undefined,
+        true,
+        undefined,
+        undefined,
+        1,
+        100,
+      );
+
+      expect(result.data.some((product) => product.code === promoCode)).toBe(
+        true,
+      );
+
+      expect(result.data.some((product) => product.code === regularCode)).toBe(
+        false,
+      );
+    });
+
+    it('should filter products by phrase', async () => {
+      const timestamp = Date.now();
+
+      const matchingCode = `PHRASE-${timestamp}`;
+
+      const otherCode = `OTHER-${timestamp}`;
+
+      await productsRepository.save([
+        productsRepository.create({
+          name: `Gaming Laptop ${timestamp}`,
+          description: 'Gaming laptop',
+          price: 100,
+          code: matchingCode,
+          isActive: true,
+          isPromo: false,
+        }),
+
+        productsRepository.create({
+          name: `Office Monitor ${timestamp}`,
+          description: 'Office monitor',
+          price: 100,
+          code: otherCode,
+          isActive: true,
+          isPromo: false,
+        }),
+      ]);
+
+      const result = await productsService.findAll(
+        undefined,
+        undefined,
+        'Gaming Laptop',
+        undefined,
+        1,
+        100,
+      );
+
+      expect(result.data.some((product) => product.code === matchingCode)).toBe(
+        true,
+      );
+
+      expect(result.data.some((product) => product.code === otherCode)).toBe(
+        false,
+      );
     });
   });
 
@@ -214,7 +434,40 @@ describe('Products integration', () => {
       });
 
       expect(savedImage).toBeDefined();
+
       expect(savedImage?.path).toBe('uploads/products/integration.jpg');
+    });
+
+    it('should remove product images when product is deleted', async () => {
+      const product = await productsRepository.save(
+        productsRepository.create({
+          name: `Cascade product ${Date.now()}`,
+          description: 'Cascade test product',
+          price: 20,
+          code: `CASCADE-${Date.now()}`,
+          isActive: true,
+          isPromo: false,
+        }),
+      );
+
+      const image = await productImagesService.createProductImage({
+        productId: product.id,
+        path: 'uploads/products/cascade.jpg',
+      });
+
+      image.product = product;
+
+      await image.save();
+
+      await productsService.remove(product.id);
+
+      const savedImage = await productImagesRepository.findOne({
+        where: {
+          id: image.id,
+        },
+      });
+
+      expect(savedImage).toBeNull();
     });
   });
 

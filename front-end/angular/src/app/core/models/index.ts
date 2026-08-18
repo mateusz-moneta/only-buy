@@ -4,6 +4,8 @@ export * from './edit-product-rate-request';
 export * from './edit-product-request';
 export * from './login';
 export * from './login-request';
+export * from './page';
+export * from './pageable';
 export * from './product';
 export * from './product-image';
 export * from './product-rate';

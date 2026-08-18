@@ -1,11 +1,13 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
+import { DEFAULT_PAGE } from '@core/constants';
 import {
   CreateProductRateRequest,
   CreateProductRequest,
   EditProductRateRequest,
   EditProductRequest,
+  Page,
   Product,
   ProductRate,
 } from '../../models';
@@ -58,13 +60,17 @@ export class ProductsService {
   public getProducts(
     isActive = true,
     isPromo = true,
-    phrase = ''
-  ): Observable<Product[]> {
-    return this.httpClient.get<Product[]>(this.basePath, {
-      params: new HttpParams()
-        .append('isActive', isActive)
-        .append('isPromo', isPromo)
-        .append('phrase', phrase),
+    phrase = '',
+    page = DEFAULT_PAGE
+  ): Observable<Page<Product>> {
+    const params = new HttpParams()
+      .append('isActive', isActive)
+      .append('isPromo', isPromo)
+      .append('page', page)
+      .append('phrase', phrase);
+
+    return this.httpClient.get<Page<Product>>(this.basePath, {
+      params,
     });
   }
 

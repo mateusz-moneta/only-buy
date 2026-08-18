@@ -2,11 +2,14 @@ import { inject } from '@angular/core';
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
 import { catchError, of, pipe, switchMap, tap } from 'rxjs';
+import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from '@core/constants';
 import {
   CreateProductRateRequest,
   CreateProductRequest,
   EditProductRateRequest,
   EditProductRequest,
+  Page,
+  Pageable,
   Product,
   ProductRate,
 } from '../../models';
@@ -14,14 +17,21 @@ import { ProductsService } from '../../services';
 
 export interface ProductsState {
   isLoading: boolean;
+  pageable: Pageable;
   products: Product[];
   selectedProduct: Product | null;
+  totalPages: number;
 }
 
 const initialState: ProductsState = {
   isLoading: false,
+  pageable: {
+    page: DEFAULT_PAGE,
+    size: DEFAULT_PAGE_SIZE,
+  },
   products: [],
   selectedProduct: null,
+  totalPages: 1,
 };
 
 export const ProductsStore = signalStore(
@@ -73,18 +83,33 @@ export const ProductsStore = signalStore(
         Partial<{
           isActive: boolean;
           isPromo: boolean;
+          page: number;
           phrase: string;
         }>
       >(
         pipe(
           tap(() => setLoading(true)),
-          switchMap(({ isActive, isPromo, phrase }) =>
-            productsService.getProducts(isActive, isPromo, phrase)
+          switchMap(({ isActive, isPromo, page, phrase }) =>
+            productsService.getProducts(isActive, isPromo, phrase, page)
           ),
-          tap((products) => {
-            patchState(store, { products });
-            setLoading(false);
-          })
+          tap(
+            ({
+              data: products,
+              limit: size,
+              page,
+              totalPages,
+            }: Page<Product>) => {
+              patchState(store, {
+                pageable: {
+                  page,
+                  size,
+                },
+                products,
+                totalPages,
+              });
+              setLoading(false);
+            }
+          )
         )
       ),
       createProduct: rxMethod<CreateProductRequest>(

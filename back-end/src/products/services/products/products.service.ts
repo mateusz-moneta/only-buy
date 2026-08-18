@@ -1,17 +1,38 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
 import { CreateProductDto, UpdateProductDto } from '../../dto';
-import { ProductEntity, ProductImageEntity } from '../../entities';
+import {
+  ProductEntity,
+  ProductImageEntity,
+  ProductRateEntity,
+} from '../../entities';
+
 import { UploadService } from '../../../uploads/services';
 import { ProductImagesService } from '../product-images/product-images.service';
+
 import { Product, ProductImage } from '../../models';
+import { Page } from '../../../shared/models';
+
+interface ProductRatingRaw {
+  product_id: string;
+  averageRating: string | null;
+  userRating: string | null;
+}
 
 @Injectable()
 export class ProductsService {
   constructor(
+    private readonly configService: ConfigService,
+
     @InjectRepository(ProductEntity)
     private readonly productsRepository: Repository<ProductEntity>,
+
+    @InjectRepository(ProductRateEntity)
+    private readonly productRatesRepository: Repository<ProductRateEntity>,
+
     private readonly productImagesService: ProductImagesService,
     private readonly uploadService: UploadService,
   ) {}
@@ -59,30 +80,56 @@ export class ProductsService {
     isActive?: boolean,
     isPromo?: boolean,
     phrase?: string,
-    username?: string,
-  ): Promise<Product[]> {
-    let query = this.getProductQuery();
+    userId?: string,
+    page?: number,
+    limit?: number,
+  ): Promise<Page<Product>> {
+    const query = this.getProductQuery();
 
     if (isActive !== undefined) {
-      query = query.andWhere('product.isActive = :isActive', { isActive });
+      query.andWhere('product.isActive = :isActive', { isActive });
     }
 
     if (isPromo !== undefined) {
-      query = query.andWhere('product.isPromo = :isPromo', { isPromo });
+      query.andWhere('product.isPromo = :isPromo', { isPromo });
     }
 
     if (phrase) {
-      query = query.andWhere('product.name ILIKE :phrase', {
-        phrase: `%${phrase}%`,
-      });
+      query.andWhere('product.name ILIKE :phrase', { phrase: `%${phrase}%` });
     }
 
-    const products = await query.getMany();
+    const defaultLimit = this.configService.get<number>('DEFAULT_LIMIT', 20);
 
-    return products.map((product) => this.mapProduct(product, username));
+    const maxLimit = this.configService.get<number>('MAX_LIMIT', 100);
+
+    const currentPage = Math.max(1, Number(page) || 1);
+
+    const pageSize = Math.min(
+      Math.max(1, Number(limit) || defaultLimit),
+      maxLimit,
+    );
+
+    const [products, total] = await query
+      .skip((currentPage - 1) * pageSize)
+      .take(pageSize)
+      .getManyAndCount();
+
+    const productIds = products.map((product) => product.id);
+
+    const ratingMap = await this.getProductRatings(productIds, userId);
+
+    return {
+      data: products.map((product) =>
+        this.mapProduct(product, ratingMap.get(product.id)),
+      ),
+      total,
+      page: currentPage,
+      limit: pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
   }
 
-  async findOneById(id: string, username?: string): Promise<Product | null> {
+  async findOneById(id: string, userId?: string): Promise<Product | null> {
     const product = await this.getProductQuery()
       .where('product.id = :id', { id })
       .getOne();
@@ -91,7 +138,9 @@ export class ProductsService {
       return null;
     }
 
-    return this.mapProduct(product, username);
+    const ratingMap = await this.getProductRatings([id], userId);
+
+    return this.mapProduct(product, ratingMap.get(id));
   }
 
   async remove(id: string): Promise<void> {
@@ -102,7 +151,7 @@ export class ProductsService {
     id: string,
     updateProduct: UpdateProductDto,
     productImages: Express.Multer.File[],
-    username?: string,
+    userId?: string,
   ): Promise<Product> {
     const queryRunner =
       this.productsRepository.manager.connection.createQueryRunner();
@@ -143,7 +192,9 @@ export class ProductsService {
           .where('image.id IN (:...ids)', {
             ids: deletedImageIds,
           })
-          .andWhere('image.productId = :productId', { productId: id })
+          .andWhere('image.productId = :productId', {
+            productId: id,
+          })
           .getMany();
 
         for (const image of images) {
@@ -185,7 +236,9 @@ export class ProductsService {
         throw new NotFoundException('Product not found');
       }
 
-      return this.mapProduct(result, username);
+      const ratingMap = await this.getProductRatings([id], userId);
+
+      return this.mapProduct(result, ratingMap.get(id));
     } catch (error) {
       await queryRunner.rollbackTransaction();
 
@@ -202,24 +255,66 @@ export class ProductsService {
   private getProductQuery() {
     return this.productsRepository
       .createQueryBuilder('product')
-      .leftJoinAndSelect('product.images', 'images')
-      .leftJoinAndSelect('product.rates', 'rates')
-      .leftJoinAndSelect('rates.user', 'user');
+      .leftJoinAndSelect('product.images', 'images');
   }
 
-  private mapProduct(product: ProductEntity, username?: string): Product {
-    const ratings = product.rates ?? [];
+  private async getProductRatings(
+    productIds: string[],
+    userId?: string,
+  ): Promise<Map<string, ProductRatingRaw>> {
+    if (!productIds.length) {
+      return new Map();
+    }
 
-    const averageRating =
-      ratings.length > 0
-        ? ratings.reduce((sum, rate) => sum + rate.rating, 0) / ratings.length
-        : 0;
+    const averageQuery = this.productRatesRepository
+      .createQueryBuilder('rate')
+      .select('rate.productId', 'product_id')
+      .addSelect('AVG(rate.rating)', 'averageRating')
+      .where('rate.productId IN (:...productIds)', { productIds })
+      .groupBy('rate.productId');
 
-    const userRating = username
-      ? (ratings.find((rate) => rate.user?.username === username)?.rating ??
-        null)
-      : null;
+    const rows = await averageQuery.getRawMany<ProductRatingRaw>();
 
+    const ratingMap = new Map<string, ProductRatingRaw>();
+
+    for (const row of rows) {
+      ratingMap.set(row.product_id, {
+        product_id: row.product_id,
+        averageRating: row.averageRating,
+        userRating: null,
+      });
+    }
+
+    if (userId) {
+      const userRatings = await this.productRatesRepository
+        .createQueryBuilder('rate')
+        .select('rate.productId', 'product_id')
+        .addSelect('rate.rating', 'userRating')
+        .where('rate.productId IN (:...productIds)', { productIds })
+        .andWhere('rate.userId = :userId', { userId })
+        .getRawMany<{
+          product_id: string;
+          userRating: number;
+        }>();
+
+      for (const row of userRatings) {
+        const existing = ratingMap.get(row.product_id);
+
+        ratingMap.set(row.product_id, {
+          product_id: row.product_id,
+          averageRating: existing?.averageRating ?? null,
+          userRating: String(row.userRating),
+        });
+      }
+    }
+
+    return ratingMap;
+  }
+
+  private mapProduct(
+    product: ProductEntity,
+    rating?: ProductRatingRaw,
+  ): Product {
     return {
       id: product.id,
       name: product.name,
@@ -228,12 +323,15 @@ export class ProductsService {
       code: product.code,
       isActive: product.isActive,
       isPromo: product.isPromo,
+
       images: product.images.map((image: ProductImageEntity): ProductImage => ({
         id: image.id,
         path: image.path,
       })),
-      averageRating: Number(averageRating.toFixed(2)),
-      rating: userRating,
+
+      averageRating: Number(rating?.averageRating ?? 0),
+
+      rating: rating?.userRating ? Number(rating.userRating) : null,
     };
   }
 }

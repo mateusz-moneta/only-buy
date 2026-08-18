@@ -1,9 +1,7 @@
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-
 import { ProductRateEntity } from '../../entities';
 import { ProductsService } from '../products/products.service';
-import { UsersService } from '../../../users/services';
 import { ProductRatesService } from './product-rates.service';
 
 describe(ProductRatesService.name, () => {
@@ -20,17 +18,12 @@ describe(ProductRatesService.name, () => {
     findOneById: jest.fn(),
   };
 
-  const usersService = {
-    findOneByUsername: jest.fn(),
-  };
-
   beforeEach(() => {
     jest.clearAllMocks();
 
     service = new ProductRatesService(
       productRatesRepository as unknown as Repository<ProductRateEntity>,
       productsService as unknown as ProductsService,
-      usersService as unknown as UsersService,
     );
   });
 
@@ -44,10 +37,7 @@ describe(ProductRatesService.name, () => {
       name: 'Product',
     };
 
-    const user = {
-      id: 'user-id',
-      username: 'john',
-    };
+    const userId = 'user-id';
 
     const dto = {
       productId: 'product-id',
@@ -56,18 +46,22 @@ describe(ProductRatesService.name, () => {
 
     it('should create product rate', async () => {
       productsService.findOneById.mockResolvedValue(product);
-      usersService.findOneByUsername.mockResolvedValue(user);
 
       productRatesRepository.findOne.mockResolvedValue(null);
 
       const productRate = {
         rating: 5,
-        product,
-        user,
-        save: jest.fn().mockResolvedValue(undefined),
+        product: {
+          id: product.id,
+        },
+        user: {
+          id: userId,
+        },
       };
 
       productRatesRepository.create.mockReturnValue(productRate);
+
+      productRatesRepository.save.mockResolvedValue(productRate);
 
       const getRawOne = jest.fn().mockResolvedValue({
         averageRating: '5',
@@ -85,11 +79,9 @@ describe(ProductRatesService.name, () => {
         select,
       });
 
-      const result = await service.createProductRate(dto, 'john');
+      const result = await service.createProductRate(dto, userId);
 
       expect(productsService.findOneById).toHaveBeenCalledWith('product-id');
-
-      expect(usersService.findOneByUsername).toHaveBeenCalledWith('john');
 
       expect(productRatesRepository.findOne).toHaveBeenCalledWith({
         where: {
@@ -104,11 +96,15 @@ describe(ProductRatesService.name, () => {
 
       expect(productRatesRepository.create).toHaveBeenCalledWith({
         rating: 5,
-        product,
-        user,
+        product: {
+          id: 'product-id',
+        },
+        user: {
+          id: 'user-id',
+        },
       });
 
-      expect(productRate.save).toHaveBeenCalledTimes(1);
+      expect(productRatesRepository.save).toHaveBeenCalledWith(productRate);
 
       expect(result).toEqual({
         rating: 5,
@@ -118,59 +114,53 @@ describe(ProductRatesService.name, () => {
 
     it('should throw NotFoundException when product does not exist', async () => {
       productsService.findOneById.mockResolvedValue(null);
-      usersService.findOneByUsername.mockResolvedValue(user);
 
-      await expect(service.createProductRate(dto, 'john')).rejects.toThrow(
-        new NotFoundException('Product or user not found'),
+      await expect(service.createProductRate(dto, userId)).rejects.toThrow(
+        new NotFoundException('Product not found'),
       );
 
       expect(productRatesRepository.findOne).not.toHaveBeenCalled();
 
       expect(productRatesRepository.create).not.toHaveBeenCalled();
-    });
 
-    it('should throw NotFoundException when user does not exist', async () => {
-      productsService.findOneById.mockResolvedValue(product);
-      usersService.findOneByUsername.mockResolvedValue(null);
-
-      await expect(service.createProductRate(dto, 'john')).rejects.toThrow(
-        new NotFoundException('Product or user not found'),
-      );
-
-      expect(productRatesRepository.findOne).not.toHaveBeenCalled();
-
-      expect(productRatesRepository.create).not.toHaveBeenCalled();
+      expect(productRatesRepository.save).not.toHaveBeenCalled();
     });
 
     it('should throw ConflictException when user already rated product', async () => {
       productsService.findOneById.mockResolvedValue(product);
-      usersService.findOneByUsername.mockResolvedValue(user);
 
       productRatesRepository.findOne.mockResolvedValue({
         id: 'existing-rate',
         rating: 4,
       });
 
-      await expect(service.createProductRate(dto, 'john')).rejects.toThrow(
+      await expect(service.createProductRate(dto, userId)).rejects.toThrow(
         new ConflictException('You have already rated this product'),
       );
 
       expect(productRatesRepository.create).not.toHaveBeenCalled();
+
+      expect(productRatesRepository.save).not.toHaveBeenCalled();
     });
 
     it('should calculate average rating after creating rate', async () => {
       productsService.findOneById.mockResolvedValue(product);
-      usersService.findOneByUsername.mockResolvedValue(user);
+
       productRatesRepository.findOne.mockResolvedValue(null);
 
       const productRate = {
         rating: 5,
-        product,
-        user,
-        save: jest.fn().mockResolvedValue(undefined),
+        product: {
+          id: product.id,
+        },
+        user: {
+          id: userId,
+        },
       };
 
       productRatesRepository.create.mockReturnValue(productRate);
+
+      productRatesRepository.save.mockResolvedValue(productRate);
 
       const getRawOne = jest.fn().mockResolvedValue({
         averageRating: '4',
@@ -188,7 +178,7 @@ describe(ProductRatesService.name, () => {
         select,
       });
 
-      const result = await service.createProductRate(dto, 'john');
+      const result = await service.createProductRate(dto, userId);
 
       expect(select).toHaveBeenCalledWith(
         'ROUND(AVG(productRate.rating))',
@@ -204,6 +194,8 @@ describe(ProductRatesService.name, () => {
   });
 
   describe('updateProductRate', () => {
+    const userId = 'user-id';
+
     const dto = {
       productId: 'product-id',
       rating: 4,
@@ -234,7 +226,7 @@ describe(ProductRatesService.name, () => {
         select,
       });
 
-      const result = await service.updateProductRate(dto, 'john');
+      const result = await service.updateProductRate(dto, userId);
 
       expect(productRatesRepository.findOne).toHaveBeenCalledWith({
         where: {
@@ -242,7 +234,7 @@ describe(ProductRatesService.name, () => {
             id: 'product-id',
           },
           user: {
-            username: 'john',
+            id: 'user-id',
           },
         },
       });
@@ -260,7 +252,7 @@ describe(ProductRatesService.name, () => {
     it('should throw NotFoundException when product rate does not exist', async () => {
       productRatesRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.updateProductRate(dto, 'john')).rejects.toThrow(
+      await expect(service.updateProductRate(dto, userId)).rejects.toThrow(
         new NotFoundException('Product rate not found'),
       );
 
@@ -294,7 +286,7 @@ describe(ProductRatesService.name, () => {
         select,
       });
 
-      const result = await service.updateProductRate(dto, 'john');
+      const result = await service.updateProductRate(dto, userId);
 
       expect(select).toHaveBeenCalledWith(
         'AVG(productRate.rating)',

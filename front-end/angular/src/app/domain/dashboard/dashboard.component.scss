@@ -31,7 +31,17 @@ section {
   }
 }
 
-main {
+main,
+footer {
   background: colors.$gray-1;
+}
+
+main {
   padding: 5rem 5.5rem;
+}
+
+footer {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
 }

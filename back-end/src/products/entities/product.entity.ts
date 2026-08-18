@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -27,9 +28,11 @@ export class ProductEntity extends BaseEntity {
   @Column({ nullable: true })
   code: string;
 
+  @Index()
   @Column()
   isActive: boolean;
 
+  @Index()
   @Column()
   isPromo: boolean;
 

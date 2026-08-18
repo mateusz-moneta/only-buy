@@ -24,10 +24,10 @@ export class UserEntity extends BaseEntity {
   @Column({ nullable: true })
   avatar: string;
 
-  @Column()
+  @Column({ unique: true })
   username: string;
 
-  @Column()
+  @Column({ unique: true })
   email: string;
 
   @Column()

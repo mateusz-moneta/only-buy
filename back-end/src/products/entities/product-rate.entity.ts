@@ -2,6 +2,7 @@ import {
   BaseEntity,
   Column,
   Entity,
+  Index,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -17,11 +18,13 @@ export class ProductRateEntity extends BaseEntity {
   @Column({ type: 'smallint' })
   rating: number;
 
+  @Index()
   @ManyToOne(() => ProductEntity, (product) => product.rates, {
     onDelete: 'CASCADE',
   })
   product: ProductEntity;
 
+  @Index()
   @ManyToOne(() => UserEntity, (user) => user.rates)
   user: UserEntity;
 

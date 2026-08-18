@@ -31,7 +31,8 @@ import { ProductRatesService, ProductsService } from './services';
 import { RolesGuard } from '../auth/guards';
 import { Admin, CurrentUser } from '../auth/decorators';
 import { ProductRate } from './models';
-import { User } from '../users/models';
+import { Page } from '../shared/models';
+import { JwtPayload } from '../auth/payloads';
 
 @ApiTags('products')
 @Controller('products')
@@ -67,13 +68,17 @@ export class ProductsController {
     @Query('isActive') isActive: boolean,
     @Query('isPromo') isPromo: boolean,
     @Query('phrase') phrase: string,
-    @CurrentUser() user: User,
-  ): Promise<Product[]> {
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+    @CurrentUser() { sub: userId }: JwtPayload,
+  ): Promise<Page<Product>> {
     return this.productsService.findAll(
       isActive,
       isPromo,
       phrase,
-      user.username,
+      userId,
+      page,
+      limit,
     );
   }
 
@@ -89,9 +94,9 @@ export class ProductsController {
   @ApiParam({ name: 'id' })
   async find(
     @Param('id') id: string,
-    @CurrentUser() user: User,
+    @CurrentUser() { sub: userId }: JwtPayload,
   ): Promise<Product> {
-    const product = await this.productsService.findOneById(id, user.username);
+    const product = await this.productsService.findOneById(id, userId);
 
     if (!product) {
       throw new NotFoundException('Product not found');
@@ -132,13 +137,13 @@ export class ProductsController {
     @Param('id') id: string,
     @Body() updateProductDto: UpdateProductDto,
     @UploadedFiles() productImages: Express.Multer.File[],
-    @CurrentUser() user: User,
+    @CurrentUser() { sub: userId }: JwtPayload,
   ): Promise<Product> {
     return this.productsService.updateProduct(
       id,
       updateProductDto,
       productImages,
-      user.username,
+      userId,
     );
   }
 
@@ -152,12 +157,9 @@ export class ProductsController {
   })
   createRate(
     @Body() createRateDto: CreateProductRateDto,
-    @CurrentUser() user: User,
+    @CurrentUser() { sub: userId }: JwtPayload,
   ): Promise<ProductRate> {
-    return this.productRatesService.createProductRate(
-      createRateDto,
-      user.username,
-    );
+    return this.productRatesService.createProductRate(createRateDto, userId);
   }
 
   @UseInterceptors(ClassSerializerInterceptor)
@@ -171,11 +173,8 @@ export class ProductsController {
   })
   updateProductRate(
     @Body() updateRateDto: UpdateProductRateDto,
-    @CurrentUser() user: User,
+    @CurrentUser() { sub: userId }: JwtPayload,
   ): Promise<ProductRate> {
-    return this.productRatesService.updateProductRate(
-      updateRateDto,
-      user.username,
-    );
+    return this.productRatesService.updateProductRate(updateRateDto, userId);
   }
 }

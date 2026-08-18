@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -20,6 +21,7 @@ export class ProductImageEntity extends BaseEntity {
   @CreateDateColumn()
   uploadedDate: Date;
 
+  @Index()
   @ManyToOne(() => ProductEntity, (product) => product.images, {
     onDelete: 'CASCADE',
   })

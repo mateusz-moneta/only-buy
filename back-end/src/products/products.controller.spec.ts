@@ -6,9 +6,16 @@ import {
   UpdateProductDto,
   UpdateProductRateDto,
 } from './dto';
+
 import { ProductsController } from './products.controller';
+
 import { ProductRatesService, ProductsService } from './services';
+
 import { ProductEntity } from './entities';
+
+import { JwtPayload } from '../auth/payloads';
+import { Product } from './models';
+import { Page } from '../shared/models';
 
 describe(ProductsController.name, () => {
   let controller: ProductsController;
@@ -100,12 +107,12 @@ describe(ProductsController.name, () => {
   });
 
   describe('findAll', () => {
-    const user = {
-      username: 'john',
-    };
+    const user: JwtPayload = {
+      sub: 'user-id',
+    } as JwtPayload;
 
-    it('should return all products', async () => {
-      const products = [
+    const page: Page<Product> = {
+      data: [
         {
           id: 'product-1',
           name: 'Product 1',
@@ -114,15 +121,23 @@ describe(ProductsController.name, () => {
           id: 'product-2',
           name: 'Product 2',
         },
-      ];
+      ] as Product[],
+      total: 2,
+      page: 1,
+      limit: 20,
+      totalPages: 1,
+    };
 
-      productsService.findAll.mockResolvedValue(products);
+    it('should return paginated products', async () => {
+      productsService.findAll.mockResolvedValue(page);
 
       const result = await controller.findAll(
         true,
         false,
         'Laptop',
-        user as any,
+        1,
+        20,
+        user,
       );
 
       expect(productsService.findAll).toHaveBeenCalledTimes(1);
@@ -131,37 +146,66 @@ describe(ProductsController.name, () => {
         true,
         false,
         'Laptop',
-        'john',
+        'user-id',
+        1,
+        20,
       );
 
-      expect(result).toBe(products);
+      expect(result).toBe(page);
     });
 
-    it('should pass undefined filters', async () => {
-      productsService.findAll.mockResolvedValue([]);
+    it('should pass undefined filters and pagination', async () => {
+      const emptyPage: Page<Product> = {
+        data: [],
+        total: 0,
+        page: 1,
+        limit: 20,
+        totalPages: 0,
+      };
+
+      productsService.findAll.mockResolvedValue(emptyPage);
 
       const result = await controller.findAll(
         undefined,
         undefined,
         undefined,
-        user as any,
+        undefined,
+        undefined,
+        user,
       );
 
       expect(productsService.findAll).toHaveBeenCalledWith(
         undefined,
         undefined,
         undefined,
-        'john',
+        'user-id',
+        undefined,
+        undefined,
       );
 
-      expect(result).toEqual([]);
+      expect(result).toBe(emptyPage);
+    });
+
+    it('should pass custom page and limit', async () => {
+      productsService.findAll.mockResolvedValue(page);
+
+      await controller.findAll(undefined, undefined, undefined, 3, 10, user);
+
+      expect(productsService.findAll).toHaveBeenCalledWith(
+        undefined,
+        undefined,
+        undefined,
+        'user-id',
+        3,
+        10,
+      );
     });
   });
 
   describe('find', () => {
-    const user = {
-      username: 'john',
-    };
+    const user: JwtPayload = {
+      sub: 'user-id',
+    } as JwtPayload;
 
     it('should return product', async () => {
       const product = {
@@ -171,13 +215,13 @@ describe(ProductsController.name, () => {
 
       productsService.findOneById.mockResolvedValue(product);
 
-      const result = await controller.find('product-id', user as any);
+      const result = await controller.find('product-id', user);
 
       expect(productsService.findOneById).toHaveBeenCalledTimes(1);
 
       expect(productsService.findOneById).toHaveBeenCalledWith(
         'product-id',
-        'john',
+        'user-id',
       );
 
       expect(result).toBe(product);
@@ -186,13 +230,13 @@ describe(ProductsController.name, () => {
     it('should throw NotFoundException when product does not exist', async () => {
       productsService.findOneById.mockResolvedValue(null);
 
-      await expect(controller.find('unknown-id', user as any)).rejects.toThrow(
+      await expect(controller.find('unknown-id', user)).rejects.toThrow(
         new NotFoundException('Product not found'),
       );
 
       expect(productsService.findOneById).toHaveBeenCalledWith(
         'unknown-id',
-        'john',
+        'user-id',
       );
     });
   });
@@ -212,9 +256,9 @@ describe(ProductsController.name, () => {
   });
 
   describe('update', () => {
-    const user = {
-      username: 'john',
-    };
+    const user: JwtPayload = {
+      sub: 'user-id',
+    } as JwtPayload;
 
     const dto = {
       name: 'Updated product',
@@ -244,7 +288,7 @@ describe(ProductsController.name, () => {
         'product-id',
         dto,
         productImages,
-        user as any,
+        user,
       );
 
       expect(productsService.updateProduct).toHaveBeenCalledTimes(1);
@@ -253,7 +297,7 @@ describe(ProductsController.name, () => {
         'product-id',
         dto,
         productImages,
-        'john',
+        'user-id',
       );
 
       expect(result).toBe(product);
@@ -266,18 +310,13 @@ describe(ProductsController.name, () => {
 
       productsService.updateProduct.mockResolvedValue(product);
 
-      const result = await controller.update(
-        'product-id',
-        dto,
-        [],
-        user as any,
-      );
+      const result = await controller.update('product-id', dto, [], user);
 
       expect(productsService.updateProduct).toHaveBeenCalledWith(
         'product-id',
         dto,
         [],
-        'john',
+        'user-id',
       );
 
       expect(result).toBe(product);
@@ -285,9 +324,9 @@ describe(ProductsController.name, () => {
   });
 
   describe('createRate', () => {
-    const user = {
-      username: 'john',
-    };
+    const user: JwtPayload = {
+      sub: 'user-id',
+    } as JwtPayload;
 
     it('should create product rate', async () => {
       const dto = {
@@ -302,13 +341,13 @@ describe(ProductsController.name, () => {
 
       productRatesService.createProductRate.mockResolvedValue(productRate);
 
-      const result = await controller.createRate(dto, user as any);
+      const result = await controller.createRate(dto, user);
 
       expect(productRatesService.createProductRate).toHaveBeenCalledTimes(1);
 
       expect(productRatesService.createProductRate).toHaveBeenCalledWith(
         dto,
-        'john',
+        'user-id',
       );
 
       expect(result).toBe(productRate);
@@ -316,9 +355,9 @@ describe(ProductsController.name, () => {
   });
 
   describe('updateProductRate', () => {
-    const user = {
-      username: 'john',
-    };
+    const user: JwtPayload = {
+      sub: 'user-id',
+    } as JwtPayload;
 
     it('should update product rate', async () => {
       const dto = {
@@ -333,13 +372,13 @@ describe(ProductsController.name, () => {
 
       productRatesService.updateProductRate.mockResolvedValue(productRate);
 
-      const result = await controller.updateProductRate(dto, user as any);
+      const result = await controller.updateProductRate(dto, user);
 
       expect(productRatesService.updateProductRate).toHaveBeenCalledTimes(1);
 
       expect(productRatesService.updateProductRate).toHaveBeenCalledWith(
         dto,
-        'john',
+        'user-id',
       );
 
       expect(result).toBe(productRate);
