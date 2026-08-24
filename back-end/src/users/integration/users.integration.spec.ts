@@ -2,11 +2,15 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { Repository } from 'typeorm';
+
 import { UsersService } from '../services';
 import { RolesService } from '../../roles/services';
 import { UploadService } from '../../uploads/services';
+
 import { RefreshTokenEntity, UserEntity } from '../entities';
+
 import { RoleEntity } from '../../roles/entities';
+
 import {
   ProductEntity,
   ProductImageEntity,
@@ -29,6 +33,7 @@ describe('Users integration', () => {
           isGlobal: true,
           envFilePath: '.env',
         }),
+
         TypeOrmModule.forRoot({
           type: 'postgres',
           host: process.env.POSTGRES_HOST,
@@ -39,6 +44,7 @@ describe('Users integration', () => {
           autoLoadEntities: true,
           synchronize: true,
         }),
+
         TypeOrmModule.forFeature([
           ProductEntity,
           ProductImageEntity,
@@ -48,6 +54,7 @@ describe('Users integration', () => {
           UserEntity,
         ]),
       ],
+
       providers: [
         RolesService,
         UsersService,
@@ -61,12 +68,17 @@ describe('Users integration', () => {
       ],
     }).compile();
 
-    usersService = module.get(UsersService);
-    rolesService = module.get(RolesService);
+    usersService = module.get<UsersService>(UsersService);
 
-    usersRepository = module.get(getRepositoryToken(UserEntity));
+    rolesService = module.get<RolesService>(RolesService);
 
-    rolesRepository = module.get(getRepositoryToken(RoleEntity));
+    usersRepository = module.get<Repository<UserEntity>>(
+      getRepositoryToken(UserEntity),
+    );
+
+    rolesRepository = module.get<Repository<RoleEntity>>(
+      getRepositoryToken(RoleEntity),
+    );
 
     await createStandardRole();
   }, 30000);
@@ -92,34 +104,113 @@ describe('Users integration', () => {
   describe('findAll', () => {
     it('should return users from database', async () => {
       const username = `integration-${Date.now()}`;
+      const email = `${username}@test.pl`;
 
       await usersService.register({
         username,
-        email: `${username}@test.pl`,
+        email,
         password: 'Password123!',
       });
 
-      const result = await usersService.findAll();
+      const result = await usersService.findAll(1, 100);
 
-      expect(result).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            username,
-            email: `${username}@test.pl`,
-            role: 'STANDARD',
-          }),
-        ]),
-      );
+      expect(result.data.length).toBeGreaterThan(0);
+      expect(result.total).toBeGreaterThan(0);
+      expect(result.page).toBe(1);
+      expect(result.limit).toBe(100);
+      expect(result.totalPages).toBeGreaterThan(0);
+
+      const persistedUser = await usersService.findOneByUsername(username);
+
+      expect(persistedUser).toBeDefined();
+      expect(persistedUser?.username).toBe(username);
+      expect(persistedUser?.email).toBe(email);
+      expect(persistedUser?.role.name).toBe('STANDARD');
+    });
+
+    it('should return persisted user fields', async () => {
+      const username = `integration-${Date.now()}`;
+      const email = `${username}@test.pl`;
+
+      await usersService.register({
+        username,
+        email,
+        password: 'Password123!',
+      });
+
+      const user = await usersService.findOneByUsername(username);
+
+      expect(user).toBeDefined();
+
+      expect(user?.username).toBe(username);
+      expect(user?.email).toBe(email);
+      expect(user?.role.name).toBe('STANDARD');
+      expect(user?.active).toBe(true);
+      expect(user?.avatar).toBeNull();
+      expect(user?.createdDate).toBeDefined();
+      expect(user?.updatedDate).toBeDefined();
+    });
+
+    it('should paginate users', async () => {
+      const firstUsername = `integration-${Date.now()}-1`;
+      const secondUsername = `integration-${Date.now()}-2`;
+
+      await usersService.register({
+        username: firstUsername,
+        email: `${firstUsername}@test.pl`,
+        password: 'Password123!',
+      });
+
+      await usersService.register({
+        username: secondUsername,
+        email: `${secondUsername}@test.pl`,
+        password: 'Password123!',
+      });
+
+      const result = await usersService.findAll(1, 1);
+
+      expect(result.page).toBe(1);
+      expect(result.limit).toBe(1);
+      expect(result.data).toHaveLength(1);
+      expect(result.total).toBeGreaterThanOrEqual(2);
+      expect(result.totalPages).toBeGreaterThanOrEqual(2);
+    });
+
+    it('should return users from the requested page', async () => {
+      const username = `integration-${Date.now()}`;
+      const email = `${username}@test.pl`;
+
+      await usersService.register({
+        username,
+        email,
+        password: 'Password123!',
+      });
+
+      const firstPage = await usersService.findAll(1, 1);
+
+      const secondPage = await usersService.findAll(2, 1);
+
+      expect(firstPage.page).toBe(1);
+      expect(secondPage.page).toBe(2);
+
+      expect(firstPage.limit).toBe(1);
+      expect(secondPage.limit).toBe(1);
+
+      expect(firstPage.data).toHaveLength(1);
+      expect(secondPage.data).toHaveLength(1);
+
+      expect(firstPage.data[0].id).not.toBe(secondPage.data[0].id);
     });
   });
 
   describe('findOneById', () => {
     it('should return user by id', async () => {
       const username = `integration-${Date.now()}`;
+      const email = `${username}@test.pl`;
 
       await usersService.register({
         username,
-        email: `${username}@test.pl`,
+        email,
         password: 'Password123!',
       });
 
@@ -132,7 +223,7 @@ describe('Users integration', () => {
       expect(result).toBeDefined();
       expect(result?.id).toBe(createdUser!.id);
       expect(result?.username).toBe(username);
-      expect(result?.email).toBe(`${username}@test.pl`);
+      expect(result?.email).toBe(email);
       expect(result?.role.name).toBe('STANDARD');
     });
 
@@ -148,10 +239,11 @@ describe('Users integration', () => {
   describe('findOneByUsername', () => {
     it('should return user by username', async () => {
       const username = `integration-${Date.now()}`;
+      const email = `${username}@test.pl`;
 
       await usersService.register({
         username,
-        email: `${username}@test.pl`,
+        email,
         password: 'Password123!',
       });
 
@@ -159,7 +251,7 @@ describe('Users integration', () => {
 
       expect(result).toBeDefined();
       expect(result?.username).toBe(username);
-      expect(result?.email).toBe(`${username}@test.pl`);
+      expect(result?.email).toBe(email);
       expect(result?.role.name).toBe('STANDARD');
     });
 
@@ -192,9 +284,11 @@ describe('Users integration', () => {
       const user = await usersService.findOneByUsername(username);
 
       expect(user).toBeDefined();
+
       expect(user?.username).toBe(username);
       expect(user?.email).toBe(email);
       expect(user?.role.name).toBe('STANDARD');
+
       expect(user?.refreshToken).toBeUndefined();
 
       expect(user?.password).toBeDefined();
@@ -303,7 +397,7 @@ describe('Users integration', () => {
 
       expect(user).toBeDefined();
 
-      await usersService.remove(user.id);
+      await usersService.remove(user!.id);
 
       const result = await usersService.findOneByUsername(username);
 

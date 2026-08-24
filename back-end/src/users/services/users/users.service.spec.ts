@@ -2,6 +2,7 @@ import {
   ConflictException,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
@@ -10,7 +11,6 @@ import { UserEntity } from '../../entities';
 import { RolesService } from '../../../roles/services';
 import { UploadService } from '../../../uploads/services';
 import { UsersService } from './users.service';
-import { ConfigService } from '@nestjs/config';
 
 jest.mock('bcrypt', () => ({
   hash: jest.fn(),
@@ -41,7 +41,19 @@ describe(UsersService.name, () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    configService.get.mockReturnValue(10);
+    configService.get.mockImplementation(
+      (key: string, defaultValue?: number) => {
+        if (key === 'DEFAULT_LIMIT') {
+          return 20;
+        }
+
+        if (key === 'MAX_LIMIT') {
+          return 100;
+        }
+
+        return defaultValue;
+      },
+    );
 
     (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-password');
 
@@ -70,7 +82,9 @@ describe(UsersService.name, () => {
           email: 'john@example.com',
           active: true,
           avatar: null,
-          role: 'STANDARD',
+          role: {
+            name: 'STANDARD',
+          },
         },
         {
           id: 'user-2',
@@ -78,43 +92,120 @@ describe(UsersService.name, () => {
           email: 'admin@example.com',
           active: true,
           avatar: '/avatars/admin.png',
-          role: 'ADMIN',
+          role: {
+            name: 'ADMIN',
+          },
         },
       ];
 
       const query = createQueryBuilder();
 
-      query.getRawMany.mockResolvedValue(users);
+      query.getManyAndCount.mockResolvedValue([users, users.length]);
 
-      const result = await service.findAll();
+      const result = await service.findAll(1, 20);
 
       expect(usersRepository.createQueryBuilder).toHaveBeenCalledWith('user');
 
       expect(query.leftJoinAndSelect).toHaveBeenCalledWith('user.role', 'role');
 
       expect(query.select).toHaveBeenCalledWith([
-        'user.active AS active',
-        'user.avatar AS avatar',
-        'user.id AS id',
-        'user.username AS username',
-        'user.email AS email',
-        'user.createdDate AS "createdDate"',
-        'user.updatedDate AS "updatedDate"',
-        'role.name AS role',
+        'user.active',
+        'user.avatar',
+        'user.id',
+        'user.username',
+        'user.email',
+        'user.createdDate',
+        'user.updatedDate',
+        'role.name',
       ]);
 
-      expect(query.getRawMany).toHaveBeenCalledTimes(1);
-      expect(result).toBe(users);
+      expect(query.skip).toHaveBeenCalledWith(0);
+      expect(query.take).toHaveBeenCalledWith(20);
+      expect(query.getManyAndCount).toHaveBeenCalledTimes(1);
+
+      expect(result.total).toBe(2);
+      expect(result.page).toBe(1);
+      expect(result.limit).toBe(20);
+      expect(result.totalPages).toBe(1);
+
+      expect(result.data).toEqual([
+        expect.objectContaining({
+          id: 'user-1',
+          username: 'john',
+          email: 'john@example.com',
+          active: true,
+          avatar: null,
+          role: 'STANDARD',
+        }),
+        expect.objectContaining({
+          id: 'user-2',
+          username: 'admin',
+          email: 'admin@example.com',
+          active: true,
+          avatar: '/avatars/admin.png',
+          role: 'ADMIN',
+        }),
+      ]);
     });
 
     it('should return empty array when there are no users', async () => {
       const query = createQueryBuilder();
 
-      query.getRawMany.mockResolvedValue([]);
+      query.getManyAndCount.mockResolvedValue([[], 0]);
 
-      const result = await service.findAll();
+      const result = await service.findAll(1, 20);
 
-      expect(result).toEqual([]);
+      expect(query.skip).toHaveBeenCalledWith(0);
+      expect(query.take).toHaveBeenCalledWith(20);
+      expect(query.getManyAndCount).toHaveBeenCalledTimes(1);
+
+      expect(result).toEqual({
+        data: [],
+        total: 0,
+        page: 1,
+        limit: 20,
+        totalPages: 0,
+      });
+    });
+
+    it('should calculate pagination offset', async () => {
+      const users = [
+        {
+          id: 'user-11',
+          username: 'user11',
+          email: 'user11@example.com',
+          active: true,
+          avatar: null,
+          role: {
+            name: 'STANDARD',
+          },
+        },
+      ];
+
+      const query = createQueryBuilder();
+
+      query.getManyAndCount.mockResolvedValue([users, 21]);
+
+      const result = await service.findAll(2, 10);
+
+      expect(query.skip).toHaveBeenCalledWith(10);
+      expect(query.take).toHaveBeenCalledWith(10);
+
+      expect(result.total).toBe(21);
+      expect(result.page).toBe(2);
+      expect(result.limit).toBe(10);
+      expect(result.totalPages).toBe(3);
+
+      expect(result.data).toEqual([
+        expect.objectContaining({
+          id: 'user-11',
+          username: 'user11',
+          email: 'user11@example.com',
+          active: true,
+          avatar: null,
+          role: 'STANDARD',
+        }),
+      ]);
     });
   });
 
@@ -140,6 +231,7 @@ describe(UsersService.name, () => {
       });
 
       expect(query.getOne).toHaveBeenCalledTimes(1);
+
       expect(result).toBe(user);
     });
 
@@ -175,6 +267,7 @@ describe(UsersService.name, () => {
       });
 
       expect(query.getOne).toHaveBeenCalledTimes(1);
+
       expect(result).toBe(user);
     });
 
@@ -232,6 +325,7 @@ describe(UsersService.name, () => {
       });
 
       expect(query.getRawOne).toHaveBeenCalledTimes(1);
+
       expect(result).toBe(user);
     });
 
@@ -270,7 +364,7 @@ describe(UsersService.name, () => {
     const role = {
       id: 'role-id',
       name: 'STANDARD',
-    } as unknown as import('../../../roles/entities').RoleEntity;
+    } as any;
 
     it('should throw ConflictException when user already exists', async () => {
       const existingUser = createUserEntity({
@@ -281,7 +375,7 @@ describe(UsersService.name, () => {
       usersRepository.findOne.mockResolvedValue(existingUser);
 
       await expect(service.register(registerUserDto)).rejects.toThrow(
-        ConflictException,
+        new ConflictException(),
       );
 
       expect(usersRepository.findOne).toHaveBeenCalledWith({
@@ -296,11 +390,13 @@ describe(UsersService.name, () => {
       });
 
       expect(rolesService.findOneByName).not.toHaveBeenCalled();
+
       expect(bcrypt.hash).not.toHaveBeenCalled();
     });
 
     it('should throw InternalServerErrorException when STANDARD role does not exist', async () => {
       usersRepository.findOne.mockResolvedValue(null);
+
       rolesService.findOneByName.mockResolvedValue(null);
 
       await expect(service.register(registerUserDto)).rejects.toThrow(
@@ -308,11 +404,13 @@ describe(UsersService.name, () => {
       );
 
       expect(rolesService.findOneByName).toHaveBeenCalledWith('STANDARD');
+
       expect(bcrypt.hash).not.toHaveBeenCalled();
     });
 
     it('should register user without avatar', async () => {
       usersRepository.findOne.mockResolvedValue(null);
+
       rolesService.findOneByName.mockResolvedValue(role);
 
       const { getSavedUser } = mockUserSave();
@@ -333,6 +431,7 @@ describe(UsersService.name, () => {
 
     it('should register user with avatar', async () => {
       usersRepository.findOne.mockResolvedValue(null);
+
       rolesService.findOneByName.mockResolvedValue(role);
 
       const avatar = {
@@ -361,6 +460,7 @@ describe(UsersService.name, () => {
 
     it('should hash password with salt rounds 10', async () => {
       usersRepository.findOne.mockResolvedValue(null);
+
       rolesService.findOneByName.mockResolvedValue(role);
 
       mockUserSave();
@@ -374,6 +474,7 @@ describe(UsersService.name, () => {
 
     it('should save hashed password instead of plain password', async () => {
       usersRepository.findOne.mockResolvedValue(null);
+
       rolesService.findOneByName.mockResolvedValue(role);
 
       const { getSavedUser } = mockUserSave();
@@ -387,6 +488,7 @@ describe(UsersService.name, () => {
 
     it('should set refreshToken to null for new user', async () => {
       usersRepository.findOne.mockResolvedValue(null);
+
       rolesService.findOneByName.mockResolvedValue(role);
 
       const { getSavedUser } = mockUserSave();
@@ -398,6 +500,7 @@ describe(UsersService.name, () => {
 
     it('should assign STANDARD role to new user', async () => {
       usersRepository.findOne.mockResolvedValue(null);
+
       rolesService.findOneByName.mockResolvedValue(role);
 
       const { getSavedUser } = mockUserSave();
@@ -409,6 +512,7 @@ describe(UsersService.name, () => {
 
     it('should assign username and email to new user', async () => {
       usersRepository.findOne.mockResolvedValue(null);
+
       rolesService.findOneByName.mockResolvedValue(role);
 
       const { getSavedUser } = mockUserSave();
@@ -416,6 +520,7 @@ describe(UsersService.name, () => {
       await service.register(registerUserDto);
 
       expect(getSavedUser().username).toBe('john');
+
       expect(getSavedUser().email).toBe('john@example.com');
     });
   });
@@ -429,6 +534,7 @@ describe(UsersService.name, () => {
       await service.remove('123');
 
       expect(usersRepository.delete).toHaveBeenCalledTimes(1);
+
       expect(usersRepository.delete).toHaveBeenCalledWith('123');
     });
   });
@@ -439,15 +545,26 @@ describe(UsersService.name, () => {
       leftJoin: jest.fn(),
       select: jest.fn(),
       where: jest.fn(),
+
+      skip: jest.fn(),
+      take: jest.fn(),
+      getManyAndCount: jest.fn(),
+
       getOne: jest.fn(),
       getRawOne: jest.fn(),
-      getRawMany: jest.fn(),
     };
 
     query.leftJoinAndSelect.mockReturnValue(query);
+
     query.leftJoin.mockReturnValue(query);
+
     query.select.mockReturnValue(query);
+
     query.where.mockReturnValue(query);
+
+    query.skip.mockReturnValue(query);
+
+    query.take.mockReturnValue(query);
 
     usersRepository.createQueryBuilder.mockReturnValue(query);
 

@@ -2,12 +2,15 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
+  DefaultValuePipe,
   Get,
   HttpCode,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Patch,
   Put,
+  Query,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -17,26 +20,25 @@ import { UsersService } from './services';
 import { Admin } from '../auth/decorators';
 import { RolesGuard } from '../auth/guards';
 import { UpdateActiveStateDto } from './dto';
+import { Page } from '../shared/models';
 
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @UseGuards(RolesGuard)
-  @Admin()
-  @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'List of users' })
   @ApiResponse({
     status: 200,
     description: 'List of users',
-    type: 'User',
-    isArray: true,
   })
-  findAll(): Promise<User[]> {
-    return this.usersService.findAll();
+  findAll(
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+  ): Promise<Page<User>> {
+    return this.usersService.findAll(page, limit);
   }
 
   @UseGuards(RolesGuard)

@@ -13,6 +13,7 @@ import { AuthStore } from '@core/state';
 import {
   ButtonComponent,
   CheckboxComponent,
+  PaginatorComponent,
   SpinnerComponent,
 } from '@shared/components';
 import { UsersService } from './services';
@@ -32,6 +33,7 @@ import { UsersStore } from './state';
     SpinnerComponent,
     TitleCasePipe,
     TranslocoPipe,
+    PaginatorComponent,
   ],
   providers: [UsersService, UsersStore],
 })
@@ -41,7 +43,9 @@ export class UsersComponent implements OnInit {
   private readonly usersStore = inject(UsersStore);
 
   protected readonly loading = this.usersStore.isLoading;
+  protected readonly pageable = this.usersStore.pageable;
   protected readonly standardDate = STANDARD_DATE;
+  protected readonly totalPages = this.usersStore.totalPages;
   protected readonly users = this.usersStore.users;
 
   protected readonly currentUsername = computed(() => {
@@ -51,7 +55,7 @@ export class UsersComponent implements OnInit {
   });
 
   public ngOnInit(): void {
-    this.usersStore.loadUsers();
+    this.usersStore.loadUsers({});
   }
 
   protected goToDashboard(): void {
@@ -63,5 +67,9 @@ export class UsersComponent implements OnInit {
       active,
       id,
     });
+  }
+
+  protected onPageChange(page: number): void {
+    this.usersStore.loadUsers({ page });
   }
 }

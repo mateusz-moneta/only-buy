@@ -13,6 +13,11 @@ describe(UsersComponent.name, () => {
         provide: UsersStore,
         useValue: {
           isLoading: signal(false),
+          pageable: signal({
+            page: 1,
+            size: 20,
+          }),
+          totalPages: signal(0),
           users: signal([]),
           loadUsers: vi.fn(),
           updateUserActive: vi.fn(),

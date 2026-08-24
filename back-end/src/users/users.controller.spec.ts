@@ -39,10 +39,10 @@ describe(UsersController.name, () => {
 
       usersService.findAll.mockResolvedValue(users);
 
-      const result = await controller.findAll();
+      const result = await controller.findAll(1, 20);
 
       expect(usersService.findAll).toHaveBeenCalledTimes(1);
-      expect(usersService.findAll).toHaveBeenCalledWith();
+      expect(usersService.findAll).toHaveBeenCalledWith(1, 20);
 
       expect(result).toBe(users);
     });
@@ -50,15 +50,35 @@ describe(UsersController.name, () => {
     it('should return empty array when there are no users', async () => {
       usersService.findAll.mockResolvedValue([]);
 
-      const result = await controller.findAll();
+      const result = await controller.findAll(1, 20);
 
       expect(usersService.findAll).toHaveBeenCalledTimes(1);
+      expect(usersService.findAll).toHaveBeenCalledWith(1, 20);
+
       expect(result).toEqual([]);
+    });
+
+    it('should pass pagination parameters to service', async () => {
+      const users = [
+        {
+          id: 'user-1',
+          username: 'john',
+          email: 'john@example.com',
+          active: true,
+        },
+      ] as User[];
+
+      usersService.findAll.mockResolvedValue(users);
+
+      const result = await controller.findAll(2, 10);
+
+      expect(usersService.findAll).toHaveBeenCalledWith(2, 10);
+      expect(result).toBe(users);
     });
   });
 
   describe('update', () => {
-    it('should update user active state', async () => {
+    it('should activate user', async () => {
       const id = 'user-id';
 
       const updateActiveStateDto = {
@@ -100,6 +120,8 @@ describe(UsersController.name, () => {
       usersService.updateActive.mockResolvedValue(user);
 
       const result = await controller.update(id, updateActiveStateDto);
+
+      expect(usersService.updateActive).toHaveBeenCalledTimes(1);
 
       expect(usersService.updateActive).toHaveBeenCalledWith(id, false);
 

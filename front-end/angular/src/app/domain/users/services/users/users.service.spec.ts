@@ -44,13 +44,54 @@ describe(UsersService.name, () => {
       },
     ];
 
-    spectator.service.getUsers().subscribe((response) => {
-      expect(response).toEqual(users);
+    const response = {
+      data: users,
+      total: 2,
+      page: 1,
+      limit: 20,
+      totalPages: 1,
+    };
+
+    spectator.service.getUsers().subscribe((result) => {
+      expect(result).toEqual(response);
     });
 
-    const request = spectator.expectOne('/api/users', HttpMethod.GET);
+    const request = spectator.expectOne('/api/users?page=1', HttpMethod.GET);
 
-    request.flush(users);
+    request.flush(response);
+  });
+
+  it('should get users with pagination', () => {
+    spectator = createService();
+
+    const users: User[] = [
+      {
+        id: 'user-11',
+        active: true,
+        avatar: null,
+        username: 'user11',
+        email: 'user11@example.com',
+        role: 'STANDARD',
+        createdDate: new Date(),
+        updatedDate: new Date(),
+      },
+    ];
+
+    const response = {
+      data: users,
+      total: 21,
+      page: 2,
+      limit: 10,
+      totalPages: 3,
+    };
+
+    spectator.service.getUsers(2).subscribe((result) => {
+      expect(result).toEqual(response);
+    });
+
+    const request = spectator.expectOne('/api/users?page=2', HttpMethod.GET);
+
+    request.flush(response);
   });
 
   it('should update user active state', () => {

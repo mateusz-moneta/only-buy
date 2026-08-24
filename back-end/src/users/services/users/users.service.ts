@@ -13,6 +13,7 @@ import { UserEntity } from '../../entities';
 import { RegisterUser, User } from '../../models';
 import { UploadService } from '../../../uploads/services';
 import { ConfigService } from '@nestjs/config';
+import { Page } from '../../../shared/models';
 
 @Injectable()
 export class UsersService {
@@ -24,21 +25,53 @@ export class UsersService {
     private readonly usersRepository: Repository<UserEntity>,
   ) {}
 
-  findAll(): Promise<User[]> {
-    return this.usersRepository
+  async findAll(page?: number, limit?: number): Promise<Page<User>> {
+    const query = this.usersRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.role', 'role')
       .select([
-        'user.active AS active',
-        'user.avatar AS avatar',
-        'user.id AS id',
-        'user.username AS username',
-        'user.email AS email',
-        'user.createdDate AS "createdDate"',
-        'user.updatedDate AS "updatedDate"',
-        'role.name AS role',
-      ])
-      .getRawMany();
+        'user.active',
+        'user.avatar',
+        'user.id',
+        'user.username',
+        'user.email',
+        'user.createdDate',
+        'user.updatedDate',
+        'role.name',
+      ]);
+
+    const defaultLimit = this.configService.get<number>('DEFAULT_LIMIT', 20);
+
+    const maxLimit = this.configService.get<number>('MAX_LIMIT', 100);
+
+    const currentPage = Math.max(1, Number(page) || 1);
+
+    const pageSize = Math.min(
+      Math.max(1, Number(limit) || defaultLimit),
+      maxLimit,
+    );
+
+    const [users, total] = await query
+      .skip((currentPage - 1) * pageSize)
+      .take(pageSize)
+      .getManyAndCount();
+
+    return {
+      data: users.map((user) => ({
+        id: user.id,
+        active: user.active,
+        avatar: user.avatar,
+        username: user.username,
+        email: user.email,
+        role: user.role.name,
+        createdDate: user.createdDate,
+        updatedDate: user.updatedDate,
+      })),
+      total,
+      page: currentPage,
+      limit: pageSize,
+      totalPages: Math.ceil(total / pageSize),
+    };
   }
 
   findOneById(id: string): Promise<UserEntity | null> {

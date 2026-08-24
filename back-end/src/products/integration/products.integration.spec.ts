@@ -52,7 +52,6 @@ describe('Products integration', () => {
           secret: process.env.SECRET,
         }),
       ],
-
       providers: [
         ProductsService,
         ProductImagesService,
@@ -280,9 +279,12 @@ describe('Products integration', () => {
       const activeCode = `ACTIVE-${timestamp}`;
       const inactiveCode = `INACTIVE-${timestamp}`;
 
+      const activeName = `Active ${timestamp}`;
+      const inactiveName = `Inactive ${timestamp}`;
+
       await productsRepository.save([
         productsRepository.create({
-          name: `Active ${timestamp}`,
+          name: activeName,
           description: 'Active product',
           details: '<p>Active product details</p>',
           price: 10,
@@ -292,7 +294,7 @@ describe('Products integration', () => {
         }),
 
         productsRepository.create({
-          name: `Inactive ${timestamp}`,
+          name: inactiveName,
           description: 'Inactive product',
           details: '<p>Inactive product details</p>',
           price: 10,
@@ -305,15 +307,17 @@ describe('Products integration', () => {
       const result = await productsService.findAll(
         true,
         undefined,
-        undefined,
+        activeName,
         undefined,
         1,
-        100,
+        20,
       );
 
-      expect(result.data.some((product) => product.code === activeCode)).toBe(
-        true,
-      );
+      expect(result.data).toHaveLength(1);
+
+      expect(result.data[0].code).toBe(activeCode);
+
+      expect(result.data[0].isActive).toBe(true);
 
       expect(result.data.some((product) => product.code === inactiveCode)).toBe(
         false,
