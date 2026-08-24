@@ -1,3 +1,4 @@
+import { TranslocoTestingModule } from '@jsverse/transloco';
 import { Spectator, createComponentFactory } from '@ngneat/spectator';
 import { beforeEach, expect, it } from 'vitest';
 import { SearchComponent } from './search.component';
@@ -5,6 +6,18 @@ import { SearchComponent } from './search.component';
 describe(SearchComponent.name, () => {
   const createComponent = createComponentFactory({
     component: SearchComponent,
+    imports: [
+      TranslocoTestingModule.forRoot({
+        langs: {
+          en: {},
+          pl: {},
+        },
+        translocoConfig: {
+          availableLangs: ['en', 'pl'],
+          defaultLang: 'en',
+        },
+      }),
+    ],
   });
 
   let spectator: Spectator<SearchComponent>;

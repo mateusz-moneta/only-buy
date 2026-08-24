@@ -1,20 +1,25 @@
 <section aria-label="Product filters">
-  <form [formGroup]="searchForm">
-    <div>
-      <app-search
-        [placeholder]="'dashboard.search' | transloco"
-        formControlName="phrase"
-      />
-    </div>
+  @if (searchForm(); as searchForm) {
+    <form [formGroup]="searchForm">
+      <div>
+        <app-search
+          [placeholder]="'dashboard.search' | transloco"
+          formControlName="phrase"
+        />
+      </div>
 
-    <div class="pl-5">
-      <app-checkbox [label]="'active' | transloco" formControlName="isActive" />
-    </div>
+      <div class="pl-5">
+        <app-checkbox
+          [label]="'active' | transloco"
+          formControlName="isActive"
+        />
+      </div>
 
-    <div>
-      <app-checkbox [label]="'promo' | transloco" formControlName="isPromo" />
-    </div>
-  </form>
+      <div>
+        <app-checkbox [label]="'promo' | transloco" formControlName="isPromo" />
+      </div>
+    </form>
+  }
 
   <div>
     @if (isAuthenticated()) {

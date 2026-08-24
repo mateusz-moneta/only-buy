@@ -3,10 +3,12 @@
     "description": "There are no products on the list",
     "title": "Ooops… It’s empty here"
   },
+  "logout": "Log out",
   "product": {
     "editProduct": "Remove product",
     "removeProduct": "Remove product",
     "showDetails": "Show details"
   },
-  "search": "Search"
+  "search": "Search",
+  "users": "Users"
 }

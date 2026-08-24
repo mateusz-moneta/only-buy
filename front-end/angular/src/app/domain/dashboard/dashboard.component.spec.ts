@@ -1,3 +1,4 @@
+import { TranslocoTestingModule } from '@jsverse/transloco';
 import { of } from 'rxjs';
 import { ProductsService } from '@core/services';
 import { Spectator, createComponentFactory } from '@ngneat/spectator';
@@ -7,6 +8,18 @@ import { DashboardComponent } from './dashboard.component';
 describe(DashboardComponent.name, () => {
   const createComponent = createComponentFactory({
     component: DashboardComponent,
+    imports: [
+      TranslocoTestingModule.forRoot({
+        langs: {
+          en: {},
+          pl: {},
+        },
+        translocoConfig: {
+          availableLangs: ['en', 'pl'],
+          defaultLang: 'en',
+        },
+      }),
+    ],
   });
 
   let spectator: Spectator<DashboardComponent>;

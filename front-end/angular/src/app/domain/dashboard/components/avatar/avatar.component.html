@@ -8,16 +8,18 @@
       <ul>
         @if (role() === 'ADMIN') {
           <li>
-            <a routerLink="/products/new">Creator of product</a>
+            <a routerLink="/products/new">{{ 'creatorProduct' | transloco }}</a>
           </li>
 
           <li>
-            <a routerLink="/users">Users</a>
+            <a routerLink="/users">{{ 'dashboard.users' | transloco }}</a>
           </li>
         }
 
         <li>
-          <button (click)="logout.emit()" type="button">Log out</button>
+          <button (click)="logout.emit()" type="button">
+            {{ 'dashboard.logout' | transloco }}
+          </button>
         </li>
       </ul>
     </div>

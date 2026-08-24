@@ -1,21 +1,38 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TranslocoTestingModule } from '@jsverse/transloco';
+import { Spectator, createComponentFactory } from '@ngneat/spectator';
+import { beforeEach, expect, it } from 'vitest';
 import { ProductComponent } from './product.component';
 
-describe('Product', () => {
-  let component: ProductComponent;
-  let fixture: ComponentFixture<ProductComponent>;
+describe(ProductComponent.name, () => {
+  const createComponent = createComponentFactory({
+    component: ProductComponent,
+    imports: [
+      TranslocoTestingModule.forRoot({
+        langs: {
+          en: {},
+          pl: {},
+        },
+        translocoConfig: {
+          availableLangs: ['en', 'pl'],
+          defaultLang: 'en',
+        },
+      }),
+    ],
+  });
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [ProductComponent],
-    }).compileComponents();
+  let spectator: Spectator<ProductComponent>;
 
-    fixture = TestBed.createComponent(ProductComponent);
-    component = fixture.componentInstance;
-    await fixture.whenStable();
+  beforeEach(() => {
+    vi.clearAllMocks();
+
+    spectator = createComponent();
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(spectator.component).toBeTruthy();
+  });
+
+  it('should match snapshot', () => {
+    expect(spectator.element.innerHTML).toMatchSnapshot();
   });
 });

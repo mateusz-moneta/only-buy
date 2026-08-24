@@ -1,3 +1,4 @@
+import { DEFAULT_PAGE } from '@core/constants';
 import {
   HttpMethod,
   SpectatorHttp,
@@ -29,6 +30,7 @@ describe(ProductsService.name, () => {
     const payload: CreateProductRequest = {
       code: 'PROD-001',
       description: 'Test product',
+      details: '<p>Product</p>',
       isActive: true,
       isPromo: false,
       name: 'Test Product',
@@ -46,10 +48,12 @@ describe(ProductsService.name, () => {
 
     expect(formData.get('code')).toBe(payload.code);
     expect(formData.get('description')).toBe(payload.description);
-    expect(formData.get('isActive')).toBe('true');
-    expect(formData.get('isPromo')).toBe('false');
+    expect(formData.get('details')).toBe(payload.details);
+    expect(formData.get('isActive')).toBe(String(payload.isActive));
+    expect(formData.get('isPromo')).toBe(String(payload.isPromo));
     expect(formData.get('name')).toBe(payload.name);
     expect(formData.get('price')).toBe(payload.price);
+    expect(formData.getAll('productImages')).toEqual([]);
   });
 
   it('should create product with images', () => {
@@ -66,6 +70,7 @@ describe(ProductsService.name, () => {
     const payload: CreateProductRequest = {
       code: 'PROD-001',
       description: 'Test product',
+      details: '<p>Product</p>',
       isActive: true,
       isPromo: false,
       name: 'Test Product',
@@ -120,6 +125,7 @@ describe(ProductsService.name, () => {
     const payload: EditProductRequest = {
       code: 'PROD-002',
       description: 'Updated product',
+      details: '<p>Updated product</p>',
       isActive: true,
       isPromo: true,
       name: 'Updated Product',
@@ -141,10 +147,13 @@ describe(ProductsService.name, () => {
 
     expect(formData.get('code')).toBe(payload.code);
     expect(formData.get('description')).toBe(payload.description);
-    expect(formData.get('isActive')).toBe('true');
-    expect(formData.get('isPromo')).toBe('true');
+    expect(formData.get('details')).toBe(payload.details);
+    expect(formData.get('isActive')).toBe(String(payload.isActive));
+    expect(formData.get('isPromo')).toBe(String(payload.isPromo));
     expect(formData.get('name')).toBe(payload.name);
     expect(formData.get('price')).toBe(payload.price);
+    expect(formData.getAll('productImages')).toEqual([]);
+    expect(formData.getAll('deletedImageIds')).toEqual([]);
   });
 
   it('should edit product with new images', () => {
@@ -159,11 +168,13 @@ describe(ProductsService.name, () => {
     const payload: EditProductRequest = {
       code: 'PROD-002',
       description: 'Updated product',
+      details: '<p>Updated product</p>',
       isActive: true,
       isPromo: false,
       name: 'Updated Product',
       price: '250',
       productImages: [image],
+      deletedImageIds: [],
     };
 
     spectator.service.editProduct(productId, payload).subscribe();
@@ -186,6 +197,7 @@ describe(ProductsService.name, () => {
     const payload: EditProductRequest = {
       code: 'PROD-002',
       description: 'Updated product',
+      details: '<p>Updated product</p>',
       isActive: true,
       isPromo: false,
       name: 'Updated Product',
@@ -242,10 +254,23 @@ describe(ProductsService.name, () => {
     spectator.service.getProducts().subscribe();
 
     const request = spectator.expectOne(
-      '/api/products?isActive=true&isPromo=true&phrase=',
+      `/api/products?isActive=true&isPromo=true&page=${DEFAULT_PAGE}&phrase=`,
       HttpMethod.GET
     );
 
-    request.flush([]);
+    request.flush({});
+  });
+
+  it('should get products with custom filters', () => {
+    spectator = createService();
+
+    spectator.service.getProducts(false, false, 'phone', 2).subscribe();
+
+    const request = spectator.expectOne(
+      '/api/products?isActive=false&isPromo=false&page=2&phrase=phone',
+      HttpMethod.GET
+    );
+
+    request.flush({});
   });
 });

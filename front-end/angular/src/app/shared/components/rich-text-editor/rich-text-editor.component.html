@@ -5,12 +5,12 @@
     </label>
   }
 
-  @if (control()) {
+  @if (control(); as control) {
     <quill-editor
+      [formControl]="control"
       [modules]="modules()"
       [placeholder]="placeholder()"
       (onBlur)="onBlur()"
-      (onContentChanged)="onContentChanged($event)"
     />
   }
 </div>

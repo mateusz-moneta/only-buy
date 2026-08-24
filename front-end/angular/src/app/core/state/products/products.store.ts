@@ -16,6 +16,11 @@ import {
 import { ProductsService } from '../../services';
 
 export interface ProductsState {
+  filters: {
+    isActive: boolean;
+    isPromo: boolean;
+    phrase: string;
+  };
   isLoading: boolean;
   pageable: Pageable;
   products: Product[];
@@ -24,6 +29,11 @@ export interface ProductsState {
 }
 
 const initialState: ProductsState = {
+  filters: {
+    isActive: true,
+    isPromo: false,
+    phrase: '',
+  },
   isLoading: false,
   pageable: {
     page: DEFAULT_PAGE,
@@ -88,7 +98,16 @@ export const ProductsStore = signalStore(
         }>
       >(
         pipe(
-          tap(() => setLoading(true)),
+          tap(({ isActive, isPromo, phrase }) => {
+            patchState(store, {
+              filters: {
+                isActive: isActive ?? false,
+                isPromo: isPromo ?? false,
+                phrase: phrase ?? '',
+              },
+              isLoading: true,
+            });
+          }),
           switchMap(({ isActive, isPromo, page, phrase }) =>
             productsService.getProducts(isActive, isPromo, phrase, page)
           ),

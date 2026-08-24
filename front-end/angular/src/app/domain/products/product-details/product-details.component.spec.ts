@@ -1,4 +1,5 @@
 import { ActivatedRoute } from '@angular/router';
+import { TranslocoTestingModule } from '@jsverse/transloco';
 import { EMPTY, of } from 'rxjs';
 import { Product } from '@core/models';
 import { ProductsService } from '@core/services';
@@ -9,6 +10,18 @@ import { ProductDetailsComponent } from './product-details.component';
 describe(ProductDetailsComponent.name, () => {
   const createComponent = createComponentFactory({
     component: ProductDetailsComponent,
+    imports: [
+      TranslocoTestingModule.forRoot({
+        langs: {
+          en: {},
+          pl: {},
+        },
+        translocoConfig: {
+          availableLangs: ['en', 'pl'],
+          defaultLang: 'en',
+        },
+      }),
+    ],
     providers: [
       {
         provide: ActivatedRoute,
@@ -29,6 +42,7 @@ describe(ProductDetailsComponent.name, () => {
               id: '0000-0000-0000',
               name: 'Test Product',
               description: 'Description',
+              details: '<p>Details</p>',
               price: 1000.0,
               code: 'TS',
               isActive: true,
@@ -36,6 +50,7 @@ describe(ProductDetailsComponent.name, () => {
               images: [],
               averageRating: 4,
               rating: 4,
+              ratingCount: 1,
               createdDate: new Date().toString(),
               updatedDate: new Date().toString(),
             } as Product)

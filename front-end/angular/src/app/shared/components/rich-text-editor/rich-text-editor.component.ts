@@ -10,7 +10,7 @@ import {
   NG_VALUE_ACCESSOR,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { ContentChange, QuillModule } from 'ngx-quill';
+import { QuillModule } from 'ngx-quill';
 import { QuillModules } from 'ngx-quill/config';
 import { BaseInput } from '@shared/abstracts';
 
@@ -45,9 +45,5 @@ export class RichTextEditorComponent extends BaseInput<string> {
 
   protected get isControlDisabled(): boolean {
     return this.disabled() || this.isDisabled;
-  }
-
-  protected onContentChanged({ html }: ContentChange): void {
-    this.control()?.setValue(html ?? '');
   }
 }

@@ -1,6 +1,6 @@
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { debounceTime } from 'rxjs';
@@ -19,6 +19,7 @@ import {
   ProductComponent,
   SearchComponent,
 } from './components';
+import { SearchForm } from './models';
 
 @Component({
   selector: 'app-dashboard',
@@ -38,7 +39,7 @@ import {
   styleUrl: './dashboard.component.scss',
   standalone: true,
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent {
   private readonly authStore = inject(AuthStore);
   private readonly destroyRef = inject(DestroyRef);
   private readonly productsStore = inject(ProductsStore);
@@ -48,22 +49,33 @@ export class DashboardComponent implements OnInit {
   protected readonly loading = this.productsStore.isLoading;
   protected readonly pageable = this.productsStore.pageable;
   protected readonly products = this.productsStore.products;
-  protected readonly searchForm = SearchFormBuilder.build();
+  protected readonly searchForm = signal<FormGroup<SearchForm> | null>(null);
   protected readonly totalPages = this.productsStore.totalPages;
   protected readonly user = this.authStore.user;
 
-  public ngOnInit(): void {
-    this.productsStore.loadProducts({});
-    this.handleForm();
-  }
+  private readonly initSearchFormEffect = effect(() => {
+    const filters = this.productsStore.filters();
+
+    if (filters) {
+      const { isActive, isPromo, phrase } = filters;
+
+      this.searchForm.set(SearchFormBuilder.build(isActive, isPromo, phrase));
+      this.handleForm();
+      this.productsStore.loadProducts({ isActive, isPromo, phrase });
+      this.initSearchFormEffect.destroy();
+    }
+  });
 
   protected onPageChange(page: number): void {
     this.productsStore.loadProducts({ page });
   }
 
   private handleForm(): void {
-    this.searchForm.valueChanges
-      .pipe(debounceTime(500), takeUntilDestroyed(this.destroyRef))
+    this.searchForm()
+      ?.valueChanges.pipe(
+        debounceTime(500),
+        takeUntilDestroyed(this.destroyRef)
+      )
       .subscribe((values) => {
         const { isActive, isPromo, phrase } = values;
 

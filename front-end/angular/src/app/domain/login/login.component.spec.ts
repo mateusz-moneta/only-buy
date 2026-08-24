@@ -1,4 +1,5 @@
 import { ActivatedRoute } from '@angular/router';
+import { TranslocoTestingModule } from '@jsverse/transloco';
 import { EMPTY } from 'rxjs';
 import { Spectator, createComponentFactory } from '@ngneat/spectator';
 import { beforeEach, expect, it } from 'vitest';
@@ -7,6 +8,18 @@ import { LoginComponent } from './login.component';
 describe(LoginComponent.name, () => {
   const createComponent = createComponentFactory({
     component: LoginComponent,
+    imports: [
+      TranslocoTestingModule.forRoot({
+        langs: {
+          en: {},
+          pl: {},
+        },
+        translocoConfig: {
+          availableLangs: ['en', 'pl'],
+          defaultLang: 'en',
+        },
+      }),
+    ],
     providers: [
       {
         provide: ActivatedRoute,

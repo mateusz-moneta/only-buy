@@ -1,15 +1,27 @@
 import { ActivatedRoute } from '@angular/router';
+import { TranslocoTestingModule } from '@jsverse/transloco';
 import { EMPTY, of } from 'rxjs';
 import { Product, ProductImage } from '@core/models';
 import { ProductsService } from '@core/services';
 import { Spectator, createComponentFactory } from '@ngneat/spectator';
 import { beforeEach, expect, it } from 'vitest';
-import { UsersService } from '../../users/services';
 import { EditProductComponent } from './edit-product.component';
 
 describe(EditProductComponent.name, () => {
   const createComponent = createComponentFactory({
     component: EditProductComponent,
+    imports: [
+      TranslocoTestingModule.forRoot({
+        langs: {
+          en: {},
+          pl: {},
+        },
+        translocoConfig: {
+          availableLangs: ['en', 'pl'],
+          defaultLang: 'en',
+        },
+      }),
+    ],
     providers: [
       {
         provide: ActivatedRoute,
@@ -30,6 +42,7 @@ describe(EditProductComponent.name, () => {
               id: '0000-0000-0000',
               name: 'Test Product',
               description: 'Description',
+              details: '<p>Details</p>',
               price: 1000.0,
               code: 'TS',
               isActive: true,
@@ -37,6 +50,7 @@ describe(EditProductComponent.name, () => {
               images: [],
               averageRating: 4,
               rating: 4,
+              ratingCount: 1,
               createdDate: new Date().toString(),
               updatedDate: new Date().toString(),
             } as Product)

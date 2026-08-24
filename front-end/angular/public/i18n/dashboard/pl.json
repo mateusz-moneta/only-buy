@@ -3,11 +3,13 @@
     "description": "Na liście nie ma żadnych produktów",
     "title": "Ups… tutaj jest pusto"
   },
+  "logout": "Wyloguj się",
   "product": {
     "editProduct": "Edytuj produkt",
     "removeProduct": "Usuń produkt",
     "showDetails": "Pokaż szczegóły"
   },
   "promo": "Promocja",
-  "search": "Szukaj"
+  "search": "Szukaj",
+  "users": "Użytkownicy"
 }
