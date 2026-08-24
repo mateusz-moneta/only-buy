@@ -11,7 +11,6 @@ export interface Product extends ProductRate {
   isActive: boolean;
   isPromo: boolean;
   images: ProductImage[];
-  ratingCount: number;
   createdDate: string;
   updatedDate: string;
 }

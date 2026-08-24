@@ -11,9 +11,9 @@
         <app-files-uploader
           [chooseImageMessage]="'filesUploader.chooseImage' | transloco"
           [emptyMessage]="'filesUploader.noSelected' | transloco"
+          [name]="'avatar' | transloco"
           [placeholder]="'filesUploader.selectFile' | transloco"
           (changeFiles)="onFileChange($event)"
-          name="Avatar"
         />
       </div>
 
@@ -27,7 +27,7 @@
 
       <div class="mt-4">
         <app-input
-          [label]="'register.email' | transloco"
+          [label]="'email' | transloco"
           [placeholder]="'register.enterEmail' | transloco"
           formControlName="email"
         />

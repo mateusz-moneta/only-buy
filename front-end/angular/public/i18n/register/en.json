@@ -1,7 +1,6 @@
 {
   "action": "Register",
   "doYouHaveAccount": "Do you have an account?",
-  "email": "E-mail",
   "enterEmail": "Enter e-mail",
   "enterRepeatPassword": "Enter repeat password",
   "repeatPassword": "Repeat password",

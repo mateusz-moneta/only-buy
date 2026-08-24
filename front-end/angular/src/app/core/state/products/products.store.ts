@@ -69,6 +69,7 @@ export const ProductsStore = signalStore(
                 ...product,
                 averageRating: productRate.averageRating,
                 rating: productRate.rating,
+                ratingCount: productRate.ratingCount,
               }
             : product
         ),

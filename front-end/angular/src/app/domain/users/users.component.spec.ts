@@ -1,4 +1,5 @@
 import { signal } from '@angular/core';
+import { TranslocoTestingModule } from '@jsverse/transloco';
 import { Spectator, createComponentFactory } from '@ngneat/spectator';
 import { beforeEach, expect, it } from 'vitest';
 import { UsersStore } from './state';
@@ -17,6 +18,18 @@ describe(UsersComponent.name, () => {
           updateUserActive: vi.fn(),
         },
       },
+    ],
+    imports: [
+      TranslocoTestingModule.forRoot({
+        langs: {
+          en: {},
+          pl: {},
+        },
+        translocoConfig: {
+          availableLangs: ['en', 'pl'],
+          defaultLang: 'en',
+        },
+      }),
     ],
   });
 

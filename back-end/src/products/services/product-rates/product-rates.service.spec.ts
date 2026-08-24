@@ -1,5 +1,6 @@
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
+
 import { ProductRateEntity } from '../../entities';
 import { ProductsService } from '../products/products.service';
 import { ProductRatesService } from './product-rates.service';
@@ -60,19 +61,23 @@ describe(ProductRatesService.name, () => {
       };
 
       productRatesRepository.create.mockReturnValue(productRate);
-
       productRatesRepository.save.mockResolvedValue(productRate);
 
       const getRawOne = jest.fn().mockResolvedValue({
         averageRating: '5',
+        ratingCount: '1',
       });
 
       const where = jest.fn().mockReturnValue({
         getRawOne,
       });
 
-      const select = jest.fn().mockReturnValue({
+      const addSelect = jest.fn().mockReturnValue({
         where,
+      });
+
+      const select = jest.fn().mockReturnValue({
+        addSelect,
       });
 
       productRatesRepository.createQueryBuilder.mockReturnValue({
@@ -109,6 +114,7 @@ describe(ProductRatesService.name, () => {
       expect(result).toEqual({
         rating: 5,
         averageRating: 5,
+        ratingCount: 1,
       });
     });
 
@@ -120,9 +126,7 @@ describe(ProductRatesService.name, () => {
       );
 
       expect(productRatesRepository.findOne).not.toHaveBeenCalled();
-
       expect(productRatesRepository.create).not.toHaveBeenCalled();
-
       expect(productRatesRepository.save).not.toHaveBeenCalled();
     });
 
@@ -139,11 +143,10 @@ describe(ProductRatesService.name, () => {
       );
 
       expect(productRatesRepository.create).not.toHaveBeenCalled();
-
       expect(productRatesRepository.save).not.toHaveBeenCalled();
     });
 
-    it('should calculate average rating after creating rate', async () => {
+    it('should calculate average rating and rating count after creating rate', async () => {
       productsService.findOneById.mockResolvedValue(product);
 
       productRatesRepository.findOne.mockResolvedValue(null);
@@ -159,19 +162,23 @@ describe(ProductRatesService.name, () => {
       };
 
       productRatesRepository.create.mockReturnValue(productRate);
-
       productRatesRepository.save.mockResolvedValue(productRate);
 
       const getRawOne = jest.fn().mockResolvedValue({
         averageRating: '4',
+        ratingCount: '3',
       });
 
       const where = jest.fn().mockReturnValue({
         getRawOne,
       });
 
-      const select = jest.fn().mockReturnValue({
+      const addSelect = jest.fn().mockReturnValue({
         where,
+      });
+
+      const select = jest.fn().mockReturnValue({
+        addSelect,
       });
 
       productRatesRepository.createQueryBuilder.mockReturnValue({
@@ -181,8 +188,13 @@ describe(ProductRatesService.name, () => {
       const result = await service.createProductRate(dto, userId);
 
       expect(select).toHaveBeenCalledWith(
-        'ROUND(AVG(productRate.rating))',
+        'AVG(productRate.rating)',
         'averageRating',
+      );
+
+      expect(addSelect).toHaveBeenCalledWith(
+        'COUNT(productRate.rating)',
+        'ratingCount',
       );
 
       expect(where).toHaveBeenCalledWith('productRate.productId = :productId', {
@@ -190,6 +202,7 @@ describe(ProductRatesService.name, () => {
       });
 
       expect(result.averageRating).toBe(4);
+      expect(result.ratingCount).toBe(3);
     });
   });
 
@@ -207,19 +220,23 @@ describe(ProductRatesService.name, () => {
       };
 
       productRatesRepository.findOne.mockResolvedValue(productRate);
-
       productRatesRepository.save.mockResolvedValue(productRate);
 
       const getRawOne = jest.fn().mockResolvedValue({
         averageRating: '4',
+        ratingCount: '5',
       });
 
       const where = jest.fn().mockReturnValue({
         getRawOne,
       });
 
-      const select = jest.fn().mockReturnValue({
+      const addSelect = jest.fn().mockReturnValue({
         where,
+      });
+
+      const select = jest.fn().mockReturnValue({
+        addSelect,
       });
 
       productRatesRepository.createQueryBuilder.mockReturnValue({
@@ -246,6 +263,7 @@ describe(ProductRatesService.name, () => {
       expect(result).toEqual({
         rating: 4,
         averageRating: 4,
+        ratingCount: 5,
       });
     });
 
@@ -257,29 +275,32 @@ describe(ProductRatesService.name, () => {
       );
 
       expect(productRatesRepository.save).not.toHaveBeenCalled();
-
       expect(productRatesRepository.createQueryBuilder).not.toHaveBeenCalled();
     });
 
-    it('should calculate average rating after updating rate', async () => {
+    it('should calculate average rating and rating count after updating rate', async () => {
       const productRate = {
         rating: 2,
       };
 
       productRatesRepository.findOne.mockResolvedValue(productRate);
-
       productRatesRepository.save.mockResolvedValue(productRate);
 
       const getRawOne = jest.fn().mockResolvedValue({
         averageRating: '3.5',
+        ratingCount: '4',
       });
 
       const where = jest.fn().mockReturnValue({
         getRawOne,
       });
 
-      const select = jest.fn().mockReturnValue({
+      const addSelect = jest.fn().mockReturnValue({
         where,
+      });
+
+      const select = jest.fn().mockReturnValue({
+        addSelect,
       });
 
       productRatesRepository.createQueryBuilder.mockReturnValue({
@@ -293,11 +314,17 @@ describe(ProductRatesService.name, () => {
         'averageRating',
       );
 
+      expect(addSelect).toHaveBeenCalledWith(
+        'COUNT(productRate.rating)',
+        'ratingCount',
+      );
+
       expect(where).toHaveBeenCalledWith('productRate.productId = :productId', {
         productId: 'product-id',
       });
 
       expect(result.averageRating).toBe(3.5);
+      expect(result.ratingCount).toBe(4);
     });
   });
 });

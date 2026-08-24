@@ -1,7 +1,9 @@
 {
   "active": "Active",
-  "creatorProduct": "Tworzenie produktu",
+  "avatar": "Avatar",
+  "creatorProduct": "Creator of product",
   "delete": "Delete",
+  "email": "E-mail",
   "enterPassword": "Enter password",
   "enterUsername": "Enter username",
   "filesUploader": {

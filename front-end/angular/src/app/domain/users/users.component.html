@@ -12,7 +12,7 @@
     </div>
 
     <div>
-      <h1>Users</h1>
+      <h1>{{ 'users.title' | transloco }}</h1>
     </div>
   </header>
 
@@ -26,13 +26,13 @@
     } @else {
       <table>
         <thead>
-          <th>Avatar</th>
-          <th>Username</th>
-          <th>E-mail</th>
-          <th>Role</th>
-          <th>Date of create</th>
-          <th>Date of update</th>
-          <th>Is active?</th>
+          <th>{{ 'avatar' | transloco }}</th>
+          <th>{{ 'username' | transloco }}</th>
+          <th>{{ 'email' | transloco }}</th>
+          <th>{{ 'users.role' | transloco }}</th>
+          <th>{{ 'users.createdDate' | transloco }}</th>
+          <th>{{ 'users.updatedDate' | transloco }}</th>
+          <th>{{ 'users.isActive' | transloco }}</th>
         </thead>
 
         <tbody>

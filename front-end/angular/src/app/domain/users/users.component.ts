@@ -7,6 +7,7 @@ import {
   inject,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { STANDARD_DATE } from '@core/constants';
 import { AuthStore } from '@core/state';
 import {
@@ -30,6 +31,7 @@ import { UsersStore } from './state';
     NgOptimizedImage,
     SpinnerComponent,
     TitleCasePipe,
+    TranslocoPipe,
   ],
   providers: [UsersService, UsersStore],
 })

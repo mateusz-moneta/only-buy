@@ -62,17 +62,20 @@ export class ProductRatesService {
 
     const result = await this.productRatesRepository
       .createQueryBuilder('productRate')
-      .select('ROUND(AVG(productRate.rating))', 'averageRating')
+      .select('AVG(productRate.rating)', 'averageRating')
+      .addSelect('COUNT(productRate.rating)', 'ratingCount')
       .where('productRate.productId = :productId', {
         productId: product.id,
       })
       .getRawOne<{
         averageRating: string;
+        ratingCount: string;
       }>();
 
     return {
       rating: productRateEntity.rating,
       averageRating: Number(result.averageRating),
+      ratingCount: Number(result.ratingCount),
     };
   }
 
@@ -102,16 +105,19 @@ export class ProductRatesService {
     const result = await this.productRatesRepository
       .createQueryBuilder('productRate')
       .select('AVG(productRate.rating)', 'averageRating')
+      .addSelect('COUNT(productRate.rating)', 'ratingCount')
       .where('productRate.productId = :productId', {
         productId: updateProductRate.productId,
       })
       .getRawOne<{
         averageRating: string;
+        ratingCount: string;
       }>();
 
     return {
       rating: productRate.rating,
       averageRating: Number(result.averageRating),
+      ratingCount: Number(result.ratingCount),
     };
   }
 }
