@@ -88,6 +88,7 @@ export const AuthStore = signalStore(
         patchState(store, {
           accessToken: null,
           isAuthenticated: false,
+          user: null,
         });
       },
       register: rxMethod<RegisterRequest>(
