@@ -50,6 +50,7 @@
             [description]="product.description ?? ''"
             [images]="product.images ?? []"
             [isAdmin]="user()?.role === 'ADMIN'"
+            [isAuthenticated]="isAuthenticated()"
             [isPromo]="product.isPromo ?? false"
             [name]="product.name ?? ''"
             [ratingCount]="product.ratingCount ?? 0"

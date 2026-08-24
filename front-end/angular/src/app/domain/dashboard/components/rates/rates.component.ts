@@ -7,6 +7,7 @@ import { Component, input, output, signal } from '@angular/core';
   standalone: true,
 })
 export class RatesComponent {
+  public readonly isAuthenticated = input<boolean>(false);
   public readonly confirmedRating = input<number>(0);
   public readonly ratingCount = input<number>(0);
 
@@ -15,11 +16,18 @@ export class RatesComponent {
   protected readonly rating = signal<number>(0);
 
   protected handleMouseEnter(hoveredRating: number): void {
+    if (!this.isAuthenticated()) {
+      return;
+    }
+
     this.rating.set(hoveredRating);
-    console.log(hoveredRating);
   }
 
   protected handleMouseLeave(): void {
+    if (!this.isAuthenticated()) {
+      return;
+    }
+
     this.rating.set(0);
   }
 

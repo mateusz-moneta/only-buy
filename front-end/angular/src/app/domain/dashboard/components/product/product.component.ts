@@ -22,6 +22,7 @@ import { RatesComponent } from '../rates/rates.component';
   standalone: true,
 })
 export class ProductComponent {
+  public readonly isAuthenticated = input<boolean>(false);
   public readonly confirmedRating = input<number>(0);
   public readonly description = input<string>('');
   public readonly images = input<ProductImage[]>([]);

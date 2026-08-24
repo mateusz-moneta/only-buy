@@ -18,6 +18,7 @@
       <div class="my-3">
         <app-rates
           [confirmedRating]="confirmedRating()"
+          [isAuthenticated]="isAuthenticated()"
           [ratingCount]="ratingCount()"
           (selectRates)="selectRates.emit($event)"
         />
