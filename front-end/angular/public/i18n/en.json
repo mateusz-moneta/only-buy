@@ -1,5 +1,6 @@
 {
   "active": "Active",
+  "delete": "Delete",
   "enterPassword": "Enter password",
   "enterUsername": "Enter username",
   "filesUploader": {

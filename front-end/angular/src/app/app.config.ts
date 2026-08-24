@@ -9,6 +9,7 @@ import { provideRouter } from '@angular/router';
 import { provideTransloco } from '@jsverse/transloco';
 import { appInitializer } from '@core/initializers';
 import { authInterceptor, errorInterceptor } from '@core/interceptors';
+import { getDefaultLang } from '@shared/utils';
 import { routes } from './app.routes';
 import { TranslocoHttpLoader } from './transloco-loader';
 
@@ -21,7 +22,7 @@ export const appConfig: ApplicationConfig = {
     provideTransloco({
       config: {
         availableLangs: ['en', 'pl'],
-        defaultLang: 'pl',
+        defaultLang: getDefaultLang(),
         reRenderOnLangChange: true,
         prodMode: !isDevMode(),
       },

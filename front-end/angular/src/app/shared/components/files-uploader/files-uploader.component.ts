@@ -6,6 +6,7 @@ import {
   output,
   viewChild,
 } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { ButtonComponent } from '@shared/components';
 
 @Component({
@@ -14,7 +15,7 @@ import { ButtonComponent } from '@shared/components';
   templateUrl: './files-uploader.component.html',
   styleUrl: './files-uploader.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ButtonComponent],
+  imports: [ButtonComponent, TranslocoPipe],
 })
 export class FilesUploaderComponent {
   public readonly accept = input<string>('');
