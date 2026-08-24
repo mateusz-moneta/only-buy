@@ -1,15 +1,18 @@
 <section aria-label="Product filters">
   <form [formGroup]="searchForm">
     <div>
-      <app-search formControlName="phrase" placeholder="Search" />
+      <app-search
+        [placeholder]="'dashboard.search' | transloco"
+        formControlName="phrase"
+      />
     </div>
 
     <div class="pl-5">
-      <app-checkbox formControlName="isActive" label="Active" />
+      <app-checkbox [label]="'active' | transloco" formControlName="isActive" />
     </div>
 
     <div>
-      <app-checkbox formControlName="isPromo" label="Promo" />
+      <app-checkbox [label]="'promo' | transloco" formControlName="isPromo" />
     </div>
   </form>
 
@@ -22,7 +25,7 @@
       />
     } @else {
       <app-button (callback)="onLogin()" type="button" variant="secondary">
-        Log in
+        {{ 'loginAction' | transloco }}
       </app-button>
     }
   </div>
@@ -44,6 +47,7 @@
             [isAdmin]="user()?.role === 'ADMIN'"
             [isPromo]="product.isPromo ?? false"
             [name]="product.name ?? ''"
+            [ratingCount]="product.ratingCount ?? 0"
             (edit)="onEditProduct(product)"
             (remove)="onRemoveProduct(product.id)"
             (selectRates)="onSelectRates(product, $event)"

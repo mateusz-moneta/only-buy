@@ -1,24 +1,30 @@
-<div class="rates">
-  @for (value of [1, 2, 3, 4, 5]; track value) {
-    <button
-      (click)="handleClick(value)"
-      (mouseenter)="handleMouseEnter(value)"
-      (mouseleave)="handleMouseLeave()"
-    >
-      <img
-        [class.rates__item--filled]="
-          value <= (rating() || confirmedRating() || 0)
-        "
-        [src]="
-          '/icons/' +
-          (value <= (rating() || confirmedRating() || 0)
-            ? 'star-filled'
-            : 'star') +
-          '.svg'
-        "
-        class="rates__item"
-        alt=""
-      />
-    </button>
-  }
+<div class="rates d-flex justify-content-between">
+  <div>
+    @for (value of [1, 2, 3, 4, 5]; track value) {
+      <button
+        (click)="handleClick(value)"
+        (mouseenter)="handleMouseEnter(value)"
+        (mouseleave)="handleMouseLeave()"
+      >
+        <img
+          [class.rates__item--filled]="
+            value <= (rating() || confirmedRating() || 0)
+          "
+          [src]="
+            '/icons/' +
+            (value <= (rating() || confirmedRating() || 0)
+              ? 'star-filled'
+              : 'star') +
+            '.svg'
+          "
+          class="rates__item"
+          alt=""
+        />
+      </button>
+    }
+  </div>
+
+  <div class="align-items-center d-flex justify-content-center">
+    <span>({{ ratingCount() }})</span>
+  </div>
 </div>

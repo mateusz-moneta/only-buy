@@ -1,0 +1,21 @@
+{
+  "active": "Aktywne",
+  "enterPassword": "Wprowadź hasło",
+  "enterUsername": "Wprowadź nazwę użytkownika",
+  "filesUploader": {
+    "chooseImage": "Wybierz zdjęcie awatara do przesłania (PNG, JPG)",
+    "noSelected": "Nie wybrano pliku do przesłania",
+    "selectFile": "Wybierz plik"
+  },
+  "loginAction": "Zaloguj się",
+  "password": "Hasło",
+  "promo": "Promocja",
+  "username": "Nazwa użytkownika",
+  "validations": {
+    "email": "Wprowadź prawidłowy adres e-mail.",
+    "maxLength": "Maksymalna długość to {{ requiredLength }} znaków.",
+    "minLength": "Minimalna długość to {{ requiredLength }} znaków.",
+    "passwordsDoNotMatch": "Hasła nie są zgodne.",
+    "required": "To pole jest wymagane."
+  }
+}

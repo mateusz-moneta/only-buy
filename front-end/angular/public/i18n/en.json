@@ -1,0 +1,21 @@
+{
+  "active": "Active",
+  "enterPassword": "Enter password",
+  "enterUsername": "Enter username",
+  "filesUploader": {
+    "chooseImage": "Choose image for avatar to upload (PNG, JPG)",
+    "noSelected": "No file currently selected for upload",
+    "selectFile": "Select file"
+  },
+  "loginAction": "Log in",
+  "password": "Password",
+  "promo": "Promo",
+  "username": "Username",
+  "validations": {
+    "email": "Please enter a valid e-mail address.",
+    "fieldRequired": "This field is required.",
+    "maxLength": "Maximum length is {{ requiredLength }} characters.",
+    "minLength": "Minimum length is {{ requiredLength }} characters.",
+    "passwordsDoNotMatch": "Passwords do not match."
+  }
+}

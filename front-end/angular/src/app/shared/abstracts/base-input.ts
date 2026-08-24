@@ -9,6 +9,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   ControlValueAccessor,
+  FormControl,
   NgControl,
   ValidationErrors,
 } from '@angular/forms';
@@ -23,6 +24,7 @@ export abstract class BaseInput<T>
   protected currentValue: T | undefined;
   protected isDisabled = false;
 
+  protected readonly control = signal<FormControl<T> | null>(null);
   protected ngControl: NgControl | null = null;
 
   protected readonly showError = signal(false);
@@ -38,9 +40,10 @@ export abstract class BaseInput<T>
 
   ngAfterViewInit(): void {
     this.ngControl = this.injector.get(NgControl, null);
+    this.control.set((this.ngControl?.control as FormControl) ?? null);
 
-    this.ngControl?.control?.events
-      .pipe(takeUntilDestroyed(this.destroyRef))
+    this.control()
+      ?.events.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(({ source }) => {
         this.showError.set(source.invalid && source.touched);
       });

@@ -1,0 +1,21 @@
+@use 'assets/colors' as colors;
+
+.rich-text-editor {
+  color: colors.$black;
+  font-size: 1.4rem;
+  width: 100%;
+
+  > label {
+    font-weight: 700;
+    margin: 0.8rem 0;
+  }
+
+  quill-editor {
+    height: 100%;
+    width: 100%;
+
+    .ql-editor {
+      min-height: 30rem;
+    }
+  }
+}

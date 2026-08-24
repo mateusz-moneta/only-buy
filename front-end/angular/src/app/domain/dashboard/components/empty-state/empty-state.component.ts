@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
+import { TranslocoDirective } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-empty-state',
-  imports: [],
+  imports: [TranslocoDirective],
   templateUrl: './empty-state.component.html',
   styleUrl: './empty-state.component.scss',
   standalone: true,

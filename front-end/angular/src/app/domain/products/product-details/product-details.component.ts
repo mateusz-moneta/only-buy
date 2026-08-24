@@ -8,6 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { ProductsStore } from '@core/state';
 import { ButtonComponent, SpinnerComponent } from '@shared/components';
 import { SafeHtmlPipe } from '@shared/pipes';
@@ -15,7 +16,13 @@ import { handleImageError } from '@shared/utils';
 
 @Component({
   selector: 'app-product-details',
-  imports: [ButtonComponent, NgOptimizedImage, SafeHtmlPipe, SpinnerComponent],
+  imports: [
+    ButtonComponent,
+    NgOptimizedImage,
+    SafeHtmlPipe,
+    SpinnerComponent,
+    TranslocoPipe,
+  ],
   templateUrl: './product-details.component.html',
   styleUrl: './product-details.component.scss',
   standalone: true,

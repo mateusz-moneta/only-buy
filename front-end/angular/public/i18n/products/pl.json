@@ -1,0 +1,12 @@
+{
+  "code": "Kod",
+  "description": "Opis",
+  "details": "Szczegóły",
+  "enterCode": "Wprowadź kod",
+  "enterDescription": "Wprowadź opis",
+  "enterDetails": "Wprowadź szczegóły",
+  "enterName": "Wprowadź nazwę",
+  "enterPrice": "Wprowadź cenę",
+  "name": "Nazwa",
+  "price": "Cena"
+}

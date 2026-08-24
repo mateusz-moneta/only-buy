@@ -1,0 +1,12 @@
+{
+  "code": "Code",
+  "description": "Description",
+  "details": "Details",
+  "enterCode": "Enter a code",
+  "enterDescription": "Enter a description",
+  "enterDetails": "Enter details",
+  "enterName": "Enter a name",
+  "enterPrice": "Enter a price",
+  "name": "Name",
+  "price": "Price"
+}

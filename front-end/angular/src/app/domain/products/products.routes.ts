@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { provideTranslocoScope } from '@jsverse/transloco';
 
 export const PRODUCTS_ROUTES: Routes = [
   {
@@ -7,6 +8,7 @@ export const PRODUCTS_ROUTES: Routes = [
       import('./new-product/new-product.component').then(
         ({ NewProductComponent }) => NewProductComponent
       ),
+    providers: [provideTranslocoScope('new-product', 'products')],
   },
   {
     path: ':id',
@@ -17,6 +19,7 @@ export const PRODUCTS_ROUTES: Routes = [
           import('./edit-product/edit-product.component').then(
             ({ EditProductComponent }) => EditProductComponent
           ),
+        providers: [provideTranslocoScope('edit-product', 'products')],
       },
       {
         path: '',
@@ -24,6 +27,7 @@ export const PRODUCTS_ROUTES: Routes = [
           import('./product-details/product-details.component').then(
             ({ ProductDetailsComponent }) => ProductDetailsComponent
           ),
+        providers: [provideTranslocoScope('product-details', 'products')],
       },
     ],
   },

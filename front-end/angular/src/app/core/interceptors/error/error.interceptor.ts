@@ -20,7 +20,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         case HttpStatusCode.Unauthorized: {
           if (authStore.isAuthenticated()) {
             authStore.logout();
-            router.navigate(['/login']);
+            router.navigate(['/']);
 
             snackbarService.error(
               'Your session has expired. Please log in again.'

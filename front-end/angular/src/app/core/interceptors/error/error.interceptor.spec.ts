@@ -83,7 +83,7 @@ describe(errorInterceptor.name, () => {
     );
 
     expect(logout).toHaveBeenCalledTimes(1);
-    expect(navigate).toHaveBeenCalledWith(['/login']);
+    expect(navigate).toHaveBeenCalledWith(['/']);
 
     expect(snackbarError).toHaveBeenCalledWith(
       'Your session has expired. Please log in again.'

@@ -12,7 +12,7 @@
     </div>
 
     <div class="col-md-6 col-sm-9 col-8 d-flex align-items-center">
-      <h1>Details of product</h1>
+      <h1>{{ 'productDetails.title' | transloco }}</h1>
     </div>
   </header>
 
@@ -39,29 +39,37 @@
         }
 
         <div class="mt-4">
-          <h2>Code</h2>
+          <h2>{{ 'products.code' | transloco }}</h2>
 
-          <p class="mt-3">{{ product()?.code ?? 'Not assigned' }}</p>
+          <p class="mt-3">
+            {{ product()?.code ?? ('productDetails.notAssigned' | transloco) }}
+          </p>
         </div>
 
         <div class="mt-4">
-          <h2>Description</h2>
+          <h2>{{ 'products.description' | transloco }}</h2>
+
+          <p>{{ product()?.description }}</p>
+        </div>
+
+        <div class="mt-4">
+          <h2>{{ 'products.details' | transloco }}</h2>
 
           <div
-            [innerHTML]="product()?.description | safeHtml"
+            [innerHTML]="product()?.details | safeHtml"
             class="product__safe-html mt-3"
           ></div>
         </div>
 
         <div class="mt-4">
-          <h2>Price</h2>
+          <h2>{{ 'products.price' | transloco }}</h2>
 
           <p class="mt-3">{{ product()?.price }} PLN</p>
         </div>
 
         @if (product()?.rating; as rating) {
           <div class="mt-4">
-            <h2>Your rating</h2>
+            <h2>{{ 'productDetails.yourRating' | transloco }}</h2>
 
             <p class="mt-3">{{ rating }} / 5</p>
           </div>
@@ -69,7 +77,7 @@
 
         @if (product()?.averageRating; as averageRating) {
           <div class="mt-4">
-            <h2>Average rating</h2>
+            <h2>{{ 'productDetails.averageRating' | transloco }}</h2>
 
             <p class="mt-3">{{ averageRating }} / 5</p>
           </div>

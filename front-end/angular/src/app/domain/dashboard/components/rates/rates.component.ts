@@ -2,13 +2,13 @@ import { Component, input, output, signal } from '@angular/core';
 
 @Component({
   selector: 'app-rates',
-  imports: [],
   templateUrl: './rates.component.html',
   styleUrl: './rates.component.scss',
   standalone: true,
 })
 export class RatesComponent {
   public readonly confirmedRating = input<number>(0);
+  public readonly ratingCount = input<number>(0);
 
   public readonly selectRates = output<number>();
 

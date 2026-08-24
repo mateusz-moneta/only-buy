@@ -1,5 +1,6 @@
 import { NgOptimizedImage } from '@angular/common';
 import { Component, input, output, signal } from '@angular/core';
+import { TranslocoDirective, TranslocoPipe } from '@jsverse/transloco';
 import { ProductImage } from '@core/models';
 import { ButtonComponent } from '@shared/components';
 import { SafeHtmlPipe } from '@shared/pipes';
@@ -8,7 +9,14 @@ import { RatesComponent } from '../rates/rates.component';
 
 @Component({
   selector: 'app-product',
-  imports: [ButtonComponent, RatesComponent, SafeHtmlPipe, NgOptimizedImage],
+  imports: [
+    ButtonComponent,
+    RatesComponent,
+    SafeHtmlPipe,
+    NgOptimizedImage,
+    TranslocoPipe,
+    TranslocoDirective,
+  ],
   templateUrl: './product.component.html',
   styleUrl: './product.component.scss',
   standalone: true,
@@ -20,6 +28,7 @@ export class ProductComponent {
   public readonly isAdmin = input<boolean>(false);
   public readonly isPromo = input<boolean>();
   public readonly name = input<string>();
+  public readonly ratingCount = input<number>(0);
 
   public readonly edit = output<void>();
   public readonly remove = output<void>();

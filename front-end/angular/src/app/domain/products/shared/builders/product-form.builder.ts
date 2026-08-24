@@ -15,6 +15,9 @@ export class ProductFormBuilder {
       }),
       description: new FormControl(product?.description ?? '', {
         nonNullable: true,
+      }),
+      details: new FormControl(product?.details ?? '', {
+        nonNullable: true,
         validators: [Validators.required],
       }),
       images: new FormControl([], {

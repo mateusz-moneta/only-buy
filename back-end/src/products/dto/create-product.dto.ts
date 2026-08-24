@@ -14,6 +14,11 @@ export class CreateProductDto {
 
   @IsNotEmpty()
   @IsString()
+  @ApiProperty({ description: 'The details of the product' })
+  readonly details: string;
+
+  @IsNotEmpty()
+  @IsString()
   @ApiProperty({ description: 'The price of the product' })
   readonly price: string;
 

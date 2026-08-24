@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { provideTranslocoScope } from '@jsverse/transloco';
 import { adminGuard, authGuard, guestGuard } from './core/guards';
 
 export const routes: Routes = [
@@ -9,6 +10,7 @@ export const routes: Routes = [
       import('./domain/login/login.component').then(
         ({ LoginComponent }) => LoginComponent
       ),
+    providers: [provideTranslocoScope('login')],
   },
   {
     canActivate: [authGuard],
@@ -25,6 +27,7 @@ export const routes: Routes = [
       import('./domain/register/register.component').then(
         ({ RegisterComponent }) => RegisterComponent
       ),
+    providers: [provideTranslocoScope('register')],
   },
   {
     canActivate: [adminGuard],
@@ -33,15 +36,16 @@ export const routes: Routes = [
       import('./domain/users/users.component').then(
         ({ UsersComponent }) => UsersComponent
       ),
+    providers: [provideTranslocoScope('users')],
   },
   {
-    canActivate: [authGuard],
     path: '',
     loadComponent: () =>
       import('./domain/dashboard/dashboard.component').then(
         ({ DashboardComponent }) => DashboardComponent
       ),
     pathMatch: 'full',
+    providers: [provideTranslocoScope('dashboard')],
   },
   {
     path: '**',
@@ -49,5 +53,6 @@ export const routes: Routes = [
       import('./domain/not-found/not-found.component').then(
         ({ NotFoundComponent }) => NotFoundComponent
       ),
+    providers: [provideTranslocoScope('notFound')],
   },
 ];

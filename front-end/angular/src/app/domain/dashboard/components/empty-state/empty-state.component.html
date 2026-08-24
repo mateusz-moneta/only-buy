@@ -1,4 +1,5 @@
 <div
+  *transloco="let t; prefix: 'dashboard.emptyState'"
   class="align-items-center d-flex empty-state flex-column justify-content-center"
 >
   <div
@@ -6,8 +7,8 @@
   >
     <img src="/icons/task-list.svg" alt="List of tasks" />
 
-    <p class="empty-state__title">Ooops… It’s empty here</p>
+    <p class="empty-state__title">{{ t('title') }}</p>
 
-    <p class="empty-state__description">There are no products on the list</p>
+    <p class="empty-state__description">{{ t('description') }}</p>
   </div>
 </div>

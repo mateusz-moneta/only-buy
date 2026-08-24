@@ -1,29 +1,33 @@
 <div class="errors">
   @if (errors()?.['required']) {
-    <span>This field is required.</span>
+    <span>{{ 'validations.required' | transloco }}</span>
   }
 
   @if (errors()?.['email']) {
-    <span>Please enter a valid e-mail address.</span>
-  }
-
-  @if (errors()?.['minlength']) {
-    <span>
-      Minimum length is
-      {{ errors()?.['minlength'].requiredLength }}
-      characters.
-    </span>
+    <span>{{ 'validations.email' | transloco }}</span>
   }
 
   @if (errors()?.['maxlength']) {
     <span>
-      Maximum length is
-      {{ errors()?.['maxlength'].requiredLength }}
-      characters.
+      {{
+        'validations.maxLength'
+          | transloco
+            : { requiredLength: errors()?.['maxlength'].requiredLength }
+      }}
+    </span>
+  }
+
+  @if (errors()?.['minlength']) {
+    <span>
+      {{
+        'validations.minLength'
+          | transloco
+            : { requiredLength: errors()?.['minlength'].requiredLength }
+      }}
     </span>
   }
 
   @if (errors()?.['passwordMismatch']) {
-    <span>Passwords do not match.</span>
+    <span>{{ 'validations.passwordsDoNotMatch' | transloco }}</span>
   }
 </div>

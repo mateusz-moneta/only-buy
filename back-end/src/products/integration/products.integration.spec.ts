@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { Repository } from 'typeorm';
+
 import { ProductsService, ProductImagesService } from '../services';
 import { UploadService } from '../../uploads/services';
 import {
@@ -55,14 +56,12 @@ describe('Products integration', () => {
       providers: [
         ProductsService,
         ProductImagesService,
-
         {
           provide: UploadService,
           useValue: {
             saveFile: jest
               .fn()
               .mockReturnValue('uploads/product-images/test-image.jpg'),
-
             deleteFile: jest.fn(),
           },
         },
@@ -94,6 +93,7 @@ describe('Products integration', () => {
       const dto = {
         name: `Integration product ${timestamp}`,
         description: 'Integration test product',
+        details: '<p>Integration test details</p>',
         price: '99.99',
         code: `INT-${timestamp}`,
         isActive: 'true',
@@ -106,6 +106,7 @@ describe('Products integration', () => {
       expect(result.id).toBeDefined();
       expect(result.name).toBe(dto.name);
       expect(result.description).toBe(dto.description);
+      expect(result.details).toBe(dto.details);
       expect(result.code).toBe(dto.code);
       expect(result.isActive).toBe(true);
       expect(result.isPromo).toBe(false);
@@ -118,18 +119,23 @@ describe('Products integration', () => {
 
       expect(savedProduct).toBeDefined();
       expect(savedProduct?.name).toBe(dto.name);
+      expect(savedProduct?.description).toBe(dto.description);
+      expect(savedProduct?.details).toBe(dto.details);
       expect(savedProduct?.price).toBe('99.99');
     });
   });
 
   describe('findOneById', () => {
     it('should return persisted product with images', async () => {
+      const timestamp = Date.now();
+
       const product = await productsRepository.save(
         productsRepository.create({
-          name: `Find product ${Date.now()}`,
+          name: `Find product ${timestamp}`,
           description: 'Find test product',
+          details: '<p>Find test product details</p>',
           price: 49.99,
-          code: `FIND-${Date.now()}`,
+          code: `FIND-${timestamp}`,
           isActive: true,
           isPromo: false,
         }),
@@ -149,6 +155,7 @@ describe('Products integration', () => {
       expect(result).toBeDefined();
       expect(result?.id).toBe(product.id);
       expect(result?.name).toBe(product.name);
+      expect(result?.details).toBe(product.details);
 
       expect(result?.images).toEqual(
         expect.arrayContaining([
@@ -180,6 +187,7 @@ describe('Products integration', () => {
         productsRepository.create({
           name,
           description: 'List test product',
+          details: '<p>List test product details</p>',
           price: 29.99,
           code,
           isActive: true,
@@ -204,6 +212,7 @@ describe('Products integration', () => {
 
       expect(result.data[0].code).toBe(code);
       expect(result.data[0].name).toBe(name);
+      expect(result.data[0].details).toBe('<p>List test product details</p>');
 
       expect(result.total).toBe(1);
       expect(result.page).toBe(1);
@@ -225,9 +234,7 @@ describe('Products integration', () => {
       expect(result.limit).toBe(2);
 
       expect(result.data.length).toBeLessThanOrEqual(2);
-
       expect(result.total).toBeGreaterThanOrEqual(result.data.length);
-
       expect(result.totalPages).toBe(Math.ceil(result.total / 2));
     });
 
@@ -236,7 +243,6 @@ describe('Products integration', () => {
 
       expect(result.page).toBe(1);
       expect(result.limit).toBe(10);
-
       expect(result.data.length).toBeLessThanOrEqual(20);
     });
 
@@ -265,7 +271,6 @@ describe('Products integration', () => {
       );
 
       expect(result.limit).toBeLessThanOrEqual(100);
-
       expect(result.data.length).toBeLessThanOrEqual(100);
     });
 
@@ -273,13 +278,13 @@ describe('Products integration', () => {
       const timestamp = Date.now();
 
       const activeCode = `ACTIVE-${timestamp}`;
-
       const inactiveCode = `INACTIVE-${timestamp}`;
 
       await productsRepository.save([
         productsRepository.create({
           name: `Active ${timestamp}`,
           description: 'Active product',
+          details: '<p>Active product details</p>',
           price: 10,
           code: activeCode,
           isActive: true,
@@ -289,6 +294,7 @@ describe('Products integration', () => {
         productsRepository.create({
           name: `Inactive ${timestamp}`,
           description: 'Inactive product',
+          details: '<p>Inactive product details</p>',
           price: 10,
           code: inactiveCode,
           isActive: false,
@@ -318,13 +324,13 @@ describe('Products integration', () => {
       const timestamp = Date.now();
 
       const promoCode = `PROMO-${timestamp}`;
-
       const regularCode = `REGULAR-${timestamp}`;
 
       await productsRepository.save([
         productsRepository.create({
           name: `Promo ${timestamp}`,
           description: 'Promo product',
+          details: '<p>Promo product details</p>',
           price: 10,
           code: promoCode,
           isActive: true,
@@ -334,6 +340,7 @@ describe('Products integration', () => {
         productsRepository.create({
           name: `Regular ${timestamp}`,
           description: 'Regular product',
+          details: '<p>Regular product details</p>',
           price: 10,
           code: regularCode,
           isActive: true,
@@ -363,13 +370,13 @@ describe('Products integration', () => {
       const timestamp = Date.now();
 
       const matchingCode = `PHRASE-${timestamp}`;
-
       const otherCode = `OTHER-${timestamp}`;
 
       await productsRepository.save([
         productsRepository.create({
           name: `Gaming Laptop ${timestamp}`,
           description: 'Gaming laptop',
+          details: '<p>Gaming laptop details</p>',
           price: 100,
           code: matchingCode,
           isActive: true,
@@ -379,6 +386,7 @@ describe('Products integration', () => {
         productsRepository.create({
           name: `Office Monitor ${timestamp}`,
           description: 'Office monitor',
+          details: '<p>Office monitor details</p>',
           price: 100,
           code: otherCode,
           isActive: true,
@@ -407,12 +415,15 @@ describe('Products integration', () => {
 
   describe('product images', () => {
     it('should create product image and persist it', async () => {
+      const timestamp = Date.now();
+
       const product = await productsRepository.save(
         productsRepository.create({
-          name: `Image product ${Date.now()}`,
+          name: `Image product ${timestamp}`,
           description: 'Image test product',
+          details: '<p>Image test product details</p>',
           price: 19.99,
-          code: `IMG-${Date.now()}`,
+          code: `IMG-${timestamp}`,
           isActive: true,
           isPromo: false,
         }),
@@ -434,17 +445,19 @@ describe('Products integration', () => {
       });
 
       expect(savedImage).toBeDefined();
-
       expect(savedImage?.path).toBe('uploads/products/integration.jpg');
     });
 
     it('should remove product images when product is deleted', async () => {
+      const timestamp = Date.now();
+
       const product = await productsRepository.save(
         productsRepository.create({
-          name: `Cascade product ${Date.now()}`,
+          name: `Cascade product ${timestamp}`,
           description: 'Cascade test product',
+          details: '<p>Cascade test product details</p>',
           price: 20,
-          code: `CASCADE-${Date.now()}`,
+          code: `CASCADE-${timestamp}`,
           isActive: true,
           isPromo: false,
         }),
@@ -473,12 +486,15 @@ describe('Products integration', () => {
 
   describe('remove', () => {
     it('should remove product from database', async () => {
+      const timestamp = Date.now();
+
       const product = await productsRepository.save(
         productsRepository.create({
-          name: `Remove product ${Date.now()}`,
+          name: `Remove product ${timestamp}`,
           description: 'Remove test product',
+          details: '<p>Remove test product details</p>',
           price: 10,
-          code: `REMOVE-${Date.now()}`,
+          code: `REMOVE-${timestamp}`,
           isActive: true,
           isPromo: false,
         }),

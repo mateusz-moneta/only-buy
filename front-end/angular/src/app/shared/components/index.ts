@@ -4,5 +4,6 @@ export * from './errors/errors.component';
 export * from './files-uploader/files-uploader.component';
 export * from './input/input.component';
 export * from './paginator/paginator.component';
+export * from './rich-text-editor/rich-text-editor.component';
 export * from './spinner/spinner.component';
 export * from './textarea/textarea.component';

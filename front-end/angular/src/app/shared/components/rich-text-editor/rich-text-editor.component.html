@@ -1,0 +1,16 @@
+<div class="rich-text-editor">
+  @if (label(); as label) {
+    <label>
+      {{ label }}
+    </label>
+  }
+
+  @if (control(); as control) {
+    <quill-editor
+      [modules]="modules()"
+      [placeholder]="placeholder()"
+      (onBlur)="onBlur()"
+      (onContentChanged)="onContentChanged($event)"
+    />
+  }
+</div>

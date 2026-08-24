@@ -2,6 +2,7 @@ import { NgOptimizedImage } from '@angular/common';
 import { Component, OnInit, effect, inject, signal } from '@angular/core';
 import { FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { ProductImage } from '@core/models';
 import { ProductsStore } from '@core/state';
 import {
@@ -9,6 +10,7 @@ import {
   CheckboxComponent,
   FilesUploaderComponent,
   InputComponent,
+  RichTextEditorComponent,
   SpinnerComponent,
   TextareaComponent,
 } from '@shared/components';
@@ -24,8 +26,10 @@ import { ProductForm } from '../shared/models';
     InputComponent,
     NgOptimizedImage,
     ReactiveFormsModule,
+    RichTextEditorComponent,
     SpinnerComponent,
     TextareaComponent,
+    TranslocoPipe,
   ],
   templateUrl: './edit-product.component.html',
   styleUrl: './edit-product.component.scss',
@@ -89,7 +93,7 @@ export class EditProductComponent implements OnInit {
       return;
     }
 
-    const { active, code, description, images, name, price, promo } =
+    const { active, code, description, details, images, name, price, promo } =
       this.form()?.value ?? {};
 
     const { id } = this.product() ?? {};
@@ -107,6 +111,7 @@ export class EditProductComponent implements OnInit {
         code: code ?? '',
         ...(deletedImageIds ? { deletedImageIds } : {}),
         description: description ?? '',
+        details: details ?? '',
         name: name ?? '',
         price: price ?? '0',
         isPromo: promo ?? false,

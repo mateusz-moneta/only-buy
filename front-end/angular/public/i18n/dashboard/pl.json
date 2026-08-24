@@ -1,0 +1,13 @@
+{
+  "emptyState": {
+    "description": "Na liście nie ma żadnych produktów",
+    "title": "Ups… tutaj jest pusto"
+  },
+  "product": {
+    "editProduct": "Edytuj produkt",
+    "removeProduct": "Usuń produkt",
+    "showDetails": "Pokaż szczegóły"
+  },
+  "promo": "Promocja",
+  "search": "Szukaj"
+}

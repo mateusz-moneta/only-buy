@@ -1,22 +1,23 @@
 .rates {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  max-width: 15rem;
+  > div {
+    > button {
+      background: none;
+      border: none;
+      outline: none;
+      padding: 0;
+    }
 
-  > button {
-    background: none;
-    border: none;
-    outline: none;
-    padding: 0;
-  }
+    > span {
+      font-size: 1.2rem;
+    }
 
-  &__item {
-    filter: invert(0.7);
+    .rates__item {
+      filter: invert(0.7);
 
-    &--filled {
-      filter: invert(12%) sepia(139%) saturate(768%) hue-rotate(363deg)
-        brightness(299%) contrast(176%);
+      &--filled {
+        filter: invert(12%) sepia(139%) saturate(768%) hue-rotate(363deg)
+          brightness(299%) contrast(176%);
+      }
     }
   }
 }

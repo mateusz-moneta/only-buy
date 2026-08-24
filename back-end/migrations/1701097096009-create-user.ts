@@ -3,21 +3,21 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 export class CreateUser1701097096009 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-            CREATE TABLE "users" (
-                                     "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
-                                     "username" VARCHAR NOT NULL,
-                                     "email" VARCHAR NOT NULL,
-                                     "password" VARCHAR NOT NULL,
-                                     "createdDate" TIMESTAMP NOT NULL DEFAULT now(),
-                                     "updatedDate" TIMESTAMP NOT NULL DEFAULT now(),
-                                     "roleId" INTEGER NOT NULL,
-                                     "active" BOOLEAN NOT NULL DEFAULT true,
-                                     "avatar" VARCHAR,
-                                     CONSTRAINT "PK_users" PRIMARY KEY ("id"),
-                                     CONSTRAINT "UQ_users_username" UNIQUE ("username"),
-                                     CONSTRAINT "UQ_users_email" UNIQUE ("email")
-            )
-        `);
+        CREATE TABLE "users" (
+                                 "id" UUID NOT NULL DEFAULT uuid_generate_v4(),
+                                 "username" VARCHAR NOT NULL,
+                                 "email" VARCHAR NOT NULL,
+                                 "password" VARCHAR NOT NULL,
+                                 "createdDate" TIMESTAMP NOT NULL DEFAULT now(),
+                                 "updatedDate" TIMESTAMP NOT NULL DEFAULT now(),
+                                 "roleId" INTEGER NOT NULL,
+                                 "active" BOOLEAN NOT NULL DEFAULT true,
+                                 "avatar" VARCHAR,
+                                 CONSTRAINT "PK_users" PRIMARY KEY ("id"),
+                                 CONSTRAINT "UQ_users_username" UNIQUE ("username"),
+                                 CONSTRAINT "UQ_users_email" UNIQUE ("email")
+        )
+    `);
     await queryRunner.query(`
       INSERT INTO users (
         "id",
@@ -38,7 +38,7 @@ export class CreateUser1701097096009 implements MigrationInterface {
         '2024-02-14 19:13:50.909089',
         '2024-02-14 19:13:50.909089',
         2,
-              true,
+        true,
         NULL
       )
     `);

@@ -2,12 +2,14 @@ import { NgOptimizedImage } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { ProductsStore } from '@core/state';
 import {
   ButtonComponent,
   CheckboxComponent,
   FilesUploaderComponent,
   InputComponent,
+  RichTextEditorComponent,
   TextareaComponent,
 } from '@shared/components';
 import { ProductFormBuilder } from '../shared/builders';
@@ -21,7 +23,9 @@ import { ProductFormBuilder } from '../shared/builders';
     InputComponent,
     NgOptimizedImage,
     ReactiveFormsModule,
+    RichTextEditorComponent,
     TextareaComponent,
+    TranslocoPipe,
   ],
   templateUrl: './new-product.component.html',
   styleUrl: './new-product.component.scss',
@@ -49,13 +53,14 @@ export class NewProductComponent {
       return;
     }
 
-    const { active, code, description, images, name, price, promo } =
+    const { active, code, description, details, images, name, price, promo } =
       this.form.value;
 
     this.productsStore.createProduct({
       isActive: active ?? false,
       code: code ?? '',
       description: description ?? '',
+      details: details ?? '',
       name: name ?? '',
       price: price ?? '0',
       isPromo: promo ?? false,

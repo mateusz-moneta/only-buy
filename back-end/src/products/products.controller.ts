@@ -29,7 +29,7 @@ import {
 import { ProductEntity } from './entities';
 import { ProductRatesService, ProductsService } from './services';
 import { RolesGuard } from '../auth/guards';
-import { Admin, CurrentUser } from '../auth/decorators';
+import { Admin, CurrentUser, Public } from '../auth/decorators';
 import { ProductRate } from './models';
 import { Page } from '../shared/models';
 import { JwtPayload } from '../auth/payloads';
@@ -55,6 +55,7 @@ export class ProductsController {
     return this.productsService.createProduct(createProductDto, productImages);
   }
 
+  @Public()
   @Get()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get all products' })
@@ -70,13 +71,13 @@ export class ProductsController {
     @Query('phrase') phrase: string,
     @Query('page') page: number,
     @Query('limit') limit: number,
-    @CurrentUser() { sub: userId }: JwtPayload,
+    @CurrentUser() jwtPayload: JwtPayload,
   ): Promise<Page<Product>> {
     return this.productsService.findAll(
       isActive,
       isPromo,
       phrase,
-      userId,
+      jwtPayload?.sub ?? '',
       page,
       limit,
     );

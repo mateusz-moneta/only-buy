@@ -2,6 +2,7 @@ import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { debounceTime } from 'rxjs';
 import { Product } from '@core/models';
 import { AuthStore, ProductsStore } from '@core/state';
@@ -31,6 +32,7 @@ import {
     SearchComponent,
     SpinnerComponent,
     ReactiveFormsModule,
+    TranslocoPipe,
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
@@ -84,8 +86,6 @@ export class DashboardComponent implements OnInit {
   }
 
   protected onLogout(): void {
-    this.redirectToLoginPage();
-
     this.authStore.logout();
   }
 

@@ -1,38 +1,46 @@
-<main class="container login">
-  <header>
-    <h1>Login</h1>
+<main class="container d-flex flex-column login">
+  <header class="login__header d-flex justify-content-center">
+    <h1>{{ 'login.title' | transloco }}</h1>
   </header>
 
-  <section>
+  <section
+    class="login__content d-flex flex-column justify-content-center flex-grow-1"
+  >
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <div>
         <app-input
+          [label]="'username' | transloco"
+          [placeholder]="'enterUsername' | transloco"
           formControlName="username"
-          label="Username"
-          placeholder="Enter username"
         />
       </div>
 
-      <div class="mt-4">
+      <div class="mt-5">
         <app-input
+          [label]="'password' | transloco"
+          [placeholder]="'enterPassword' | transloco"
           type="password"
           formControlName="password"
-          label="Password"
-          placeholder="Enter password"
         />
       </div>
 
       <div class="mt-5 w-100">
-        <app-button type="submit"> Log in </app-button>
+        <app-button type="submit">
+          {{ 'login.action' | transloco }}
+        </app-button>
       </div>
     </form>
 
     <div class="login__link mt-5">
-      <a routerLink="/register"> Do you want to register? </a>
+      <a routerLink="/register">
+        {{ 'login.doYouWantToRegister' | transloco }}
+      </a>
     </div>
 
     <div class="login__link mt-5">
-      <a routerLink="/forgot-password"> Forgot password? </a>
+      <a routerLink="/forgot-password">
+        {{ 'login.forgotPassword' | transloco }}
+      </a>
     </div>
   </section>
 </main>

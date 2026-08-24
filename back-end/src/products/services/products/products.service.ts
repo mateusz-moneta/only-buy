@@ -19,6 +19,7 @@ import { Page } from '../../../shared/models';
 interface ProductRatingRaw {
   product_id: string;
   averageRating: string | null;
+  ratingCount: string;
   userRating: string | null;
 }
 
@@ -44,6 +45,7 @@ export class ProductsService {
     const product = new ProductEntity({
       name: createProduct.name,
       description: createProduct.description,
+      details: createProduct.details,
       price: parseFloat(createProduct.price),
       code: createProduct.code,
       isActive: createProduct.isActive === 'true',
@@ -270,6 +272,7 @@ export class ProductsService {
       .createQueryBuilder('rate')
       .select('rate.productId', 'product_id')
       .addSelect('AVG(rate.rating)', 'averageRating')
+      .addSelect('COUNT(rate.rating)', 'ratingCount')
       .where('rate.productId IN (:...productIds)', { productIds })
       .groupBy('rate.productId');
 
@@ -281,6 +284,7 @@ export class ProductsService {
       ratingMap.set(row.product_id, {
         product_id: row.product_id,
         averageRating: row.averageRating,
+        ratingCount: row.ratingCount,
         userRating: null,
       });
     }
@@ -303,6 +307,7 @@ export class ProductsService {
         ratingMap.set(row.product_id, {
           product_id: row.product_id,
           averageRating: existing?.averageRating ?? null,
+          ratingCount: existing?.ratingCount ?? '0',
           userRating: String(row.userRating),
         });
       }
@@ -319,19 +324,21 @@ export class ProductsService {
       id: product.id,
       name: product.name,
       description: product.description,
+      details: product.details,
       price: product.price,
       code: product.code,
       isActive: product.isActive,
       isPromo: product.isPromo,
-
       images: product.images.map((image: ProductImageEntity): ProductImage => ({
         id: image.id,
         path: image.path,
       })),
-
       averageRating: Number(rating?.averageRating ?? 0),
-
-      rating: rating?.userRating ? Number(rating.userRating) : null,
+      rating:
+        rating?.userRating !== null && rating?.userRating !== undefined
+          ? Number(rating.userRating)
+          : null,
+      ratingCount: Number(rating?.ratingCount ?? 0),
     };
   }
 }

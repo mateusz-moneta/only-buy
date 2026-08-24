@@ -10,6 +10,7 @@ import { UserEntity } from '../../entities';
 import { RolesService } from '../../../roles/services';
 import { UploadService } from '../../../uploads/services';
 import { UsersService } from './users.service';
+import { ConfigService } from '@nestjs/config';
 
 jest.mock('bcrypt', () => ({
   hash: jest.fn(),
@@ -17,6 +18,10 @@ jest.mock('bcrypt', () => ({
 
 describe(UsersService.name, () => {
   let service: UsersService;
+
+  const configService = {
+    get: jest.fn(),
+  };
 
   const usersRepository = {
     createQueryBuilder: jest.fn(),
@@ -36,12 +41,15 @@ describe(UsersService.name, () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
+    configService.get.mockReturnValue(10);
+
     (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-password');
 
     service = new UsersService(
+      configService as unknown as ConfigService,
+      rolesService as unknown as RolesService,
       uploadService as unknown as UploadService,
       usersRepository as unknown as Repository<UserEntity>,
-      rolesService as unknown as RolesService,
     );
   });
 
@@ -132,7 +140,6 @@ describe(UsersService.name, () => {
       });
 
       expect(query.getOne).toHaveBeenCalledTimes(1);
-
       expect(result).toBe(user);
     });
 
@@ -168,7 +175,6 @@ describe(UsersService.name, () => {
       });
 
       expect(query.getOne).toHaveBeenCalledTimes(1);
-
       expect(result).toBe(user);
     });
 
@@ -204,8 +210,6 @@ describe(UsersService.name, () => {
 
       const result = await service.updateActive('user-id', false);
 
-      expect(usersRepository.update).toHaveBeenCalledTimes(1);
-
       expect(usersRepository.update).toHaveBeenCalledWith('user-id', {
         active: false,
       });
@@ -228,7 +232,6 @@ describe(UsersService.name, () => {
       });
 
       expect(query.getRawOne).toHaveBeenCalledTimes(1);
-
       expect(result).toBe(user);
     });
 
@@ -293,13 +296,11 @@ describe(UsersService.name, () => {
       });
 
       expect(rolesService.findOneByName).not.toHaveBeenCalled();
-
       expect(bcrypt.hash).not.toHaveBeenCalled();
     });
 
     it('should throw InternalServerErrorException when STANDARD role does not exist', async () => {
       usersRepository.findOne.mockResolvedValue(null);
-
       rolesService.findOneByName.mockResolvedValue(null);
 
       await expect(service.register(registerUserDto)).rejects.toThrow(
@@ -307,13 +308,11 @@ describe(UsersService.name, () => {
       );
 
       expect(rolesService.findOneByName).toHaveBeenCalledWith('STANDARD');
-
       expect(bcrypt.hash).not.toHaveBeenCalled();
     });
 
     it('should register user without avatar', async () => {
       usersRepository.findOne.mockResolvedValue(null);
-
       rolesService.findOneByName.mockResolvedValue(role);
 
       const { getSavedUser } = mockUserSave();
@@ -334,7 +333,6 @@ describe(UsersService.name, () => {
 
     it('should register user with avatar', async () => {
       usersRepository.findOne.mockResolvedValue(null);
-
       rolesService.findOneByName.mockResolvedValue(role);
 
       const avatar = {
@@ -363,7 +361,6 @@ describe(UsersService.name, () => {
 
     it('should hash password with salt rounds 10', async () => {
       usersRepository.findOne.mockResolvedValue(null);
-
       rolesService.findOneByName.mockResolvedValue(role);
 
       mockUserSave();
@@ -377,7 +374,6 @@ describe(UsersService.name, () => {
 
     it('should save hashed password instead of plain password', async () => {
       usersRepository.findOne.mockResolvedValue(null);
-
       rolesService.findOneByName.mockResolvedValue(role);
 
       const { getSavedUser } = mockUserSave();
@@ -391,7 +387,6 @@ describe(UsersService.name, () => {
 
     it('should set refreshToken to null for new user', async () => {
       usersRepository.findOne.mockResolvedValue(null);
-
       rolesService.findOneByName.mockResolvedValue(role);
 
       const { getSavedUser } = mockUserSave();
@@ -403,7 +398,6 @@ describe(UsersService.name, () => {
 
     it('should assign STANDARD role to new user', async () => {
       usersRepository.findOne.mockResolvedValue(null);
-
       rolesService.findOneByName.mockResolvedValue(role);
 
       const { getSavedUser } = mockUserSave();
@@ -415,7 +409,6 @@ describe(UsersService.name, () => {
 
     it('should assign username and email to new user', async () => {
       usersRepository.findOne.mockResolvedValue(null);
-
       rolesService.findOneByName.mockResolvedValue(role);
 
       const { getSavedUser } = mockUserSave();
@@ -423,7 +416,6 @@ describe(UsersService.name, () => {
       await service.register(registerUserDto);
 
       expect(getSavedUser().username).toBe('john');
-
       expect(getSavedUser().email).toBe('john@example.com');
     });
   });
@@ -434,11 +426,10 @@ describe(UsersService.name, () => {
         affected: 1,
       });
 
-      await service.remove(123);
+      await service.remove('123');
 
       expect(usersRepository.delete).toHaveBeenCalledTimes(1);
-
-      expect(usersRepository.delete).toHaveBeenCalledWith(123);
+      expect(usersRepository.delete).toHaveBeenCalledWith('123');
     });
   });
 

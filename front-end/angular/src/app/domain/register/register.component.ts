@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { AuthStore } from '@core/state';
 import {
   ButtonComponent,
@@ -17,6 +18,7 @@ import { RegisterFormBuilder } from './builders';
     InputComponent,
     ReactiveFormsModule,
     RouterLink,
+    TranslocoPipe,
   ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',

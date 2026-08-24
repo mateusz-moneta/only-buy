@@ -1,12 +1,17 @@
 <main class="container register">
-  <header class="register__header">
-    <h1>Register</h1>
+  <header class="register__header d-flex justify-content-center">
+    <h1>{{ 'register.title' | transloco }}</h1>
   </header>
 
-  <section class="register__content">
+  <section
+    class="register__content d-flex flex-column justify-content-center flex-grow-1"
+  >
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <div>
         <app-files-uploader
+          [chooseImageMessage]="'filesUploader.chooseImage' | transloco"
+          [emptyMessage]="'filesUploader.noSelected' | transloco"
+          [placeholder]="'filesUploader.selectFile' | transloco"
           (changeFiles)="onFileChange($event)"
           name="Avatar"
         />
@@ -14,45 +19,47 @@
 
       <div class="mt-4">
         <app-input
+          [label]="'username' | transloco"
+          [placeholder]="'enterUsername' | transloco"
           formControlName="username"
-          label="Username"
-          placeholder="Enter username"
         />
       </div>
 
       <div class="mt-4">
         <app-input
+          [label]="'register.email' | transloco"
+          [placeholder]="'register.enterEmail' | transloco"
           formControlName="email"
-          label="E-mail"
-          placeholder="Enter e-mail"
         />
       </div>
 
       <div class="mt-4">
         <app-input
+          [label]="'password' | transloco"
+          [placeholder]="'enterPassword' | transloco"
           type="password"
           formControlName="password"
-          label="Password"
-          placeholder="Enter password"
         />
       </div>
 
       <div class="mt-4">
         <app-input
+          [label]="'register.repeatPassword' | transloco"
+          [placeholder]="'register.enterRepeatPassword' | transloco"
           type="password"
           formControlName="repeatPassword"
-          label="Repeat password"
-          placeholder="Repeat password"
         />
       </div>
 
       <div class="mt-5 w-100">
-        <app-button type="submit"> Register </app-button>
+        <app-button type="submit">
+          {{ 'register.action' | transloco }}
+        </app-button>
       </div>
     </form>
 
     <div class="register__link mt-5 mb-5">
-      <a routerLink="/login"> Do you have an account? </a>
+      <a routerLink="/login"> {{ 'register.doYouHaveAccount' | transloco }} </a>
     </div>
   </section>
 </main>

@@ -65,6 +65,7 @@ describe(ProductsService.name, () => {
     const createProductDto: CreateProductDto = {
       name: 'Product',
       description: 'Description',
+      details: '<p>Details</p>',
       price: '99.99',
       code: 'PRODUCT-001',
       isActive: 'true',
@@ -555,6 +556,7 @@ describe(ProductsService.name, () => {
     const updateDto: UpdateProductDto = {
       name: 'Updated product',
       description: 'Updated description',
+      details: '<p>Updated details</p>',
       price: '149.99',
       code: 'UPDATED-001',
       isActive: 'true',

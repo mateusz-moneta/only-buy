@@ -81,19 +81,20 @@ export class ProductsService {
 
     formData.append('code', payload.code);
     formData.append('description', payload.description);
+    formData.append('details', payload.details);
     formData.append('isActive', String(payload.isActive));
     formData.append('isPromo', String(payload.isPromo));
     formData.append('name', payload.name);
     formData.append('price', payload.price);
 
-    payload.productImages?.forEach((image: File) => {
-      formData.append('productImages', image);
-    });
+    for (const productImage of payload.productImages) {
+      formData.append('productImages', productImage);
+    }
 
     if ('deletedImageIds' in payload) {
-      payload.deletedImageIds?.forEach((id: string) => {
-        formData.append('deletedImageIds', id);
-      });
+      for (const deletedImageId of payload.deletedImageIds ?? []) {
+        formData.append('deletedImageIds', deletedImageId);
+      }
     }
 
     return formData;
