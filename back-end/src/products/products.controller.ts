@@ -83,6 +83,7 @@ export class ProductsController {
     );
   }
 
+  @Public()
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
   @HttpCode(HttpStatus.OK)

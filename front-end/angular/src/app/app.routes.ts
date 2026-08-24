@@ -13,7 +13,6 @@ export const routes: Routes = [
     providers: [provideTranslocoScope('login')],
   },
   {
-    canActivate: [authGuard],
     path: 'products',
     loadChildren: () =>
       import('./domain/products/products.routes').then(

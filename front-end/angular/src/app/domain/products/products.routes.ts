@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { provideTranslocoScope } from '@jsverse/transloco';
+import { authGuard } from '@core/guards';
 
 export const PRODUCTS_ROUTES: Routes = [
   {
@@ -8,6 +9,7 @@ export const PRODUCTS_ROUTES: Routes = [
       import('./new-product/new-product.component').then(
         ({ NewProductComponent }) => NewProductComponent
       ),
+    canActivate: [authGuard],
     providers: [provideTranslocoScope('new-product', 'products')],
   },
   {
@@ -19,6 +21,7 @@ export const PRODUCTS_ROUTES: Routes = [
           import('./edit-product/edit-product.component').then(
             ({ EditProductComponent }) => EditProductComponent
           ),
+        canActivate: [authGuard],
         providers: [provideTranslocoScope('edit-product', 'products')],
       },
       {
