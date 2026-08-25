@@ -25,7 +25,11 @@ export class UsersService {
     private readonly usersRepository: Repository<UserEntity>,
   ) {}
 
-  async findAll(page?: number, limit?: number): Promise<Page<User>> {
+  async findAll(
+    page?: number,
+    limit?: number,
+    username?: string,
+  ): Promise<Page<User>> {
     const query = this.usersRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.role', 'role')
@@ -39,6 +43,12 @@ export class UsersService {
         'user.updatedDate',
         'role.name',
       ]);
+
+    if (username) {
+      query.andWhere('user.username ILIKE :username', {
+        username: `%${username}%`,
+      });
+    }
 
     const defaultLimit = this.configService.get<number>('DEFAULT_LIMIT', 20);
 

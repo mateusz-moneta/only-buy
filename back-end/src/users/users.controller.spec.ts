@@ -39,10 +39,10 @@ describe(UsersController.name, () => {
 
       usersService.findAll.mockResolvedValue(users);
 
-      const result = await controller.findAll(1, 20);
+      const result = await controller.findAll(1, 20, undefined);
 
       expect(usersService.findAll).toHaveBeenCalledTimes(1);
-      expect(usersService.findAll).toHaveBeenCalledWith(1, 20);
+      expect(usersService.findAll).toHaveBeenCalledWith(1, 20, undefined);
 
       expect(result).toBe(users);
     });
@@ -50,10 +50,10 @@ describe(UsersController.name, () => {
     it('should return empty array when there are no users', async () => {
       usersService.findAll.mockResolvedValue([]);
 
-      const result = await controller.findAll(1, 20);
+      const result = await controller.findAll(1, 20, undefined);
 
       expect(usersService.findAll).toHaveBeenCalledTimes(1);
-      expect(usersService.findAll).toHaveBeenCalledWith(1, 20);
+      expect(usersService.findAll).toHaveBeenCalledWith(1, 20, undefined);
 
       expect(result).toEqual([]);
     });
@@ -70,9 +70,9 @@ describe(UsersController.name, () => {
 
       usersService.findAll.mockResolvedValue(users);
 
-      const result = await controller.findAll(2, 10);
+      const result = await controller.findAll(2, 10, undefined);
 
-      expect(usersService.findAll).toHaveBeenCalledWith(2, 10);
+      expect(usersService.findAll).toHaveBeenCalledWith(2, 10, undefined);
       expect(result).toBe(users);
     });
   });

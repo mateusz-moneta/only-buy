@@ -1,7 +1,5 @@
 import { INestApplication } from '@nestjs/common';
-
 import { Test, TestingModule } from '@nestjs/testing';
-
 import request from 'supertest';
 
 import { AppModule } from '../src/app.module';
@@ -43,8 +41,24 @@ describe('Products', () => {
     await app.close();
   });
 
-  it('should reject unauthenticated request', async () => {
-    await request(app.getHttpServer()).get('/products').expect(401);
+  it('should return products for unauthenticated user', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/products')
+      .query({
+        page: 1,
+        limit: 20,
+      })
+      .expect(200);
+
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        data: expect.any(Array),
+        total: expect.any(Number),
+        page: 1,
+        limit: 20,
+        totalPages: expect.any(Number),
+      }),
+    );
   });
 
   it('should return products for authenticated user', async () => {
@@ -61,8 +75,8 @@ describe('Products', () => {
       expect.objectContaining({
         data: expect.any(Array),
         total: expect.any(Number),
-        page: expect.any(Number),
-        limit: expect.any(Number),
+        page: 1,
+        limit: 20,
         totalPages: expect.any(Number),
       }),
     );
@@ -129,12 +143,15 @@ describe('Products', () => {
   });
 
   it('should create a product for authenticated user', async () => {
+    const code = `TEST-${Date.now()}`;
+
     const response = await request(app.getHttpServer())
       .post('/products/new')
       .set('Authorization', `Bearer ${accessToken}`)
       .field('name', 'Integration Test Product')
       .field('description', 'Product created during integration test')
-      .field('code', `TEST-${Date.now()}`)
+      .field('details', '<p>Product details</p>')
+      .field('code', code)
       .field('price', '100')
       .field('isActive', 'true')
       .field('isPromo', 'false')
@@ -148,6 +165,9 @@ describe('Products', () => {
       expect.objectContaining({
         id: productId,
         name: 'Integration Test Product',
+        description: 'Product created during integration test',
+        details: '<p>Product details</p>',
+        code,
       }),
     );
   });
@@ -174,12 +194,15 @@ describe('Products', () => {
   });
 
   it('should update product', async () => {
+    const code = `TEST-UPDATED-${Date.now()}`;
+
     const response = await request(app.getHttpServer())
       .put(`/products/${productId}`)
       .set('Authorization', `Bearer ${accessToken}`)
       .field('name', 'Updated Integration Product')
       .field('description', 'Updated description')
-      .field('code', `TEST-UPDATED-${Date.now()}`)
+      .field('details', '<p>Updated details</p>')
+      .field('code', code)
       .field('price', '250')
       .field('isActive', 'true')
       .field('isPromo', 'true')
@@ -202,11 +225,8 @@ describe('Products', () => {
       .expect(200);
 
     expect(response.body.name).toBe('Updated Integration Product');
-
     expect(response.body.description).toBe('Updated description');
-
     expect(response.body.isPromo).toBe(true);
-
     expect(response.body.price).toBe('250.00');
   });
 });

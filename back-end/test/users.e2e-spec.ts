@@ -10,6 +10,7 @@ describe('Users', () => {
   let adminAccessToken: string;
   let userAccessToken: string;
   let userId: string;
+  let username: string;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -37,7 +38,7 @@ describe('Users', () => {
 
     adminAccessToken = adminLogin.body.accessToken;
 
-    const username = `integration_user_${Date.now()}`;
+    username = `integration_user_${Date.now()}`;
 
     await request(app.getHttpServer())
       .post('/auth/register')
@@ -60,10 +61,15 @@ describe('Users', () => {
 
     const usersResponse = await request(app.getHttpServer())
       .get('/users')
+      .query({
+        page: 1,
+        limit: 100,
+        username,
+      })
       .set('Authorization', `Bearer ${adminAccessToken}`)
       .expect(200);
 
-    const createdUser = usersResponse.body.find(
+    const createdUser = usersResponse.body.data.find(
       (user: any) => user.username === username,
     );
 
@@ -79,21 +85,31 @@ describe('Users', () => {
   it('TS-27 - should return list of users for administrator', async () => {
     const response = await request(app.getHttpServer())
       .get('/users')
+      .query({
+        page: 1,
+        limit: 100,
+      })
       .set('Authorization', `Bearer ${adminAccessToken}`)
       .expect(200);
 
-    expect(Array.isArray(response.body)).toBe(true);
+    expect(Array.isArray(response.body.data)).toBe(true);
 
     expect(response.body).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          id: expect.any(String),
-          username: expect.any(String),
-          email: expect.any(String),
-          role: expect.any(String),
-          active: expect.any(Boolean),
-        }),
-      ]),
+      expect.objectContaining({
+        data: expect.arrayContaining([
+          expect.objectContaining({
+            id: expect.any(String),
+            username: expect.any(String),
+            email: expect.any(String),
+            role: expect.any(String),
+            active: expect.any(Boolean),
+          }),
+        ]),
+        page: 1,
+        limit: 100,
+        total: expect.any(Number),
+        totalPages: expect.any(Number),
+      }),
     );
   });
 

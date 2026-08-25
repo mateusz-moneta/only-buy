@@ -27,6 +27,8 @@ import { Page } from '../shared/models';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @UseGuards(RolesGuard)
+  @Admin()
   @Get()
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'List of users' })
@@ -37,8 +39,9 @@ export class UsersController {
   findAll(
     @Query('page') page: number,
     @Query('limit') limit: number,
+    @Query('username') username?: string,
   ): Promise<Page<User>> {
-    return this.usersService.findAll(page, limit);
+    return this.usersService.findAll(page, limit, username);
   }
 
   @UseGuards(RolesGuard)
