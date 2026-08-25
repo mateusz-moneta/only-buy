@@ -1,16 +1,19 @@
 import {
   BaseEntity,
+  Check,
   Column,
   Entity,
   Index,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Unique,
 } from 'typeorm';
-
 import { ProductEntity } from './product.entity';
 import { UserEntity } from '../../users/entities';
 
 @Entity({ name: 'products_rates' })
+@Unique(['product', 'user'])
+@Check(`"rating" BETWEEN 1 AND 5`)
 export class ProductRateEntity extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;

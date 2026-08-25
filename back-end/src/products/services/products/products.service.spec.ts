@@ -1,23 +1,26 @@
 import { NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
-
+import {
+  AuditAction,
+  AuditEntity,
+  AuditLogsService,
+} from '../../../audit-logs';
 import {
   ProductEntity,
   ProductImageEntity,
   ProductRateEntity,
 } from '../../entities';
-
 import { CreateProductDto, UpdateProductDto } from '../../dto';
-
 import { ProductImagesService } from '../product-images/product-images.service';
-import { UploadService } from '../../../uploads/services';
+import { UploadService } from '../../../uploads';
 import { ProductsService } from './products.service';
 
 describe(ProductsService.name, () => {
   let service: ProductsService;
 
   const productsRepository = {
+    findOne: jest.fn(),
     save: jest.fn(),
     delete: jest.fn(),
     createQueryBuilder: jest.fn(),
@@ -41,14 +44,21 @@ describe(ProductsService.name, () => {
     deleteFile: jest.fn(),
   };
 
+  const auditLogsService = {
+    create: jest.fn(),
+  };
+
   const configService = {
     get: jest.fn((key: string, defaultValue?: number) => defaultValue),
   };
+
+  const userId = 'user-id';
 
   beforeEach(() => {
     jest.clearAllMocks();
 
     service = new ProductsService(
+      auditLogsService as unknown as AuditLogsService,
       configService as unknown as ConfigService,
       productsRepository as unknown as Repository<ProductEntity>,
       productRatesRepository as unknown as Repository<ProductRateEntity>,
@@ -85,7 +95,7 @@ describe(ProductsService.name, () => {
 
       productsRepository.save.mockResolvedValue(savedProduct);
 
-      const result = await service.createProduct(createProductDto, []);
+      const result = await service.createProduct(createProductDto, [], userId);
 
       expect(productsRepository.save).toHaveBeenCalledTimes(1);
 
@@ -99,6 +109,17 @@ describe(ProductsService.name, () => {
       expect(product.isPromo).toBe(false);
 
       expect(productImagesService.createProductImage).not.toHaveBeenCalled();
+
+      expect(auditLogsService.create).toHaveBeenCalledTimes(1);
+
+      expect(auditLogsService.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          action: AuditAction.CREATE,
+          entity: AuditEntity.PRODUCT,
+          entityId: savedProduct.id,
+          userId,
+        }),
+      );
 
       expect(result).toBe(savedProduct);
     });
@@ -117,6 +138,7 @@ describe(ProductsService.name, () => {
           isPromo: 'true',
         },
         [],
+        userId,
       );
 
       const product = productsRepository.save.mock.calls[0][0] as ProductEntity;
@@ -148,7 +170,11 @@ describe(ProductsService.name, () => {
 
       productImagesService.createProductImage.mockResolvedValue(savedImage);
 
-      const result = await service.createProduct(createProductDto, [file]);
+      const result = await service.createProduct(
+        createProductDto,
+        [file],
+        userId,
+      );
 
       expect(uploadService.saveFile).toHaveBeenCalledWith(
         file,
@@ -161,8 +187,16 @@ describe(ProductsService.name, () => {
       });
 
       expect(savedImage.product).toBe(savedProduct);
-
       expect(savedImage.save).toHaveBeenCalledTimes(1);
+
+      expect(auditLogsService.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          action: AuditAction.CREATE,
+          entity: AuditEntity.PRODUCT,
+          entityId: savedProduct.id,
+          userId,
+        }),
+      );
 
       expect(result).toBe(savedProduct);
     });
@@ -185,13 +219,7 @@ describe(ProductsService.name, () => {
 
       query.getManyAndCount.mockResolvedValue([products, 2]);
 
-      const ratingQuery = createRatingQueryBuilder();
-
-      ratingQuery.getRawMany.mockResolvedValue([]);
-
-      productRatesRepository.createQueryBuilder.mockReturnValueOnce(
-        ratingQuery,
-      );
+      mockNoRatings();
 
       const result = await service.findAll();
 
@@ -202,7 +230,6 @@ describe(ProductsService.name, () => {
       expect(query.getManyAndCount).toHaveBeenCalledTimes(1);
 
       expect(query.skip).toHaveBeenCalledWith(0);
-
       expect(query.take).toHaveBeenCalledWith(20);
 
       expect(result.data).toHaveLength(2);
@@ -220,12 +247,11 @@ describe(ProductsService.name, () => {
 
       query.getManyAndCount.mockResolvedValue([[], 100]);
 
-      mockProductRatings();
+      mockNoRatings();
 
       await service.findAll(undefined, undefined, undefined, undefined, 2, 20);
 
       expect(query.skip).toHaveBeenCalledWith(20);
-
       expect(query.take).toHaveBeenCalledWith(20);
     });
 
@@ -234,7 +260,7 @@ describe(ProductsService.name, () => {
 
       query.getManyAndCount.mockResolvedValue([[], 0]);
 
-      mockProductRatings();
+      mockNoRatings();
 
       await service.findAll();
 
@@ -246,7 +272,7 @@ describe(ProductsService.name, () => {
 
       query.getManyAndCount.mockResolvedValue([[], 0]);
 
-      mockProductRatings();
+      mockNoRatings();
 
       await service.findAll(undefined, undefined, undefined, undefined, 1, 500);
 
@@ -258,7 +284,7 @@ describe(ProductsService.name, () => {
 
       query.getManyAndCount.mockResolvedValue([[], 0]);
 
-      mockProductRatings();
+      mockNoRatings();
 
       await service.findAll(undefined, undefined, undefined, undefined, 0, 20);
 
@@ -270,7 +296,7 @@ describe(ProductsService.name, () => {
 
       query.getManyAndCount.mockResolvedValue([[], 0]);
 
-      mockProductRatings();
+      mockNoRatings();
 
       await service.findAll(true);
 
@@ -287,7 +313,7 @@ describe(ProductsService.name, () => {
 
       query.getManyAndCount.mockResolvedValue([[], 0]);
 
-      mockProductRatings();
+      mockNoRatings();
 
       await service.findAll(undefined, true);
 
@@ -304,7 +330,7 @@ describe(ProductsService.name, () => {
 
       query.getManyAndCount.mockResolvedValue([[], 0]);
 
-      mockProductRatings();
+      mockNoRatings();
 
       await service.findAll(undefined, undefined, 'Laptop');
 
@@ -321,7 +347,7 @@ describe(ProductsService.name, () => {
 
       query.getManyAndCount.mockResolvedValue([[], 0]);
 
-      mockProductRatings();
+      mockNoRatings();
 
       await service.findAll(true, false, 'Laptop');
 
@@ -356,27 +382,7 @@ describe(ProductsService.name, () => {
 
       query.getManyAndCount.mockResolvedValue([[product], 1]);
 
-      const averageQuery = createRatingQueryBuilder();
-
-      averageQuery.getRawMany.mockResolvedValue([
-        {
-          product_id: 'product-id',
-          averageRating: '4.5',
-        },
-      ]);
-
-      const userQuery = createRatingQueryBuilder();
-
-      userQuery.getRawMany.mockResolvedValue([
-        {
-          product_id: 'product-id',
-          userRating: 5,
-        },
-      ]);
-
-      productRatesRepository.createQueryBuilder
-        .mockReturnValueOnce(averageQuery)
-        .mockReturnValueOnce(userQuery);
+      mockRatingsWithUserRating('4.5', 5);
 
       const result = await service.findAll(
         undefined,
@@ -385,12 +391,14 @@ describe(ProductsService.name, () => {
         'user-id',
       );
 
+      const userQuery =
+        productRatesRepository.createQueryBuilder.mock.results[1].value;
+
       expect(userQuery.andWhere).toHaveBeenCalledWith('rate.userId = :userId', {
         userId: 'user-id',
       });
 
       expect(result.data[0].rating).toBe(5);
-
       expect(result.data[0].averageRating).toBe(4.5);
     });
 
@@ -428,7 +436,6 @@ describe(ProductsService.name, () => {
       );
 
       expect(result.data[0].rating).toBeNull();
-
       expect(result.data[0].averageRating).toBe(4.5);
     });
 
@@ -441,18 +448,11 @@ describe(ProductsService.name, () => {
 
       query.getManyAndCount.mockResolvedValue([[product], 1]);
 
-      const averageQuery = createRatingQueryBuilder();
-
-      averageQuery.getRawMany.mockResolvedValue([]);
-
-      productRatesRepository.createQueryBuilder.mockReturnValueOnce(
-        averageQuery,
-      );
+      mockNoRatings();
 
       const result = await service.findAll();
 
       expect(result.data[0].averageRating).toBe(0);
-
       expect(result.data[0].rating).toBeNull();
     });
   });
@@ -468,13 +468,7 @@ describe(ProductsService.name, () => {
 
       query.getOne.mockResolvedValue(product);
 
-      const ratingQuery = createRatingQueryBuilder();
-
-      ratingQuery.getRawMany.mockResolvedValue([]);
-
-      productRatesRepository.createQueryBuilder.mockReturnValueOnce(
-        ratingQuery,
-      );
+      mockNoRatings();
 
       const result = await service.findOneById('product-id');
 
@@ -483,9 +477,7 @@ describe(ProductsService.name, () => {
       });
 
       expect(result?.id).toBe('product-id');
-
       expect(result?.name).toBe('Product');
-
       expect(result?.averageRating).toBe(0);
       expect(result?.rating).toBeNull();
     });
@@ -509,27 +501,7 @@ describe(ProductsService.name, () => {
 
       query.getOne.mockResolvedValue(product);
 
-      const averageQuery = createRatingQueryBuilder();
-
-      averageQuery.getRawMany.mockResolvedValue([
-        {
-          product_id: 'product-id',
-          averageRating: '4',
-        },
-      ]);
-
-      const userQuery = createRatingQueryBuilder();
-
-      userQuery.getRawMany.mockResolvedValue([
-        {
-          product_id: 'product-id',
-          userRating: 5,
-        },
-      ]);
-
-      productRatesRepository.createQueryBuilder
-        .mockReturnValueOnce(averageQuery)
-        .mockReturnValueOnce(userQuery);
+      mockRatingsWithUserRating('4', 5);
 
       const result = await service.findOneById('product-id', 'user-id');
 
@@ -539,16 +511,48 @@ describe(ProductsService.name, () => {
   });
 
   describe('remove', () => {
-    it('should delete product by id', async () => {
+    it('should delete product by id and create audit log', async () => {
+      const product = createProductEntity({
+        id: 'product-id',
+      });
+
+      productsRepository.findOne.mockResolvedValue(product);
       productsRepository.delete.mockResolvedValue({
         affected: 1,
       });
 
-      await service.remove('product-id');
+      await service.remove('product-id', userId);
 
-      expect(productsRepository.delete).toHaveBeenCalledTimes(1);
+      expect(productsRepository.findOne).toHaveBeenCalledWith({
+        where: {
+          id: 'product-id',
+        },
+      });
 
       expect(productsRepository.delete).toHaveBeenCalledWith('product-id');
+
+      expect(auditLogsService.create).toHaveBeenCalledTimes(1);
+
+      expect(auditLogsService.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          action: AuditAction.DELETE,
+          entity: AuditEntity.PRODUCT,
+          entityId: 'product-id',
+          userId,
+        }),
+      );
+    });
+
+    it('should throw NotFoundException when product does not exist', async () => {
+      productsRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.remove('unknown-id', userId)).rejects.toThrow(
+        new NotFoundException('Product not found'),
+      );
+
+      expect(productsRepository.delete).not.toHaveBeenCalled();
+
+      expect(auditLogsService.create).not.toHaveBeenCalled();
     });
   });
 
@@ -601,77 +605,13 @@ describe(ProductsService.name, () => {
       return query;
     };
 
-    const mockAverageRating = (
-      productId = 'product-id',
-      averageRating = '4.5',
-    ) => {
-      const ratingQuery = createRatingQueryBuilder();
-
-      ratingQuery.getRawMany.mockResolvedValue([
-        {
-          product_id: productId,
-          averageRating,
-        },
-      ]);
-
-      productRatesRepository.createQueryBuilder.mockReturnValueOnce(
-        ratingQuery,
-      );
-
-      return ratingQuery;
-    };
-
-    const mockNoRatings = () => {
-      const ratingQuery = createRatingQueryBuilder();
-
-      ratingQuery.getRawMany.mockResolvedValue([]);
-
-      productRatesRepository.createQueryBuilder.mockReturnValueOnce(
-        ratingQuery,
-      );
-
-      return ratingQuery;
-    };
-
-    const mockRatingsWithUserRating = (
-      averageRating = '4.5',
-      userRating = 5,
-    ) => {
-      const averageQuery = createRatingQueryBuilder();
-
-      averageQuery.getRawMany.mockResolvedValue([
-        {
-          product_id: 'product-id',
-          averageRating,
-        },
-      ]);
-
-      const userQuery = createRatingQueryBuilder();
-
-      userQuery.getRawMany.mockResolvedValue([
-        {
-          product_id: 'product-id',
-          userRating,
-        },
-      ]);
-
-      productRatesRepository.createQueryBuilder
-        .mockReturnValueOnce(averageQuery)
-        .mockReturnValueOnce(userQuery);
-
-      return {
-        averageQuery,
-        userQuery,
-      };
-    };
-
     it('should throw NotFoundException when product does not exist', async () => {
       const queryRunner = createQueryRunner();
 
       queryRunner.manager.findOne.mockResolvedValue(null);
 
       await expect(
-        service.updateProduct('product-id', updateDto, []),
+        service.updateProduct('product-id', updateDto, [], userId),
       ).rejects.toThrow(new NotFoundException('Product not found'));
 
       expect(queryRunner.manager.findOne).toHaveBeenCalledWith(ProductEntity, {
@@ -687,6 +627,8 @@ describe(ProductsService.name, () => {
       expect(queryRunner.commitTransaction).not.toHaveBeenCalled();
 
       expect(queryRunner.release).toHaveBeenCalledTimes(1);
+
+      expect(auditLogsService.create).not.toHaveBeenCalled();
     });
 
     it('should update product and commit transaction', async () => {
@@ -717,10 +659,14 @@ describe(ProductsService.name, () => {
       queryRunner.manager.save.mockResolvedValue(product);
 
       mockResultProduct(updatedProduct);
+      mockNoRatings();
 
-      mockAverageRating('product-id', '4.5');
-
-      const result = await service.updateProduct('product-id', updateDto, []);
+      const result = await service.updateProduct(
+        'product-id',
+        updateDto,
+        [],
+        userId,
+      );
 
       expect(product.name).toBe('Updated product');
 
@@ -731,6 +677,7 @@ describe(ProductsService.name, () => {
       expect(product.code).toBe('UPDATED-001');
 
       expect(product.isActive).toBe(true);
+
       expect(product.isPromo).toBe(false);
 
       expect(queryRunner.manager.save).toHaveBeenCalledWith(product);
@@ -745,7 +692,7 @@ describe(ProductsService.name, () => {
 
       expect(result.name).toBe('Updated product');
 
-      expect(result.averageRating).toBe(4.5);
+      expect(result.averageRating).toBe(0);
 
       expect(result.rating).toBeNull();
     });
@@ -762,14 +709,13 @@ describe(ProductsService.name, () => {
       queryRunner.manager.save.mockResolvedValue(product);
 
       mockResultProduct(product);
-
       mockRatingsWithUserRating('4.5', 5);
 
       const result = await service.updateProduct(
         'product-id',
         updateDto,
         [],
-        'user-id',
+        userId,
       );
 
       expect(result.averageRating).toBe(4.5);
@@ -812,7 +758,6 @@ describe(ProductsService.name, () => {
       queryRunner.manager.createQueryBuilder.mockReturnValue(imageQuery);
 
       mockResultProduct(product);
-
       mockNoRatings();
 
       await service.updateProduct(
@@ -822,11 +767,7 @@ describe(ProductsService.name, () => {
           deletedImageIds: ['image-id'],
         },
         [],
-      );
-
-      expect(queryRunner.manager.createQueryBuilder).toHaveBeenCalledWith(
-        ProductImageEntity,
-        'image',
+        userId,
       );
 
       expect(imageQuery.where).toHaveBeenCalledWith('image.id IN (:...ids)', {
@@ -880,7 +821,6 @@ describe(ProductsService.name, () => {
       queryRunner.manager.createQueryBuilder.mockReturnValue(imageQuery);
 
       mockResultProduct(product);
-
       mockNoRatings();
 
       await service.updateProduct(
@@ -890,6 +830,7 @@ describe(ProductsService.name, () => {
           deletedImageIds: ['image-id'],
         },
         [],
+        userId,
       );
 
       expect(imageQuery.where).toHaveBeenCalledWith('image.id IN (:...ids)', {
@@ -927,10 +868,9 @@ describe(ProductsService.name, () => {
       uploadService.saveFile.mockReturnValue('/images/new-image.png');
 
       mockResultProduct(product);
-
       mockNoRatings();
 
-      await service.updateProduct('product-id', updateDto, [file]);
+      await service.updateProduct('product-id', updateDto, [file], userId);
 
       expect(uploadService.saveFile).toHaveBeenCalledWith(
         file,
@@ -978,10 +918,9 @@ describe(ProductsService.name, () => {
         .mockReturnValueOnce('/images/image-2.png');
 
       mockResultProduct(product);
-
       mockNoRatings();
 
-      await service.updateProduct('product-id', updateDto, files);
+      await service.updateProduct('product-id', updateDto, files, userId);
 
       expect(uploadService.saveFile).toHaveBeenCalledTimes(2);
 
@@ -997,7 +936,7 @@ describe(ProductsService.name, () => {
         'product-images/product-id',
       );
 
-      expect(queryRunner.manager.save).toHaveBeenCalledTimes(3);
+      expect(queryRunner.manager.save).toHaveBeenCalledTimes(4);
     });
 
     it('should rollback transaction and delete created files when update fails', async () => {
@@ -1021,7 +960,7 @@ describe(ProductsService.name, () => {
       uploadService.saveFile.mockReturnValue('/images/created.png');
 
       await expect(
-        service.updateProduct('product-id', updateDto, [file]),
+        service.updateProduct('product-id', updateDto, [file], userId),
       ).rejects.toThrow('Database error');
 
       expect(queryRunner.rollbackTransaction).toHaveBeenCalledTimes(1);
@@ -1033,6 +972,8 @@ describe(ProductsService.name, () => {
       );
 
       expect(queryRunner.release).toHaveBeenCalledTimes(1);
+
+      expect(auditLogsService.create).not.toHaveBeenCalled();
     });
 
     it('should rollback transaction when deleting image fails', async () => {
@@ -1075,6 +1016,7 @@ describe(ProductsService.name, () => {
             deletedImageIds: ['image-id'],
           },
           [],
+          userId,
         ),
       ).rejects.toThrow('Delete image failed');
 
@@ -1085,6 +1027,8 @@ describe(ProductsService.name, () => {
       expect(uploadService.deleteFile).not.toHaveBeenCalled();
 
       expect(queryRunner.release).toHaveBeenCalledTimes(1);
+
+      expect(auditLogsService.create).not.toHaveBeenCalled();
     });
 
     it('should delete files only after successful transaction commit', async () => {
@@ -1116,7 +1060,6 @@ describe(ProductsService.name, () => {
       queryRunner.manager.createQueryBuilder.mockReturnValue(imageQuery);
 
       mockResultProduct(product);
-
       mockNoRatings();
 
       await service.updateProduct(
@@ -1126,6 +1069,7 @@ describe(ProductsService.name, () => {
           deletedImageIds: ['image-id'],
         },
         [],
+        userId,
       );
 
       expect(queryRunner.commitTransaction).toHaveBeenCalledTimes(1);
@@ -1141,39 +1085,6 @@ describe(ProductsService.name, () => {
         uploadService.deleteFile.mock.invocationCallOrder[0];
 
       expect(commitOrder).toBeLessThan(deleteFileOrder);
-    });
-
-    it('should delete created files when final product query fails', async () => {
-      const product = createProductEntity({
-        id: 'product-id',
-      });
-
-      const file = {
-        originalname: 'image.png',
-        mimetype: 'image/png',
-      } as Express.Multer.File;
-
-      const queryRunner = createQueryRunner();
-
-      queryRunner.manager.findOne.mockResolvedValue(product);
-
-      queryRunner.manager.save
-        .mockResolvedValueOnce(product)
-        .mockRejectedValueOnce(new Error('Database error'));
-
-      uploadService.saveFile.mockReturnValue('/images/created.png');
-
-      await expect(
-        service.updateProduct('product-id', updateDto, [file]),
-      ).rejects.toThrow('Database error');
-
-      expect(queryRunner.rollbackTransaction).toHaveBeenCalledTimes(1);
-
-      expect(uploadService.deleteFile).toHaveBeenCalledWith(
-        '/images/created.png',
-      );
-
-      expect(queryRunner.release).toHaveBeenCalledTimes(1);
     });
 
     it('should throw NotFoundException when updated product cannot be found after commit', async () => {
@@ -1192,7 +1103,7 @@ describe(ProductsService.name, () => {
       resultQuery.getOne.mockResolvedValue(null);
 
       await expect(
-        service.updateProduct('product-id', updateDto, []),
+        service.updateProduct('product-id', updateDto, [], userId),
       ).rejects.toThrow(new NotFoundException('Product not found'));
 
       expect(queryRunner.commitTransaction).toHaveBeenCalledTimes(1);
@@ -1200,6 +1111,8 @@ describe(ProductsService.name, () => {
       expect(queryRunner.rollbackTransaction).toHaveBeenCalledTimes(1);
 
       expect(queryRunner.release).toHaveBeenCalledTimes(1);
+
+      expect(auditLogsService.create).not.toHaveBeenCalled();
     });
 
     it('should release query runner when update fails', async () => {
@@ -1210,7 +1123,7 @@ describe(ProductsService.name, () => {
       );
 
       await expect(
-        service.updateProduct('product-id', updateDto, []),
+        service.updateProduct('product-id', updateDto, [], userId),
       ).rejects.toThrow('Database error');
 
       expect(queryRunner.rollbackTransaction).toHaveBeenCalledTimes(1);
@@ -1234,11 +1147,12 @@ describe(ProductsService.name, () => {
       mockResultProduct(product);
       mockNoRatings();
 
-      await service.updateProduct('product-id', updateDto, []);
+      await service.updateProduct('product-id', updateDto, [], userId);
 
       expect(queryRunner.release).toHaveBeenCalledTimes(1);
     });
   });
+
   describe('rating calculations', () => {
     it('should calculate average rating in SQL', async () => {
       const product = createProductEntity({
@@ -1249,24 +1163,22 @@ describe(ProductsService.name, () => {
 
       query.getManyAndCount.mockResolvedValue([[product], 1]);
 
-      const averageQuery = createRatingQueryBuilder();
+      const ratingQuery = createRatingQueryBuilder();
 
-      averageQuery.getRawMany.mockResolvedValue([
+      ratingQuery.getRawMany.mockResolvedValue([
         {
           product_id: 'product-id',
           averageRating: '4.33',
         },
       ]);
 
-      productRatesRepository.createQueryBuilder.mockReturnValueOnce(
-        averageQuery,
-      );
+      productRatesRepository.createQueryBuilder.mockReturnValue(ratingQuery);
 
       const result = await service.findAll();
 
       expect(result.data[0].averageRating).toBe(4.33);
 
-      expect(averageQuery.groupBy).toHaveBeenCalledWith('rate.productId');
+      expect(ratingQuery.groupBy).toHaveBeenCalledWith('rate.productId');
     });
 
     it('should calculate user rating using userId', async () => {
@@ -1278,37 +1190,20 @@ describe(ProductsService.name, () => {
 
       query.getManyAndCount.mockResolvedValue([[product], 1]);
 
-      const averageQuery = createRatingQueryBuilder();
-
-      averageQuery.getRawMany.mockResolvedValue([
-        {
-          product_id: 'product-id',
-          averageRating: '4',
-        },
-      ]);
-
-      const userQuery = createRatingQueryBuilder();
-
-      userQuery.getRawMany.mockResolvedValue([
-        {
-          product_id: 'product-id',
-          userRating: 5,
-        },
-      ]);
-
-      productRatesRepository.createQueryBuilder
-        .mockReturnValueOnce(averageQuery)
-        .mockReturnValueOnce(userQuery);
+      mockRatingsWithUserRating('4', 5);
 
       const result = await service.findAll(
         undefined,
         undefined,
         undefined,
-        'user-id',
+        userId,
       );
 
+      const userQuery =
+        productRatesRepository.createQueryBuilder.mock.results[1].value;
+
       expect(userQuery.andWhere).toHaveBeenCalledWith('rate.userId = :userId', {
-        userId: 'user-id',
+        userId,
       });
 
       expect(result.data[0].rating).toBe(5);
@@ -1318,6 +1213,9 @@ describe(ProductsService.name, () => {
   function createProductQueryBuilder() {
     const query = {
       leftJoinAndSelect: jest.fn(),
+      leftJoin: jest.fn(),
+      select: jest.fn(),
+      addSelect: jest.fn(),
       where: jest.fn(),
       andWhere: jest.fn(),
       skip: jest.fn(),
@@ -1327,6 +1225,12 @@ describe(ProductsService.name, () => {
     };
 
     query.leftJoinAndSelect.mockReturnValue(query);
+
+    query.leftJoin.mockReturnValue(query);
+
+    query.select.mockReturnValue(query);
+
+    query.addSelect.mockReturnValue(query);
 
     query.where.mockReturnValue(query);
 
@@ -1345,15 +1249,22 @@ describe(ProductsService.name, () => {
     const query = {
       select: jest.fn(),
       addSelect: jest.fn(),
+      leftJoin: jest.fn(),
+      innerJoin: jest.fn(),
       where: jest.fn(),
       andWhere: jest.fn(),
       groupBy: jest.fn(),
       getRawMany: jest.fn(),
+      getRawOne: jest.fn(),
     };
 
     query.select.mockReturnValue(query);
 
     query.addSelect.mockReturnValue(query);
+
+    query.leftJoin.mockReturnValue(query);
+
+    query.innerJoin.mockReturnValue(query);
 
     query.where.mockReturnValue(query);
 
@@ -1364,8 +1275,39 @@ describe(ProductsService.name, () => {
     return query;
   }
 
-  function mockProductRatings(): void {
-    productRatesRepository.createQueryBuilder.mockReset();
+  function mockNoRatings(): void {
+    const query = createRatingQueryBuilder();
+
+    query.getRawMany.mockResolvedValue([]);
+
+    productRatesRepository.createQueryBuilder.mockReturnValue(query);
+  }
+
+  function mockRatingsWithUserRating(
+    averageRating: string,
+    userRating: number,
+  ): void {
+    const averageQuery = createRatingQueryBuilder();
+
+    averageQuery.getRawMany.mockResolvedValue([
+      {
+        product_id: 'product-id',
+        averageRating,
+      },
+    ]);
+
+    const userQuery = createRatingQueryBuilder();
+
+    userQuery.getRawMany.mockResolvedValue([
+      {
+        product_id: 'product-id',
+        userRating,
+      },
+    ]);
+
+    productRatesRepository.createQueryBuilder
+      .mockReturnValueOnce(averageQuery)
+      .mockReturnValueOnce(userQuery);
   }
 
   function createProductEntity(
@@ -1381,6 +1323,9 @@ describe(ProductsService.name, () => {
       isPromo: false,
       images: [],
       rates: [],
+      createdBy: {
+        id: userId,
+      },
       ...overrides,
     } as ProductEntity;
   }

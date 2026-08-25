@@ -2,14 +2,11 @@ import {
   Body,
   ClassSerializerInterceptor,
   Controller,
-  DefaultValuePipe,
   Get,
   HttpCode,
   HttpStatus,
   Param,
-  ParseIntPipe,
   Patch,
-  Put,
   Query,
   UseGuards,
   UseInterceptors,
@@ -17,10 +14,11 @@ import {
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from './models';
 import { UsersService } from './services';
-import { Admin } from '../auth/decorators';
+import { Admin, CurrentUser } from '../auth/decorators';
 import { RolesGuard } from '../auth/guards';
 import { UpdateActiveStateDto } from './dto';
 import { Page } from '../shared/models';
+import { JwtPayload } from '../auth/payloads';
 
 @ApiTags('users')
 @Controller('users')
@@ -59,7 +57,12 @@ export class UsersController {
   update(
     @Param('id') id: string,
     @Body() updateActiveStateDto: UpdateActiveStateDto,
+    @CurrentUser() { sub: userId }: JwtPayload,
   ): Promise<User> {
-    return this.usersService.updateActive(id, updateActiveStateDto.active);
+    return this.usersService.updateActive(
+      id,
+      updateActiveStateDto.active,
+      userId,
+    );
   }
 }

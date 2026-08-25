@@ -1,6 +1,7 @@
 import {
   ConflictException,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
@@ -8,8 +9,14 @@ import * as bcrypt from 'bcrypt';
 
 import { RegisterUserDto } from '../../dto';
 import { UserEntity } from '../../entities';
-import { RolesService } from '../../../roles/services';
-import { UploadService } from '../../../uploads/services';
+import { RolesService } from '../../../roles';
+import { RoleEntity } from '../../../roles/entities';
+import { UploadService } from '../../../uploads';
+import {
+  AuditAction,
+  AuditEntity,
+  AuditLogsService,
+} from '../../../audit-logs';
 import { UsersService } from './users.service';
 
 jest.mock('bcrypt', () => ({
@@ -21,6 +28,10 @@ describe(UsersService.name, () => {
 
   const configService = {
     get: jest.fn(),
+  };
+
+  const auditLogsService = {
+    create: jest.fn(),
   };
 
   const usersRepository = {
@@ -51,13 +62,20 @@ describe(UsersService.name, () => {
           return 100;
         }
 
+        if (key === 'BCRYPT_SALT_ROUNDS') {
+          return 10;
+        }
+
         return defaultValue;
       },
     );
 
-    (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-password');
+    (bcrypt.hash as jest.MockedFunction<typeof bcrypt.hash>).mockResolvedValue(
+      'hashed-password' as never,
+    );
 
     service = new UsersService(
+      auditLogsService as unknown as AuditLogsService,
       configService as unknown as ConfigService,
       rolesService as unknown as RolesService,
       uploadService as unknown as UploadService,
@@ -76,26 +94,26 @@ describe(UsersService.name, () => {
   describe('findAll', () => {
     it('should return all users', async () => {
       const users = [
-        {
+        createUserEntity({
           id: 'user-1',
           username: 'john',
           email: 'john@example.com',
           active: true,
           avatar: null,
-          role: {
+          role: createRoleEntity({
             name: 'STANDARD',
-          },
-        },
-        {
+          }),
+        }),
+        createUserEntity({
           id: 'user-2',
           username: 'admin',
           email: 'admin@example.com',
           active: true,
           avatar: '/avatars/admin.png',
-          role: {
+          role: createRoleEntity({
             name: 'ADMIN',
-          },
-        },
+          }),
+        }),
       ];
 
       const query = createQueryBuilder();
@@ -121,31 +139,37 @@ describe(UsersService.name, () => {
 
       expect(query.skip).toHaveBeenCalledWith(0);
       expect(query.take).toHaveBeenCalledWith(20);
+
       expect(query.getManyAndCount).toHaveBeenCalledTimes(1);
 
-      expect(result.total).toBe(2);
-      expect(result.page).toBe(1);
-      expect(result.limit).toBe(20);
-      expect(result.totalPages).toBe(1);
-
-      expect(result.data).toEqual([
-        expect.objectContaining({
-          id: 'user-1',
-          username: 'john',
-          email: 'john@example.com',
-          active: true,
-          avatar: null,
-          role: 'STANDARD',
-        }),
-        expect.objectContaining({
-          id: 'user-2',
-          username: 'admin',
-          email: 'admin@example.com',
-          active: true,
-          avatar: '/avatars/admin.png',
-          role: 'ADMIN',
-        }),
-      ]);
+      expect(result).toEqual({
+        data: [
+          {
+            id: 'user-1',
+            active: true,
+            avatar: null,
+            username: 'john',
+            email: 'john@example.com',
+            role: 'STANDARD',
+            createdDate: users[0].createdDate,
+            updatedDate: users[0].updatedDate,
+          },
+          {
+            id: 'user-2',
+            active: true,
+            avatar: '/avatars/admin.png',
+            username: 'admin',
+            email: 'admin@example.com',
+            role: 'ADMIN',
+            createdDate: users[1].createdDate,
+            updatedDate: users[1].updatedDate,
+          },
+        ],
+        total: 2,
+        page: 1,
+        limit: 20,
+        totalPages: 1,
+      });
     });
 
     it('should return empty array when there are no users', async () => {
@@ -157,7 +181,6 @@ describe(UsersService.name, () => {
 
       expect(query.skip).toHaveBeenCalledWith(0);
       expect(query.take).toHaveBeenCalledWith(20);
-      expect(query.getManyAndCount).toHaveBeenCalledTimes(1);
 
       expect(result).toEqual({
         data: [],
@@ -170,16 +193,11 @@ describe(UsersService.name, () => {
 
     it('should calculate pagination offset', async () => {
       const users = [
-        {
+        createUserEntity({
           id: 'user-11',
           username: 'user11',
           email: 'user11@example.com',
-          active: true,
-          avatar: null,
-          role: {
-            name: 'STANDARD',
-          },
-        },
+        }),
       ];
 
       const query = createQueryBuilder();
@@ -196,16 +214,42 @@ describe(UsersService.name, () => {
       expect(result.limit).toBe(10);
       expect(result.totalPages).toBe(3);
 
-      expect(result.data).toEqual([
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0]).toEqual(
         expect.objectContaining({
           id: 'user-11',
           username: 'user11',
           email: 'user11@example.com',
           active: true,
-          avatar: null,
           role: 'STANDARD',
         }),
-      ]);
+      );
+    });
+
+    it('should filter users by username', async () => {
+      const users = [
+        createUserEntity({
+          id: 'user-1',
+          username: 'john',
+          email: 'john@example.com',
+        }),
+      ];
+
+      const query = createQueryBuilder();
+
+      query.getManyAndCount.mockResolvedValue([users, 1]);
+
+      const result = await service.findAll(1, 20, 'john');
+
+      expect(query.andWhere).toHaveBeenCalledWith(
+        'user.username ILIKE :username',
+        {
+          username: '%john%',
+        },
+      );
+
+      expect(result.data).toHaveLength(1);
+      expect(result.data[0].username).toBe('john');
     });
   });
 
@@ -283,8 +327,22 @@ describe(UsersService.name, () => {
   });
 
   describe('updateActive', () => {
-    it('should update user active status', async () => {
-      const user = {
+    it('should deactivate user and create audit log', async () => {
+      const user = createUserEntity({
+        id: 'user-id',
+        username: 'john',
+        active: true,
+      });
+
+      usersRepository.findOne.mockResolvedValue(user);
+
+      usersRepository.update.mockResolvedValue({
+        affected: 1,
+      });
+
+      const query = createQueryBuilder();
+
+      const updatedUser = {
         id: 'user-id',
         username: 'john',
         email: 'john@example.com',
@@ -293,64 +351,128 @@ describe(UsersService.name, () => {
         role: 'STANDARD',
       };
 
-      const query = createQueryBuilder();
+      query.getRawOne.mockResolvedValue(updatedUser);
 
-      usersRepository.update.mockResolvedValue({
-        affected: 1,
+      const changedBy = 'admin-id';
+
+      const result = await service.updateActive('user-id', false, changedBy);
+
+      expect(usersRepository.findOne).toHaveBeenCalledWith({
+        where: {
+          id: 'user-id',
+        },
       });
-
-      query.getRawOne.mockResolvedValue(user);
-
-      const result = await service.updateActive('user-id', false);
 
       expect(usersRepository.update).toHaveBeenCalledWith('user-id', {
         active: false,
       });
 
-      expect(query.leftJoin).toHaveBeenCalledWith('user.role', 'role');
+      expect(auditLogsService.create).toHaveBeenCalledTimes(1);
 
-      expect(query.select).toHaveBeenCalledWith([
-        'user.active AS active',
-        'user.avatar AS avatar',
-        'user.id AS id',
-        'user.username AS username',
-        'user.email AS email',
-        'user.createdDate AS "createdDate"',
-        'user.updatedDate AS "updatedDate"',
-        'role.name AS role',
-      ]);
-
-      expect(query.where).toHaveBeenCalledWith('user.id = :id', {
-        id: 'user-id',
+      expect(auditLogsService.create).toHaveBeenCalledWith({
+        action: AuditAction.UPDATE,
+        entity: AuditEntity.USER,
+        entityId: 'user-id',
+        userId: changedBy,
+        oldValue: {
+          active: true,
+        },
+        newValue: {
+          active: false,
+        },
       });
 
-      expect(query.getRawOne).toHaveBeenCalledTimes(1);
-
-      expect(result).toBe(user);
+      expect(result).toBe(updatedUser);
     });
 
-    it('should activate user', async () => {
-      const user = {
+    it('should activate user and create audit log', async () => {
+      const user = createUserEntity({
         id: 'user-id',
         username: 'john',
-        active: true,
-      };
+        active: false,
+      });
 
-      const query = createQueryBuilder();
+      usersRepository.findOne.mockResolvedValue(user);
 
       usersRepository.update.mockResolvedValue({
         affected: 1,
       });
 
-      query.getRawOne.mockResolvedValue(user);
+      const query = createQueryBuilder();
 
-      const result = await service.updateActive('user-id', true);
+      const updatedUser = {
+        id: 'user-id',
+        username: 'john',
+        email: 'john@example.com',
+        active: true,
+        avatar: null,
+        role: 'STANDARD',
+      };
+
+      query.getRawOne.mockResolvedValue(updatedUser);
+
+      const changedBy = 'admin-id';
+
+      const result = await service.updateActive('user-id', true, changedBy);
 
       expect(usersRepository.update).toHaveBeenCalledWith('user-id', {
         active: true,
       });
 
-      expect(result).toBe(user);
+      expect(auditLogsService.create).toHaveBeenCalledWith({
+        action: AuditAction.UPDATE,
+        entity: AuditEntity.USER,
+        entityId: 'user-id',
+        userId: changedBy,
+        oldValue: {
+          active: false,
+        },
+        newValue: {
+          active: true,
+        },
+      });
+
+      expect(result).toBe(updatedUser);
+    });
+
+    it('should not create audit log when active status does not change', async () => {
+      const user = createUserEntity({
+        id: 'user-id',
+        active: true,
+      });
+
+      usersRepository.findOne.mockResolvedValue(user);
+
+      usersRepository.update.mockResolvedValue({
+        affected: 1,
+      });
+
+      const query = createQueryBuilder();
+
+      query.getRawOne.mockResolvedValue({
+        id: 'user-id',
+        active: true,
+      });
+
+      await service.updateActive('user-id', true, 'admin-id');
+
+      expect(usersRepository.update).toHaveBeenCalledWith('user-id', {
+        active: true,
+      });
+
+      expect(auditLogsService.create).not.toHaveBeenCalled();
+    });
+
+    it('should throw NotFoundException when user does not exist', async () => {
+      usersRepository.findOne.mockResolvedValue(null);
+
+      await expect(
+        service.updateActive('unknown-id', true, 'admin-id'),
+      ).rejects.toThrow(new NotFoundException('User not found'));
+
+      expect(usersRepository.update).not.toHaveBeenCalled();
+
+      expect(auditLogsService.create).not.toHaveBeenCalled();
     });
   });
 
@@ -361,10 +483,7 @@ describe(UsersService.name, () => {
       password: 'password123',
     };
 
-    const role = {
-      id: 'role-id',
-      name: 'STANDARD',
-    } as any;
+    const role = createRoleEntity();
 
     it('should throw ConflictException when user already exists', async () => {
       const existingUser = createUserEntity({
@@ -413,7 +532,7 @@ describe(UsersService.name, () => {
 
       rolesService.findOneByName.mockResolvedValue(role);
 
-      const { getSavedUser } = mockUserSave();
+      const savedUser = mockUserSave();
 
       const result = await service.register(registerUserDto);
 
@@ -421,7 +540,9 @@ describe(UsersService.name, () => {
 
       expect(uploadService.saveFile).not.toHaveBeenCalled();
 
-      expect(getSavedUser()).toBeDefined();
+      expect(savedUser().password).toBe('hashed-password');
+
+      expect(savedUser().avatar).toBeNull();
 
       expect(result).toEqual({
         email: 'john@example.com',
@@ -442,7 +563,7 @@ describe(UsersService.name, () => {
 
       uploadService.saveFile.mockReturnValue('uploads/avatars/avatar.png');
 
-      const { getSavedUser } = mockUserSave();
+      const savedUser = mockUserSave();
 
       const result = await service.register(registerUserDto, avatar);
 
@@ -450,7 +571,7 @@ describe(UsersService.name, () => {
 
       expect(uploadService.saveFile).toHaveBeenCalledWith(avatar, 'avatars');
 
-      expect(getSavedUser().avatar).toBe('uploads/avatars/avatar.png');
+      expect(savedUser().avatar).toBe('uploads/avatars/avatar.png');
 
       expect(result).toEqual({
         email: 'john@example.com',
@@ -458,7 +579,7 @@ describe(UsersService.name, () => {
       });
     });
 
-    it('should hash password with salt rounds 10', async () => {
+    it('should hash password with configured salt rounds', async () => {
       usersRepository.findOne.mockResolvedValue(null);
 
       rolesService.findOneByName.mockResolvedValue(role);
@@ -477,13 +598,13 @@ describe(UsersService.name, () => {
 
       rolesService.findOneByName.mockResolvedValue(role);
 
-      const { getSavedUser } = mockUserSave();
+      const savedUser = mockUserSave();
 
       await service.register(registerUserDto);
 
-      expect(getSavedUser().password).toBe('hashed-password');
+      expect(savedUser().password).toBe('hashed-password');
 
-      expect(getSavedUser().password).not.toBe('password123');
+      expect(savedUser().password).not.toBe('password123');
     });
 
     it('should set refreshToken to null for new user', async () => {
@@ -491,11 +612,11 @@ describe(UsersService.name, () => {
 
       rolesService.findOneByName.mockResolvedValue(role);
 
-      const { getSavedUser } = mockUserSave();
+      const savedUser = mockUserSave();
 
       await service.register(registerUserDto);
 
-      expect(getSavedUser().refreshToken).toBeNull();
+      expect(savedUser().refreshToken).toBeNull();
     });
 
     it('should assign STANDARD role to new user', async () => {
@@ -503,11 +624,11 @@ describe(UsersService.name, () => {
 
       rolesService.findOneByName.mockResolvedValue(role);
 
-      const { getSavedUser } = mockUserSave();
+      const savedUser = mockUserSave();
 
       await service.register(registerUserDto);
 
-      expect(getSavedUser().role).toBe(role);
+      expect(savedUser().role).toBe(role);
     });
 
     it('should assign username and email to new user', async () => {
@@ -515,27 +636,80 @@ describe(UsersService.name, () => {
 
       rolesService.findOneByName.mockResolvedValue(role);
 
-      const { getSavedUser } = mockUserSave();
+      const savedUser = mockUserSave();
 
       await service.register(registerUserDto);
 
-      expect(getSavedUser().username).toBe('john');
-
-      expect(getSavedUser().email).toBe('john@example.com');
+      expect(savedUser().username).toBe('john');
+      expect(savedUser().email).toBe('john@example.com');
     });
   });
 
   describe('remove', () => {
-    it('should remove user by id', async () => {
+    it('should remove user and create audit log', async () => {
+      const user = createUserEntity({
+        id: 'user-id',
+        username: 'john',
+        email: 'john@example.com',
+        active: true,
+        avatar: null,
+        role: createRoleEntity({
+          name: 'STANDARD',
+        }),
+      });
+
+      usersRepository.findOne.mockResolvedValue(user);
+
       usersRepository.delete.mockResolvedValue({
         affected: 1,
       });
 
-      await service.remove('123');
+      const changedBy = 'admin-id';
+
+      await service.remove('user-id', changedBy);
+
+      expect(usersRepository.findOne).toHaveBeenCalledWith({
+        where: {
+          id: 'user-id',
+        },
+        relations: {
+          role: true,
+        },
+      });
+
+      expect(auditLogsService.create).toHaveBeenCalledTimes(1);
+
+      expect(auditLogsService.create).toHaveBeenCalledWith({
+        action: AuditAction.DELETE,
+        entity: AuditEntity.USER,
+        entityId: 'user-id',
+        userId: changedBy,
+        oldValue: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          active: user.active,
+          avatar: user.avatar,
+          role: user.role?.name ?? null,
+        },
+        newValue: null,
+      });
 
       expect(usersRepository.delete).toHaveBeenCalledTimes(1);
 
-      expect(usersRepository.delete).toHaveBeenCalledWith('123');
+      expect(usersRepository.delete).toHaveBeenCalledWith('user-id');
+    });
+
+    it('should throw NotFoundException when user does not exist', async () => {
+      usersRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.remove('unknown-id', 'admin-id')).rejects.toThrow(
+        new NotFoundException('User not found'),
+      );
+
+      expect(auditLogsService.create).not.toHaveBeenCalled();
+
+      expect(usersRepository.delete).not.toHaveBeenCalled();
     });
   });
 
@@ -545,11 +719,10 @@ describe(UsersService.name, () => {
       leftJoin: jest.fn(),
       select: jest.fn(),
       where: jest.fn(),
-
+      andWhere: jest.fn(),
       skip: jest.fn(),
       take: jest.fn(),
       getManyAndCount: jest.fn(),
-
       getOne: jest.fn(),
       getRawOne: jest.fn(),
     };
@@ -557,13 +730,10 @@ describe(UsersService.name, () => {
     query.leftJoinAndSelect.mockReturnValue(query);
 
     query.leftJoin.mockReturnValue(query);
-
     query.select.mockReturnValue(query);
-
     query.where.mockReturnValue(query);
-
+    query.andWhere.mockReturnValue(query);
     query.skip.mockReturnValue(query);
-
     query.take.mockReturnValue(query);
 
     usersRepository.createQueryBuilder.mockReturnValue(query);
@@ -571,9 +741,7 @@ describe(UsersService.name, () => {
     return query;
   }
 
-  function mockUserSave(): {
-    getSavedUser: () => UserEntity;
-  } {
+  function mockUserSave(): () => UserEntity {
     let savedUser: UserEntity | undefined;
 
     jest.spyOn(UserEntity.prototype, 'save').mockImplementation(function (
@@ -584,15 +752,21 @@ describe(UsersService.name, () => {
       return Promise.resolve(this);
     });
 
-    return {
-      getSavedUser: () => {
-        if (!savedUser) {
-          throw new Error('User was not saved');
-        }
+    return () => {
+      if (!savedUser) {
+        throw new Error('User was not saved');
+      }
 
-        return savedUser;
-      },
+      return savedUser;
     };
+  }
+
+  function createRoleEntity(overrides: Partial<RoleEntity> = {}): RoleEntity {
+    return {
+      id: 'role-id',
+      name: 'STANDARD',
+      ...overrides,
+    } as RoleEntity;
   }
 
   function createUserEntity(overrides: Partial<UserEntity> = {}): UserEntity {
@@ -604,8 +778,8 @@ describe(UsersService.name, () => {
       avatar: null,
       active: true,
       refreshToken: null,
-      role: {} as UserEntity['role'],
+      role: createRoleEntity(),
       ...overrides,
-    } as unknown as UserEntity;
+    } as UserEntity;
   }
 });

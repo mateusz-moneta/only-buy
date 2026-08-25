@@ -2,22 +2,29 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import 'multer';
 import { RegisterUserDto } from '../../dto';
-import { RolesService } from '../../../roles/services';
+import { RolesService } from '../../../roles';
 import { UserEntity } from '../../entities';
 import { RegisterUser, User } from '../../models';
-import { UploadService } from '../../../uploads/services';
+import { UploadService } from '../../../uploads';
 import { ConfigService } from '@nestjs/config';
 import { Page } from '../../../shared/models';
+import {
+  AuditLogsService,
+  AuditAction,
+  AuditEntity,
+} from '../../../audit-logs';
 
 @Injectable()
 export class UsersService {
   constructor(
+    private readonly auditLogsService: AuditLogsService,
     private readonly configService: ConfigService,
     private readonly rolesService: RolesService,
     private readonly uploadService: UploadService,
@@ -100,10 +107,39 @@ export class UsersService {
       .getOne();
   }
 
-  async updateActive(id: string, active: boolean): Promise<User> {
+  async updateActive(
+    id: string,
+    active: boolean,
+    changedBy: string,
+  ): Promise<User> {
+    const user = await this.usersRepository.findOne({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const oldActive = user.active;
+
     await this.usersRepository.update(id, {
       active,
     });
+
+    if (oldActive !== active) {
+      await this.auditLogsService.create({
+        action: AuditAction.UPDATE,
+        entity: AuditEntity.USER,
+        entityId: id,
+        userId: changedBy,
+        oldValue: {
+          active: oldActive,
+        },
+        newValue: {
+          active,
+        },
+      });
+    }
 
     return this.usersRepository
       .createQueryBuilder('user')
@@ -143,6 +179,7 @@ export class UsersService {
     }
 
     const saltRounds = this.configService.get<number>('BCRYPT_SALT_ROUNDS', 10);
+
     const hash = await bcrypt.hash(password, 10);
 
     const user = new UserEntity({
@@ -162,7 +199,34 @@ export class UsersService {
     };
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: string, changedBy: string): Promise<void> {
+    const user = await this.usersRepository.findOne({
+      where: { id },
+      relations: {
+        role: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    await this.auditLogsService.create({
+      action: AuditAction.DELETE,
+      entity: AuditEntity.USER,
+      entityId: id,
+      userId: changedBy,
+      oldValue: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        active: user.active,
+        avatar: user.avatar,
+        role: user.role?.name,
+      },
+      newValue: null,
+    });
+
     await this.usersRepository.delete(id);
   }
 }

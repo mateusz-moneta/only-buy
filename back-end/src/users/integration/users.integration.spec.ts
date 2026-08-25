@@ -2,20 +2,18 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { Repository } from 'typeorm';
-
 import { UsersService } from '../services';
-import { RolesService } from '../../roles/services';
-import { UploadService } from '../../uploads/services';
-
+import { RolesService } from '../../roles';
+import { UploadService } from '../../uploads';
 import { RefreshTokenEntity, UserEntity } from '../entities';
-
 import { RoleEntity } from '../../roles/entities';
-
 import {
   ProductEntity,
   ProductImageEntity,
   ProductRateEntity,
 } from '../../products/entities';
+import { AuditLogsService, AuditAction, AuditEntity } from '../../audit-logs';
+import { AuditLogEntity } from '../../audit-logs/entities';
 
 describe('Users integration', () => {
   let module: TestingModule;
@@ -25,6 +23,9 @@ describe('Users integration', () => {
 
   let usersRepository: Repository<UserEntity>;
   let rolesRepository: Repository<RoleEntity>;
+  let auditLogsRepository: Repository<AuditLogEntity>;
+
+  let auditUserId: string;
 
   beforeAll(async () => {
     module = await Test.createTestingModule({
@@ -52,12 +53,15 @@ describe('Users integration', () => {
           RefreshTokenEntity,
           RoleEntity,
           UserEntity,
+          AuditLogEntity,
         ]),
       ],
 
       providers: [
         RolesService,
         UsersService,
+        AuditLogsService,
+
         {
           provide: UploadService,
           useValue: {
@@ -80,7 +84,29 @@ describe('Users integration', () => {
       getRepositoryToken(RoleEntity),
     );
 
+    auditLogsRepository = module.get<Repository<AuditLogEntity>>(
+      getRepositoryToken(AuditLogEntity),
+    );
+
     await createStandardRole();
+
+    /*
+     * Create a real user which will be used
+     * as the actor in audit logs.
+     */
+    const username = `audit-user-${Date.now()}`;
+
+    await usersService.register({
+      username,
+      email: `${username}@test.pl`,
+      password: 'Password123!',
+    });
+
+    const auditUser = await usersService.findOneByUsername(username);
+
+    expect(auditUser).toBeDefined();
+
+    auditUserId = auditUser!.id;
   }, 30000);
 
   afterAll(async () => {
@@ -153,6 +179,7 @@ describe('Users integration', () => {
 
     it('should paginate users', async () => {
       const firstUsername = `integration-${Date.now()}-1`;
+
       const secondUsername = `integration-${Date.now()}-2`;
 
       await usersService.register({
@@ -334,7 +361,7 @@ describe('Users integration', () => {
   });
 
   describe('updateActive', () => {
-    it('should update user active state in database', async () => {
+    it('should update user active state and create audit log', async () => {
       const username = `integration-${Date.now()}`;
 
       await usersService.register({
@@ -347,7 +374,11 @@ describe('Users integration', () => {
 
       expect(user).toBeDefined();
 
-      const result = await usersService.updateActive(user!.id, false);
+      const result = await usersService.updateActive(
+        user!.id,
+        false,
+        auditUserId,
+      );
 
       expect(result).toBeDefined();
       expect(result.username).toBe(username);
@@ -356,9 +387,35 @@ describe('Users integration', () => {
       const updatedUser = await usersService.findOneByUsername(username);
 
       expect(updatedUser?.active).toBe(false);
+
+      const auditLog = await auditLogsRepository.findOne({
+        where: {
+          entity: AuditEntity.USER,
+          entityId: user!.id,
+          action: AuditAction.UPDATE,
+        },
+        order: {
+          createdDate: 'DESC',
+        },
+      });
+
+      expect(auditLog).toBeDefined();
+      expect(auditLog?.userId).toBe(auditUserId);
+
+      expect(auditLog?.oldValue).toEqual(
+        expect.objectContaining({
+          active: true,
+        }),
+      );
+
+      expect(auditLog?.newValue).toEqual(
+        expect.objectContaining({
+          active: false,
+        }),
+      );
     });
 
-    it('should activate inactive user', async () => {
+    it('should activate inactive user and create audit log', async () => {
       const username = `integration-${Date.now()}`;
 
       await usersService.register({
@@ -371,20 +428,50 @@ describe('Users integration', () => {
 
       expect(user).toBeDefined();
 
-      await usersService.updateActive(user!.id, false);
+      await usersService.updateActive(user!.id, false, auditUserId);
 
-      const result = await usersService.updateActive(user!.id, true);
+      const result = await usersService.updateActive(
+        user!.id,
+        true,
+        auditUserId,
+      );
 
       expect(result.active).toBe(true);
 
       const updatedUser = await usersService.findOneByUsername(username);
 
       expect(updatedUser?.active).toBe(true);
+
+      const auditLog = await auditLogsRepository.findOne({
+        where: {
+          entity: AuditEntity.USER,
+          entityId: user!.id,
+          action: AuditAction.UPDATE,
+        },
+        order: {
+          createdDate: 'DESC',
+        },
+      });
+
+      expect(auditLog).toBeDefined();
+      expect(auditLog?.userId).toBe(auditUserId);
+
+      expect(auditLog?.oldValue).toEqual(
+        expect.objectContaining({
+          active: false,
+        }),
+      );
+
+      expect(auditLog?.newValue).toEqual(
+        expect.objectContaining({
+          active: true,
+        }),
+      );
     });
   });
 
   describe('remove', () => {
-    it('should remove user from database', async () => {
+    it('should remove user and create audit log', async () => {
       const username = `integration-${Date.now()}`;
 
       await usersService.register({
@@ -397,11 +484,36 @@ describe('Users integration', () => {
 
       expect(user).toBeDefined();
 
-      await usersService.remove(user!.id);
+      await usersService.remove(user.id, auditUserId);
 
       const result = await usersService.findOneByUsername(username);
 
       expect(result).toBeNull();
+
+      const auditLog = await auditLogsRepository.findOne({
+        where: {
+          entity: AuditEntity.USER,
+          entityId: user.id,
+          action: AuditAction.DELETE,
+        },
+        order: {
+          createdDate: 'DESC',
+        },
+      });
+
+      expect(auditLog).toBeDefined();
+      expect(auditLog?.userId).toBe(auditUserId);
+
+      expect(auditLog?.oldValue).toEqual(
+        expect.objectContaining({
+          id: user.id,
+          username,
+          email: `${username}@test.pl`,
+          active: true,
+        }),
+      );
+
+      expect(auditLog?.newValue).toBeNull();
     });
   });
 });

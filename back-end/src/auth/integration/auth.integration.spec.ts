@@ -6,15 +6,17 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuthService } from '../services';
 import { RefreshTokenService, UsersService } from '../../users/services';
-import { RolesService } from '../../roles/services';
-import { RefreshTokenEntity, UserEntity } from '../../users/entities';
-import { RoleEntity } from '../../roles/entities';
-import { UploadService } from '../../uploads/services';
+import { RolesService } from '../../roles';
+import { RefreshTokenEntity, UserEntity } from '../../users';
+import { UploadService } from '../../uploads';
 import {
   ProductEntity,
   ProductImageEntity,
   ProductRateEntity,
 } from '../../products/entities';
+import { RoleEntity } from '../../roles/entities';
+import { AuditLogEntity } from '../../audit-logs/entities';
+import { AuditLogsService } from '../../audit-logs';
 
 describe('Auth integration', () => {
   let module: TestingModule;
@@ -45,6 +47,7 @@ describe('Auth integration', () => {
           synchronize: true,
         }),
         TypeOrmModule.forFeature([
+          AuditLogEntity,
           ProductImageEntity,
           ProductEntity,
           ProductRateEntity,
@@ -61,6 +64,12 @@ describe('Auth integration', () => {
         RefreshTokenService,
         RolesService,
         UsersService,
+        {
+          provide: AuditLogsService,
+          useValue: {
+            create: jest.fn(),
+          },
+        },
         {
           provide: UploadService,
           useValue: {
@@ -168,7 +177,7 @@ describe('Auth integration', () => {
 
       expect(user).toBeDefined();
 
-      await usersService.updateActive(user!.id, false);
+      await usersService.updateActive(user.id, false, 'user-id');
 
       await expect(
         authService.login({

@@ -2,19 +2,22 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-
 import { CreateProductDto, UpdateProductDto } from '../../dto';
 import {
   ProductEntity,
   ProductImageEntity,
   ProductRateEntity,
 } from '../../entities';
-
-import { UploadService } from '../../../uploads/services';
+import { UploadService } from '../../../uploads';
 import { ProductImagesService } from '../product-images/product-images.service';
-
 import { Product, ProductImage } from '../../models';
 import { Page } from '../../../shared/models';
+import {
+  AuditLogsService,
+  AuditAction,
+  AuditEntity,
+} from '../../../audit-logs';
+import { AuditLogEntity } from '../../../audit-logs/entities';
 
 interface ProductRatingRaw {
   product_id: string;
@@ -26,14 +29,12 @@ interface ProductRatingRaw {
 @Injectable()
 export class ProductsService {
   constructor(
+    private readonly auditLogsService: AuditLogsService,
     private readonly configService: ConfigService,
-
     @InjectRepository(ProductEntity)
     private readonly productsRepository: Repository<ProductEntity>,
-
     @InjectRepository(ProductRateEntity)
     private readonly productRatesRepository: Repository<ProductRateEntity>,
-
     private readonly productImagesService: ProductImagesService,
     private readonly uploadService: UploadService,
   ) {}
@@ -41,6 +42,7 @@ export class ProductsService {
   async createProduct(
     createProduct: CreateProductDto,
     productImages: Express.Multer.File[],
+    userId?: string,
   ): Promise<ProductEntity> {
     const product = new ProductEntity({
       name: createProduct.name,
@@ -53,6 +55,23 @@ export class ProductsService {
     });
 
     const savedProduct = await this.productsRepository.save(product);
+
+    if (userId) {
+      await this.auditLogsService.create({
+        action: AuditAction.CREATE,
+        entity: AuditEntity.PRODUCT,
+        entityId: savedProduct.id,
+        userId,
+        newValue: {
+          name: savedProduct.name,
+          description: savedProduct.description,
+          price: savedProduct.price,
+          code: savedProduct.code,
+          isActive: savedProduct.isActive,
+          isPromo: savedProduct.isPromo,
+        },
+      });
+    }
 
     if (productImages?.length) {
       await Promise.all(
@@ -145,8 +164,33 @@ export class ProductsService {
     return this.mapProduct(product, ratingMap.get(id));
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: string, userId?: string): Promise<void> {
+    const product = await this.productsRepository.findOne({
+      where: { id },
+    });
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
     await this.productsRepository.delete(id);
+
+    if (userId) {
+      await this.auditLogsService.create({
+        action: AuditAction.DELETE,
+        entity: AuditEntity.PRODUCT,
+        entityId: id,
+        userId,
+        oldValue: {
+          name: product.name,
+          description: product.description,
+          price: product.price,
+          code: product.code,
+          isActive: product.isActive,
+          isPromo: product.isPromo,
+        },
+      });
+    }
   }
 
   async updateProduct(
@@ -172,6 +216,15 @@ export class ProductsService {
       if (!product) {
         throw new NotFoundException('Product not found');
       }
+
+      const oldValue = {
+        name: product.name,
+        description: product.description,
+        price: product.price,
+        code: product.code,
+        isActive: product.isActive,
+        isPromo: product.isPromo,
+      };
 
       product.name = updateProduct.name;
       product.description = updateProduct.description;
@@ -222,6 +275,26 @@ export class ProductsService {
 
           await queryRunner.manager.save(image);
         }
+      }
+
+      const newValue = {
+        name: savedProduct.name,
+        description: savedProduct.description,
+        price: savedProduct.price,
+        code: savedProduct.code,
+        isActive: savedProduct.isActive,
+        isPromo: savedProduct.isPromo,
+      };
+
+      if (userId && JSON.stringify(oldValue) !== JSON.stringify(newValue)) {
+        await queryRunner.manager.save(AuditLogEntity, {
+          action: AuditAction.UPDATE,
+          entity: AuditEntity.PRODUCT,
+          entityId: savedProduct.id,
+          userId,
+          oldValue,
+          newValue,
+        });
       }
 
       await queryRunner.commitTransaction();

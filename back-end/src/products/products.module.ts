@@ -16,10 +16,12 @@ import {
 } from './services';
 import { UsersModule } from '../users';
 import { UploadsModule } from '../uploads';
+import { AuditLogsModule } from '../audit-logs';
 
 @Module({
   controllers: [ProductsController],
   imports: [
+    AuditLogsModule,
     MulterModule.register(),
     TypeOrmModule.forFeature([
       ProductEntity,

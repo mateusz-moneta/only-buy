@@ -51,8 +51,13 @@ export class ProductsController {
   create(
     @Body() createProductDto: CreateProductDto,
     @UploadedFiles() productImages: Express.Multer.File[],
+    @CurrentUser() { sub: userId }: JwtPayload,
   ): Promise<ProductEntity> {
-    return this.productsService.createProduct(createProductDto, productImages);
+    return this.productsService.createProduct(
+      createProductDto,
+      productImages,
+      userId,
+    );
   }
 
   @Public()
@@ -118,8 +123,11 @@ export class ProductsController {
     type: 'Product',
   })
   @ApiParam({ name: 'id' })
-  remove(@Param('id') id: string): Promise<void> {
-    return this.productsService.remove(id);
+  remove(
+    @Param('id') id: string,
+    @CurrentUser() { sub: userId }: JwtPayload,
+  ): Promise<void> {
+    return this.productsService.remove(id, userId);
   }
 
   @UseGuards(RolesGuard)

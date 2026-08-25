@@ -16,6 +16,7 @@ import { ProductEntity } from './entities';
 import { JwtPayload } from '../auth/payloads';
 import { Product } from './models';
 import { Page } from '../shared/models';
+import { Role } from '../users/models';
 
 describe(ProductsController.name, () => {
   let controller: ProductsController;
@@ -31,6 +32,12 @@ describe(ProductsController.name, () => {
   const productRatesService = {
     createProductRate: jest.fn(),
     updateProductRate: jest.fn(),
+  };
+
+  const user: JwtPayload = {
+    sub: 'user-id',
+    username: 'john',
+    role: 'STANDARD',
   };
 
   beforeEach(() => {
@@ -57,11 +64,7 @@ describe(ProductsController.name, () => {
         isPromo: 'false',
       } as CreateProductDto;
 
-      const productImages = [
-        {
-          originalname: 'image.png',
-        },
-      ] as Express.Multer.File[];
+      const productImages: Express.Multer.File[] = [];
 
       const product = {
         id: 'product-id',
@@ -70,13 +73,14 @@ describe(ProductsController.name, () => {
 
       productsService.createProduct.mockResolvedValue(product);
 
-      const result = await controller.create(dto, productImages);
+      const result = await controller.create(dto, productImages, user);
 
       expect(productsService.createProduct).toHaveBeenCalledTimes(1);
 
       expect(productsService.createProduct).toHaveBeenCalledWith(
         dto,
         productImages,
+        'user-id',
       );
 
       expect(result).toBe(product);
@@ -98,19 +102,19 @@ describe(ProductsController.name, () => {
 
       productsService.createProduct.mockResolvedValue(product);
 
-      const result = await controller.create(dto, []);
+      const result = await controller.create(dto, [], user);
 
-      expect(productsService.createProduct).toHaveBeenCalledWith(dto, []);
+      expect(productsService.createProduct).toHaveBeenCalledWith(
+        dto,
+        [],
+        'user-id',
+      );
 
       expect(result).toBe(product);
     });
   });
 
   describe('findAll', () => {
-    const user: JwtPayload = {
-      sub: 'user-id',
-    } as JwtPayload;
-
     const page: Page<Product> = {
       data: [
         {
@@ -203,10 +207,6 @@ describe(ProductsController.name, () => {
   });
 
   describe('find', () => {
-    const user: JwtPayload = {
-      sub: 'user-id',
-    } as JwtPayload;
-
     it('should return product', async () => {
       const product = {
         id: 'product-id',
@@ -245,21 +245,20 @@ describe(ProductsController.name, () => {
     it('should remove product', async () => {
       productsService.remove.mockResolvedValue(undefined);
 
-      const result = await controller.remove('product-id');
+      const result = await controller.remove('product-id', user);
 
       expect(productsService.remove).toHaveBeenCalledTimes(1);
 
-      expect(productsService.remove).toHaveBeenCalledWith('product-id');
+      expect(productsService.remove).toHaveBeenCalledWith(
+        'product-id',
+        'user-id',
+      );
 
       expect(result).toBeUndefined();
     });
   });
 
   describe('update', () => {
-    const user: JwtPayload = {
-      sub: 'user-id',
-    } as JwtPayload;
-
     const dto = {
       name: 'Updated product',
       description: 'Updated description',
@@ -271,11 +270,7 @@ describe(ProductsController.name, () => {
     } as UpdateProductDto;
 
     it('should update product', async () => {
-      const productImages = [
-        {
-          originalname: 'new-image.png',
-        },
-      ] as Express.Multer.File[];
+      const productImages: Express.Multer.File[] = [];
 
       const product = {
         id: 'product-id',
@@ -324,15 +319,11 @@ describe(ProductsController.name, () => {
   });
 
   describe('createRate', () => {
-    const user: JwtPayload = {
-      sub: 'user-id',
-    } as JwtPayload;
-
     it('should create product rate', async () => {
-      const dto = {
+      const dto: CreateProductRateDto = {
         productId: 'product-id',
         rating: 5,
-      } as CreateProductRateDto;
+      };
 
       const productRate = {
         rating: 5,
@@ -355,15 +346,11 @@ describe(ProductsController.name, () => {
   });
 
   describe('updateProductRate', () => {
-    const user: JwtPayload = {
-      sub: 'user-id',
-    } as JwtPayload;
-
     it('should update product rate', async () => {
-      const dto = {
+      const dto: UpdateProductRateDto = {
         productId: 'product-id',
         rating: 4,
-      } as UpdateProductRateDto;
+      };
 
       const productRate = {
         rating: 4,

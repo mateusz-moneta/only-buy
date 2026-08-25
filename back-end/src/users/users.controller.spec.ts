@@ -1,6 +1,7 @@
 import { UsersController } from './users.controller';
 import { UsersService } from './services';
 import { User } from './models';
+import { JwtPayload } from '../auth/payloads';
 
 describe(UsersController.name, () => {
   let controller: UsersController;
@@ -72,12 +73,20 @@ describe(UsersController.name, () => {
 
       const result = await controller.findAll(2, 10, undefined);
 
+      expect(usersService.findAll).toHaveBeenCalledTimes(1);
       expect(usersService.findAll).toHaveBeenCalledWith(2, 10, undefined);
+
       expect(result).toBe(users);
     });
   });
 
   describe('update', () => {
+    const currentUser: JwtPayload = {
+      sub: 'admin-id',
+      username: 'admin',
+      role: 'ADMIN',
+    };
+
     it('should activate user', async () => {
       const id = 'user-id';
 
@@ -94,11 +103,19 @@ describe(UsersController.name, () => {
 
       usersService.updateActive.mockResolvedValue(user);
 
-      const result = await controller.update(id, updateActiveStateDto);
+      const result = await controller.update(
+        id,
+        updateActiveStateDto,
+        currentUser,
+      );
 
       expect(usersService.updateActive).toHaveBeenCalledTimes(1);
 
-      expect(usersService.updateActive).toHaveBeenCalledWith(id, true);
+      expect(usersService.updateActive).toHaveBeenCalledWith(
+        id,
+        true,
+        currentUser.sub,
+      );
 
       expect(result).toBe(user);
     });
@@ -119,11 +136,19 @@ describe(UsersController.name, () => {
 
       usersService.updateActive.mockResolvedValue(user);
 
-      const result = await controller.update(id, updateActiveStateDto);
+      const result = await controller.update(
+        id,
+        updateActiveStateDto,
+        currentUser,
+      );
 
       expect(usersService.updateActive).toHaveBeenCalledTimes(1);
 
-      expect(usersService.updateActive).toHaveBeenCalledWith(id, false);
+      expect(usersService.updateActive).toHaveBeenCalledWith(
+        id,
+        false,
+        currentUser.sub,
+      );
 
       expect(result).toBe(user);
     });
