@@ -8,7 +8,7 @@ import { UploadService } from './services';
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads',
-      exclude: ['/api*'],
+      exclude: ['/api/*splat'],
     }),
   ],
   providers: [UploadService],
