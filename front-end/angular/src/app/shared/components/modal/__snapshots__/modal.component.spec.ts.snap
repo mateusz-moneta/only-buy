@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`_ModalComponent > should match snapshot 1`] = `"<div _ngcontent-a-c2562334952="" role="presentation" class="modal__backdrop"><div _ngcontent-a-c2562334952="" role="dialog" aria-modal="true"><div _ngcontent-a-c2562334952="" class="modal__header"><!--container--><button _ngcontent-a-c2562334952="" type="button" aria-label="Close modal" class="modal__close"> × </button></div><div _ngcontent-a-c2562334952="" class="modal__content"></div><div _ngcontent-a-c2562334952="" class="modal__footer"></div></div></div><!--container-->"`;

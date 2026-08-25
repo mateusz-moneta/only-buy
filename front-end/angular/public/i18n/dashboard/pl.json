@@ -1,4 +1,6 @@
 {
+  "cancel": "Anuluj",
+  "deleteProduct": "Usuń produkt",
   "emptyState": {
     "description": "Na liście nie ma żadnych produktów",
     "title": "Ups… tutaj jest pusto"
@@ -9,7 +11,9 @@
     "removeProduct": "Usuń produkt",
     "showDetails": "Pokaż szczegóły"
   },
-  "promo": "Promocja",
+  "removeModal": {
+    "question": "Do you want to remove this product?"
+  },
   "search": "Szukaj",
   "users": "Użytkownicy"
 }

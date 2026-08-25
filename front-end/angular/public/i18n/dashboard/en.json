@@ -1,4 +1,6 @@
 {
+  "cancel": "Cancel",
+  "deleteProduct": "Delete product",
   "emptyState": {
     "description": "There are no products on the list",
     "title": "Ooops… It’s empty here"
@@ -8,6 +10,9 @@
     "editProduct": "Remove product",
     "removeProduct": "Remove product",
     "showDetails": "Show details"
+  },
+  "removeModal": {
+    "question": "Czy na pewno chcesz usunąć ten produkt?"
   },
   "search": "Search",
   "users": "Users"

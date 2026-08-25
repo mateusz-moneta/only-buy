@@ -9,6 +9,7 @@ import { AuthStore, ProductsStore } from '@core/state';
 import {
   ButtonComponent,
   CheckboxComponent,
+  ModalComponent,
   PaginatorComponent,
   SpinnerComponent,
 } from '@shared/components';
@@ -28,6 +29,7 @@ import { SearchForm } from './models';
     ButtonComponent,
     CheckboxComponent,
     EmptyStateComponent,
+    ModalComponent,
     PaginatorComponent,
     ProductComponent,
     SearchComponent,
@@ -46,6 +48,7 @@ export class DashboardComponent {
   private readonly router = inject(Router);
 
   protected readonly isAuthenticated = this.authStore.isAuthenticated;
+  protected readonly isRemoveProductModalOpen = signal<string | null>(null);
   protected readonly loading = this.productsStore.isLoading;
   protected readonly pageable = this.productsStore.pageable;
   protected readonly products = this.productsStore.products;
@@ -101,8 +104,19 @@ export class DashboardComponent {
     this.authStore.logout();
   }
 
-  protected onRemoveProduct(productId: string): void {
+  protected onOpenRemoveProductModal(productId: string): void {
+    this.isRemoveProductModalOpen.set(productId);
+  }
+
+  protected onRemoveProduct(): void {
+    const productId = this.isRemoveProductModalOpen();
+
+    if (!productId) {
+      return;
+    }
+
     this.productsStore.deleteProduct({ productId });
+    this.isRemoveProductModalOpen.set(null);
   }
 
   protected onShowDetails(product: Product): void {

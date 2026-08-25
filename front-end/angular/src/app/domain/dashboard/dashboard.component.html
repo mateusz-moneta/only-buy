@@ -55,7 +55,7 @@
             [name]="product.name ?? ''"
             [ratingCount]="product.ratingCount ?? 0"
             (edit)="onEditProduct(product)"
-            (remove)="onRemoveProduct(product.id)"
+            (remove)="onOpenRemoveProductModal(product.id)"
             (selectRates)="onSelectRates(product, $event)"
             (showDetails)="onShowDetails(product)"
           />
@@ -74,3 +74,21 @@
     (pageChange)="onPageChange($event)"
   />
 </footer>
+
+<app-modal
+  [open]="!!isRemoveProductModalOpen()"
+  [title]="'dashboard.deleteProduct' | transloco"
+  (closed)="isRemoveProductModalOpen.set(null)"
+>
+  <p>{{ 'dashboard.removeModal.question' | transloco }}</p>
+
+  <ng-container modal-footer>
+    <app-button (callback)="isRemoveProductModalOpen.set(null)" type="button">
+      {{ 'dashboard.cancel' | transloco }}
+    </app-button>
+
+    <app-button (callback)="onRemoveProduct()" type="button">
+      {{ 'delete' | transloco }}
+    </app-button>
+  </ng-container>
+</app-modal>
