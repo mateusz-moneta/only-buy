@@ -1,9 +1,6 @@
 package com.example.onlybuy.roles.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.UUID;
 

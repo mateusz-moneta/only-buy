@@ -13,7 +13,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class RoleService {
-
     private final RoleRepository roleRepository;
     private final RoleMapper roleMapper;
 

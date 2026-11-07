@@ -34,10 +34,10 @@ public class UserEntity {
     @Column(nullable = false)
     private Boolean active;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private Date createdDate;
 
-    @Column(nullable = false)
+    @Column()
     private Date updatedDate;
 
     @OneToOne
