@@ -1,14 +1,14 @@
 package com.example.onlybuy.roles.mapper;
 
-import com.example.onlybuy.roles.dto.RoleDto;
-import com.example.onlybuy.roles.entity.Role;
+import com.example.onlybuy.roles.dto.RoleResponse;
+import com.example.onlybuy.roles.entity.RoleEntity;
 
 import org.springframework.stereotype.Component;
 
 @Component
 public class RoleMapper {
-    public RoleDto toDto(Role role) {
-        return new RoleDto(
+    public RoleResponse toDto(RoleEntity role) {
+        return new RoleResponse(
                 role.getId(),
                 role.getName()
         );

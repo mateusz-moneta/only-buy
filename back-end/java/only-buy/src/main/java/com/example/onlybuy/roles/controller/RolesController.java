@@ -1,6 +1,6 @@
 package com.example.onlybuy.roles.controller;
 
-import com.example.onlybuy.roles.dto.RoleDto;
+import com.example.onlybuy.roles.dto.RoleResponse;
 import com.example.onlybuy.roles.service.RoleService;
 
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ public class RolesController {
     private final RoleService roleService;
 
     @GetMapping
-    public List<RoleDto> getRoles() {
+    public List<RoleResponse> getRoles() {
         return roleService.getAllRoles();
     }
 }

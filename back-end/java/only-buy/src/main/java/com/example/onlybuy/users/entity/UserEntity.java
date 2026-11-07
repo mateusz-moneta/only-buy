@@ -1,5 +1,6 @@
-package com.example.onlybuy.auth.entity;
+package com.example.onlybuy.users.entity;
 
+import com.example.onlybuy.auth.entity.RefreshTokenEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -41,5 +42,5 @@ public class User {
 
     @OneToOne
     @JoinColumn(name = "userId", referencedColumnName = "id")
-    private RefreshToken refreshToken;
+    private RefreshTokenEntity refreshToken;
 }
