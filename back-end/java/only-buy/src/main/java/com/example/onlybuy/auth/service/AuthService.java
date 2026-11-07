@@ -1,5 +1,6 @@
 package com.example.onlybuy.auth.service;
 
+import com.example.onlybuy.auth.dto.LoginRequest;
 import com.example.onlybuy.auth.dto.RegisterRequest;
 import com.example.onlybuy.users.dto.UserResponse;
 import com.example.onlybuy.users.entity.UserEntity;
@@ -17,8 +18,11 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
-    public UserResponse register(RegisterRequest request) {
+    public UserResponse login(LoginRequest request) {
+        return new UserResponse();
+    }
 
+    public UserResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already exists");
         }

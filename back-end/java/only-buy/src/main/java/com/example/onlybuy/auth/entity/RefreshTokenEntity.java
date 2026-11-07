@@ -23,7 +23,7 @@ public class RefreshTokenEntity {
     @Column(nullable = false)
     private String token;
 
-    @Column(nullable = false)
+    @Column()
     private Date expiresAt;
 
     @OneToOne

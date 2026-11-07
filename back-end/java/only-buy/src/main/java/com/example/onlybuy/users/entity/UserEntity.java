@@ -1,6 +1,7 @@
 package com.example.onlybuy.users.entity;
 
 import com.example.onlybuy.auth.entity.RefreshTokenEntity;
+import com.example.onlybuy.roles.entity.RoleEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,6 +40,10 @@ public class UserEntity {
 
     @Column()
     private Date updatedDate;
+
+    @OneToOne
+    @JoinColumn(name = "roleId", referencedColumnName = "id")
+    private RoleEntity role;
 
     @OneToOne
     @JoinColumn(name = "userId", referencedColumnName = "id")
